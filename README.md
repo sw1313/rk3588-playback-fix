@@ -8,7 +8,7 @@ The LSPosed module restores a selectable HW+ default in Yamby on any chipset, wh
 
 | Asset | Version | Purpose |
 | --- | --- | --- |
-| `RK3588-Mpv-Fix-0.3.1.apk` | 0.3.1 | Yamby HW+ defaults on any chipset; generic mpv override on RK3588 |
+| `RK3588-Mpv-Fix-0.3.2.apk` | 0.3.2 | Yamby HW+ defaults on any chipset; optional RK3588 white-edge correction |
 | `rk3588-frameguard-0.1.0.zip` | 0.1.0 | Magisk module to keep refresh-rate requests at 60Hz |
 
 Install the APK, enable it in LSPosed, and select Yamby as its scope. Open the module's settings once, then force-stop and reopen Yamby. In **Settings → MPV Player → Default decoding mode**, choose **HW+**. The adapter was tested with Yamby **2.1.0.11 (20010012)** and LSPosed **2.2.1**. Future Yamby releases may need a new adapter.
@@ -34,6 +34,14 @@ On the tested device, affected HEVC Main10 content produced green frames through
 The module adds HW+ to Yamby's own default-mode menu and preserves that saved value when Yamby initializes its player. Manual HW/HW+/SW choices remain available. **It does not override `vo`: `gpu` and `gpu-next` remain under the player's control.**
 
 For other mpv applications on **RK3588 only**, select the application in LSPosed and enable the module's hardware-decoding preference. It detects common MPVLib string setters and supported delayed bindings, replacing copy/auto hardware-decoding requests with `mediacodec`. Explicit software decoding is retained. Only Yamby has been tested on the device; fully obfuscated or native-only bindings may need separate adapters. Other chipsets receive no generic mpv hooks. No hooks are applied to Android system processes.
+
+## Optional Yamby white-edge correction
+
+Version 0.3.2 adds **Yamby HW+ top gray/white edge correction** in the module's settings. It is **off by default** and only installs on RK3588. Enable it only for the reproduced four-pixel top edge, then force-stop and reopen Yamby.
+
+The tested H.264 and HEVC decoders report `crop-top=4` and a 1920×1080 active image inside a 1920×1104 hardware buffer. The AImageReader rendering path exposes the padding at the top. The module applies a four-pixel RGB sampling compensation for 1080p H.264/HEVC MediaCodec playback, supporting both the padded texture and the 1080p intermediate texture produced by debanding. It retains the correction across player recreation and shader-list changes, while preserving existing shaders. Other codecs, resolutions and software decoding are excluded when the decoder properties become available. Rendering with `vo=gpu` and Anime4K/debanding was tested; other rendering paths remain unverified.
+
+This is a rendering workaround, not a vendor-driver patch. It does not zoom the image or change its aspect ratio. If earlier preprocessing has already discarded edge rows, it cannot reconstruct them. On/off comparison reproduced and removed the edge; the user confirmed playback re-entry remained clear and both the H.264 and HEVC test videos were clear after switching between them.
 
 ## Frame Guard
 

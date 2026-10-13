@@ -47,6 +47,8 @@ public final class PlaybackHook implements IXposedHookLoadPackage {
         prefs = new XSharedPreferences(MODULE, "fixes");
         refresh();
         if (isYamby) {
+            YambyCropFix.install(app.classLoader, app.appInfo != null ? app.appInfo.dataDir : null, this::report,
+                () -> { refresh(); return prefs.getFile().canRead() && prefs.getBoolean("cropfix", false); });
             boolean installed = YambySettingsPatch.install(app.classLoader, this::report,
                 () -> { refresh(); return prefs.getFile().canRead() && prefs.getBoolean("yamby_menu", true); });
             report("Loaded Yamby settings adapter in " + app.processName + "; installed=" + installed);
