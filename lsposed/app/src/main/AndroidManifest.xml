@@ -1,0 +1,20 @@
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-feature android:name="android.hardware.touchscreen" android:required="false" />
+    <uses-feature android:name="android.software.leanback" android:required="false" />
+    <application android:label="RK3588 mpv 兼容修复" android:allowBackup="false"
+        android:banner="@drawable/banner" android:icon="@drawable/icon"
+        android:theme="@android:style/Theme.Material.NoActionBar">
+        <meta-data android:name="xposedmodule" android:value="true" />
+        <meta-data android:name="xposeddescription" android:value="为作用域中的 mpv 播放器启用 RK3588 非 copy 硬解；支持常见 JNI 封装及动态加载，保留 SW" />
+        <meta-data android:name="xposedminversion" android:value="93" />
+        <meta-data android:name="xposedsharedprefs" android:value="true" />
+        <meta-data android:name="xposedscope" android:resource="@array/scope" />
+        <activity android:name=".SettingsActivity" android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+                <category android:name="android.intent.category.LEANBACK_LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+</manifest>

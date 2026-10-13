@@ -1,0 +1,6 @@
+id=rk3588_frameguard
+name=RK3588 Frame Guard
+version=0.1.0
+versionCode=1
+author=Local workspace
+description=RK3588 Android 12: preserve 60Hz and disable broken content mode switching. Action toggles original settings; uninstall restores them.
