@@ -26,20 +26,32 @@ public final class PlaybackHook implements IXposedHookLoadPackage {
     private XSharedPreferences prefs;
     private long lastReload;
     private boolean nonCopy;
-    private boolean yambySettings;
 
     @Override public void handleLoadPackage(XC_LoadPackage.LoadPackageParam app) {
         // LSPosed supplies the user-selected scope. Never run in system processes or ourselves.
         if (MODULE.equals(app.packageName) || "android".equals(app.packageName)
                 || app.packageName.startsWith("com.android.")) return;
-        Class<?> props = XposedHelpers.findClass("android.os.SystemProperties", null);
-        String board = (String) XposedHelpers.callStaticMethod(props, "get", "ro.board.platform", "");
-        if (!"rk3588".equals(board)) { report("Unsupported platform: " + board); return; }
+        boolean isYamby = "com.hush.yamby".equals(app.packageName);
+        if (!isYamby) {
+            // Only the generic decoder override depends on Rockchip hardware.
+            // Yamby's own settings adapter must not depend on system-property access.
+            try {
+                Class<?> props = XposedHelpers.findClass("android.os.SystemProperties", null);
+                String board = (String) XposedHelpers.callStaticMethod(props, "get", "ro.board.platform", "");
+                if (!"rk3588".equals(board)) { report("Generic mpv fix requires RK3588"); return; }
+            } catch (Throwable e) {
+                report("Platform check unavailable; generic mpv fix skipped");
+                return;
+            }
+        }
         prefs = new XSharedPreferences(MODULE, "fixes");
         refresh();
-        if ("com.hush.yamby".equals(app.packageName)) {
-            yambySettings = YambySettingsPatch.install(app.classLoader, this::report,
+        if (isYamby) {
+            boolean installed = YambySettingsPatch.install(app.classLoader, this::report,
                 () -> { refresh(); return prefs.getFile().canRead() && prefs.getBoolean("yamby_menu", true); });
+            report("Loaded Yamby settings adapter in " + app.processName + "; installed=" + installed);
+            // Yamby always owns its decoder choices, even if a future version cannot be adapted.
+            return;
         }
         for (String name : KNOWN_BINDINGS) {
             Class<?> lib = XposedHelpers.findClassIfExists(name, app.classLoader);
@@ -68,7 +80,7 @@ public final class PlaybackHook implements IXposedHookLoadPackage {
             report("Waiting for a supported mpv binding in " + app.packageName);
         }
         report("Loaded in " + app.processName + "; bindings=" + hooked.size()
-            + "; noncopy=" + nonCopy + "; yambyMenu=" + yambySettings);
+            + "; noncopy=" + nonCopy);
     }
 
     private static boolean candidate(String name) {
@@ -118,7 +130,7 @@ public final class PlaybackHook implements IXposedHookLoadPackage {
                 String key = (String) p.args[index], value = (String) p.args[index + 1];
                 if ("hwdec".equals(key)) {
                     String replacement = value;
-                    if (nonCopy && !yambySettings && (value.contains("mediacodec-copy") || value.startsWith("auto"))) {
+                    if (nonCopy && (value.contains("mediacodec-copy") || value.startsWith("auto"))) {
                         replacement = "mediacodec";
                         p.args[index + 1] = replacement;
                     }

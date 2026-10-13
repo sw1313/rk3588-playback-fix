@@ -2,16 +2,18 @@
 
 [中文说明](README.zh-CN.md) · [Downloads](https://github.com/sw1313/rk3588-playback-fix/releases/latest)
 
-Two small modules for playback issues observed on an H96Max V58 running RK3588 Android 12. The LSPosed module restores a selectable HW+ default in Yamby; the Magisk module prevents problematic content frame-rate switching.
+The LSPosed module restores a selectable HW+ default in Yamby on any chipset, while its generic mpv decoder override is restricted to RK3588. A separate Magisk module prevents problematic content frame-rate switching observed on an H96Max V58 running RK3588 Android 12.
 
 ## Downloads and installation
 
 | Asset | Version | Purpose |
 | --- | --- | --- |
-| `RK3588-Mpv-Fix-0.3.0.apk` | 0.3.0 | LSPosed module for Yamby and supported mpv bindings |
+| `RK3588-Mpv-Fix-0.3.1.apk` | 0.3.1 | Yamby HW+ defaults on any chipset; generic mpv override on RK3588 |
 | `rk3588-frameguard-0.1.0.zip` | 0.1.0 | Magisk module to keep refresh-rate requests at 60Hz |
 
 Install the APK, enable it in LSPosed, and select Yamby as its scope. Open the module's settings once, then force-stop and reopen Yamby. In **Settings → MPV Player → Default decoding mode**, choose **HW+**. The adapter was tested with Yamby **2.1.0.11 (20010012)** and LSPosed **2.2.1**. Future Yamby releases may need a new adapter.
+
+Yamby's settings adapter has no chipset restriction. The APK requires Android 8.0 or later and a working LSPosed installation. Actual HW+ playback still depends on the device's MediaCodec implementation and supported formats. Cross-chipset scope is enabled in code; physical-device playback has only been tested on RK3588. Yamby never receives the generic forced decoder override, including when its settings adapter cannot be installed.
 
 Install the ZIP using Magisk. Its service runs after boot completes. It requires **RK3588 and Android API 32**. Each module can be used independently.
 
@@ -31,7 +33,7 @@ On the tested device, affected HEVC Main10 content produced green frames through
 
 The module adds HW+ to Yamby's own default-mode menu and preserves that saved value when Yamby initializes its player. Manual HW/HW+/SW choices remain available. **It does not override `vo`: `gpu` and `gpu-next` remain under the player's control.**
 
-For other mpv applications, select the application in LSPosed and enable the module's hardware-decoding preference. It detects common MPVLib string setters and supported delayed bindings, replacing copy/auto hardware-decoding requests with `mediacodec`. Explicit software decoding is retained. Only Yamby has been tested on the device; fully obfuscated or native-only bindings may need separate adapters. Hooks are restricted to RK3588 and are not applied to Android system processes.
+For other mpv applications on **RK3588 only**, select the application in LSPosed and enable the module's hardware-decoding preference. It detects common MPVLib string setters and supported delayed bindings, replacing copy/auto hardware-decoding requests with `mediacodec`. Explicit software decoding is retained. Only Yamby has been tested on the device; fully obfuscated or native-only bindings may need separate adapters. Other chipsets receive no generic mpv hooks. No hooks are applied to Android system processes.
 
 ## Frame Guard
 
@@ -61,6 +63,7 @@ On Windows use `gradlew.bat` and `python`. The APK is generated under `lsposed/a
 ## Validation and privacy
 
 - APK assembly and Android Lint passed.
+- Version 0.3.1 passed eight isolated hook-scope scenarios using the actual entry-point code and mocked Android/Xposed boundaries, including non-RK Yamby routing, RK-only generic hooks, unknown adapters, software decoding and renderer preservation. These checks do not simulate physical non-RK decoding or firmware. The updated module also loaded successfully on the RK3588 test device.
 - Yamby's HW+ default was retained across an application restart, and the previously green video rendered correctly.
 - Magisk installation and Android shell syntax checks passed. Isolated settings-store checks covered backup, repeated application, manual changes, unset values, pause/resume, and uninstall restoration.
 - Automatic application following a full device reboot still needs verification. Other players and firmware versions have not been verified.
