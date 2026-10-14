@@ -8,7 +8,7 @@ The LSPosed module restores a selectable HW+ default in Yamby on any chipset, wh
 
 | Asset | Version | Purpose |
 | --- | --- | --- |
-| `RK3588-Mpv-Fix-0.3.2.apk` | 0.3.2 | Yamby HW+ defaults on any chipset; optional RK3588 white-edge correction |
+| `RK3588-Mpv-Fix-0.3.3.apk` | 0.3.3 | Yamby HW+ defaults on any chipset; optional RK3588 white-edge correction |
 | `rk3588-frameguard-0.1.0.zip` | 0.1.0 | Magisk module to keep refresh-rate requests at 60Hz |
 
 Install the APK, enable it in LSPosed, and select Yamby as its scope. Open the module's settings once, then force-stop and reopen Yamby. In **Settings → MPV Player → Default decoding mode**, choose **HW+**. The adapter was tested with Yamby **2.1.0.11 (20010012)** and LSPosed **2.2.1**. Future Yamby releases may need a new adapter.
@@ -37,11 +37,13 @@ For other mpv applications on **RK3588 only**, select the application in LSPosed
 
 ## Optional Yamby white-edge correction
 
-Version 0.3.2 adds **Yamby HW+ top gray/white edge correction** in the module's settings. It is **off by default** and only installs on RK3588. Enable it only for the reproduced four-pixel top edge, then force-stop and reopen Yamby.
+Version 0.3.3 provides **Yamby HW+ adaptive gray/white edge correction** in the module's settings. It is **off by default** and remains RK3588-only. Enable it for reproduced padding at the video edge, then force-stop and reopen Yamby.
 
-The tested H.264 and HEVC decoders report `crop-top=4` and a 1920×1080 active image inside a 1920×1104 hardware buffer. The AImageReader rendering path exposes the padding at the top. The module applies a four-pixel RGB sampling compensation for 1080p H.264/HEVC MediaCodec playback, supporting both the padded texture and the 1080p intermediate texture produced by debanding. It retains the correction across player recreation and shader-list changes, while preserving existing shaders. Other codecs, resolutions and software decoding are excluded when the decoder properties become available. Rendering with `vo=gpu` and Anime4K/debanding was tested; other rendering paths remain unverified.
+The tested decoder reports `crop-top=4` with a 1920×1080 active image in a 1920×1104 hardware buffer. Version 0.3.3 no longer hard-codes that resolution, offset or H.264/HEVC codec list. It listens to MediaCodec crop reports and AImageReader buffer dimensions through Yamby's mpv log callback, and matches them against the current video's dimensions and non-copy hardware-decoding state. Missing, zero, invalid or mismatched crop metadata produces no correction. Switching files and recreating the player discard previous metadata.
 
-This is a rendering workaround, not a vendor-driver patch. It does not zoom the image or change its aspect ratio. If earlier preprocessing has already discarded edge rows, it cannot reconstruct them. On/off comparison reproduced and removed the edge; the user confirmed playback re-entry remained clear and both the H.264 and HEVC test videos were clear after switching between them.
+The generated RGB shader uses the reported top/left offset and accepts either the original padded texture or an intermediate texture at the active video's dimensions. Its execution condition supports both `gpu` and `gpu-next` semantics. Existing shaders and the player's renderer choice are preserved; shader-list resets reattach the current correction. This relies on Yamby exposing the relevant verbose decoder/render messages; different wrappers or future message formats may require an adapter update.
+
+This is rendering compensation, not a vendor-driver patch. It does not zoom the image or change its aspect ratio. It cannot reconstruct edge pixels discarded by earlier processing. 1080p H.264/HEVC correction was previously confirmed with `gpu`; the user has now confirmed the adaptive correction removed the edge with `gpu-next`. 720p/4K and other codecs have metadata/shader tests, which do not establish physical-device playback support. It is intended for the observed RK3588 AImageReader padding fault, not every possible edge artifact.
 
 ## Frame Guard
 
@@ -62,7 +64,7 @@ It backs up the original values to `/data/adb/rk3588-frameguard/original.conf` b
 Use JDK 17 and an Android SDK containing platform 35. Set `ANDROID_HOME` to your SDK directory or configure an untracked `lsposed/local.properties`.
 
 ```sh
-./gradlew -p lsposed :app:assembleDebug :app:lintDebug
+./gradlew -p lsposed :app:assembleDebug :app:lintDebug :app:testDebugUnitTest
 python3 tools/package_magisk.py
 ```
 
@@ -70,7 +72,7 @@ On Windows use `gradlew.bat` and `python`. The APK is generated under `lsposed/a
 
 ## Validation and privacy
 
-- APK assembly and Android Lint passed.
+- APK assembly, Android Lint and crop geometry unit tests passed. Generated 1080p, 720p and 4K shaders also compiled with a GLSL ES 3.20 validator. Isolated hook checks covered metadata availability, shader preservation, file/player resets, resolution/codec changes, SW exclusion and scope boundaries.
 - Version 0.3.1 passed eight isolated hook-scope scenarios using the actual entry-point code and mocked Android/Xposed boundaries, including non-RK Yamby routing, RK-only generic hooks, unknown adapters, software decoding and renderer preservation. These checks do not simulate physical non-RK decoding or firmware. The updated module also loaded successfully on the RK3588 test device.
 - Yamby's HW+ default was retained across an application restart, and the previously green video rendered correctly.
 - Magisk installation and Android shell syntax checks passed. Isolated settings-store checks covered backup, repeated application, manual changes, unset values, pause/resume, and uninstall restoration.
