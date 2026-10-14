@@ -4,7 +4,7 @@
 
 LSPosed 模块为所有芯片开放 Yamby 默认 HW+ 设置补全，其他 mpv 应用的强制 HW+ 仅限 RK3588。另有独立 Magisk 模块处理刷新率切换导致的整屏短暂黑屏。实体设备测试为 H96Max V58、RK3588、Android 12（API 32）。
 
-另有独立的 [MPP 1.1.0 用户态升级实验版](https://github.com/sw1313/rk3588-playback-fix/releases/tag/mpp-v0.1.0)，提供 32／64 位解码库，只接受当前已验证的 Android 12 厂商组件。与 Frame Guard、LSPosed 模块分开使用；安装范围、测试结果和回退方法见 [模块说明](magisk-mpp/README.md)。系统覆盖后的完整 Codec2 播放仍待测试。
+另有独立的 [MPP 1.1.0 用户态升级实验版](https://github.com/sw1313/rk3588-playback-fix/releases/tag/mpp-v0.1.1)，提供 32／64 位解码库，只接受当前已验证的 Android 12 厂商组件。0.1.1 修正了启动自检的路径误报，已在实体设备验证安装、重启和实际加载。与 Frame Guard、LSPosed 模块分开使用；安装范围、测试结果和回退方法见 [模块说明](magisk-mpp/README.md)。系统覆盖后的完整 Codec2 播放仍待测试。
 
 ## LSPosed 模块 0.3.3
 

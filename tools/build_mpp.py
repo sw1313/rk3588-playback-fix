@@ -83,7 +83,8 @@ def package():
     paths.append(MODULE / "checksums.sha256")
     destination = ROOT / "dist"
     destination.mkdir(exist_ok=True)
-    archive = destination / "rk3588-mpp-upgrade-0.1.0-mpp1.1.0.zip"
+    properties = dict(line.split("=", 1) for line in (MODULE / "module.prop").read_text().splitlines() if "=" in line)
+    archive = destination / ("rk3588-mpp-upgrade-" + properties["version"] + ".zip")
     with zipfile.ZipFile(archive, "w", zipfile.ZIP_DEFLATED) as output:
         for path in paths:
             name = path.relative_to(MODULE).as_posix()

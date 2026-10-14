@@ -10,11 +10,18 @@ Both Android libraries keep the `libmpp.so` SONAME and require only `liblog.so`,
 
 ## Install and rollback
 
-1. Install `rk3588-mpp-upgrade-0.1.0-mpp1.1.0.zip` using Magisk's **Install from storage**, then reboot.
-2. Test actual H.264, HEVC, AV1 and other media in the apps you use, including seeking and subtitles. Installation and full Codec2 playback after the system overlay have not yet been tested.
+1. Install `rk3588-mpp-upgrade-0.1.1-mpp1.1.0.zip` using Magisk's **Install from storage**, then reboot.
+2. Test actual H.264, HEVC, AV1 and other media in the apps you use, including seeking and subtitles. Installation and post-boot library loading have been checked; full Codec2 playback after the system overlay still needs testing.
 3. To roll back, press this module's **Action** button or disable it in Magisk, then reboot. Uninstalling and rebooting also restores the firmware originals. Processes keep already-loaded libraries until restarted; the Action button does not hot-swap a running decoder.
 
 The late-start script records library-load checks in the module's `status.txt`. Failure disables the module for the next reboot without rebooting automatically. This is not a Codec2 crash monitor or boot-loop recovery mechanism; it only runs after boot completion. The module never writes the real vendor partition.
+
+Version 0.1.1 fixes a false boot-check failure in 0.1.0: a helper launched from
+`/data` could not access `/vendor` through its default linker namespace. Each
+probe now receives only its ABI's vendor library directory in `LD_LIBRARY_PATH`.
+Both active vendor libraries were checked successfully with this override on the
+physical box. The MPP libraries, revision, symbol contracts and installer guards
+are unchanged.
 
 ## Validation performed
 
