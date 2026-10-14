@@ -1,0 +1,10 @@
+{
+  "project": "rockchip-linux/mpp",
+  "tag": "1.1.0",
+  "revision": "c08762ebfadeb4e986d2fed993bc7a54862d3ebe",
+  "source": "https://github.com/rockchip-linux/mpp/tree/c08762ebfadeb4e986d2fed993bc7a54862d3ebe",
+  "android_api": 32,
+  "abis": ["arm64-v8a", "armeabi-v7a"],
+  "library_soname": "libmpp.so",
+  "licenses": ["Apache-2.0", "MIT"]
+}

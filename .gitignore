@@ -10,3 +10,9 @@
 *.keystore
 *.log
 .DS_Store
+magisk-mpp/bin/
+magisk-mpp/system/
+magisk-mpp/checksums.sha256
+dist/
+__pycache__/
+*.pyc

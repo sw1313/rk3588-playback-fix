@@ -17,6 +17,8 @@ Yamby's settings adapter has no chipset restriction. The APK requires Android 8.
 
 Install the ZIP using Magisk. Its service runs after boot completes. It requires **RK3588 and Android API 32**. Each module can be used independently.
 
+A separate [experimental MPP userspace upgrade](https://github.com/sw1313/rk3588-playback-fix/releases/tag/mpp-v0.1.0) provides MPP 1.1.0 ARM32/ARM64 libraries for the exact tested Android 12 vendor stack. It is independent of Frame Guard and the LSPosed APK. Read its [compatibility, validation and rollback instructions](magisk-mpp/README.md) before installation; full Android Codec2 playback after the system overlay remains unverified.
+
 ## HW versus HW+
 
 These names describe Yamby's current mpv settings; other players may use different labels.
