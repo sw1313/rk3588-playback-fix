@@ -1,6 +1,6 @@
 id=rk3588_decode_stack
 name=RK3588 Decode Stack
-version=0.5.0
-versionCode=500
+version=0.5.1
+versionCode=501
 author=sw1313
-description=SDK14 Codec2 core port for verified API32 firmware, paired with newer MPP 1.1.0 compatibility stack. Full ten-bit/HDR metadata, selectable prior Codec2 backend and reboot rollback. Original kernel, HIDL service ABI and legacy codec paths retained.
+description=SDK14 Codec2 core for verified API32 firmware with guarded AVC/HEVC eight-bit buffer routing and serialized stop. Full ten-bit/P010 and HDR preserved, independent buffer/backend switches and reboot rollback. Original kernel, player and hooks retained.

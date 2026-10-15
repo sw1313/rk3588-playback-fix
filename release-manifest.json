@@ -1,0 +1,39 @@
+{
+  "kind": "independently_versioned_components",
+  "date": "2026-10-16",
+  "system_modules_firmware_pinned": true,
+  "components": [
+    {
+      "id": "decode-stack",
+      "version": "0.5.1",
+      "status": "pre-release",
+      "filename": "rk3588-decode-stack-0.5.1.zip",
+      "sha256": "6fa00f1daaa5eb5f41cd7fee6f5eb695f87dd6edd70fd7bd40ce835a6918a6d4",
+      "url": "https://github.com/sw1313/rk3588-playback-fix/releases/download/v0.5.1/rk3588-decode-stack-0.5.1.zip"
+    },
+    {
+      "id": "mali-global",
+      "version": "0.2.0",
+      "status": "pre-release",
+      "filename": "rk3588-mali-global-0.2.0.zip",
+      "sha256": "9d6959f68ba4fe54591d4ccac1e91a677272668a6d20bf61eb0bb64087cbec03",
+      "url": "https://github.com/sw1313/rk3588-playback-fix/releases/download/v0.3.2-system/rk3588-mali-global-0.2.0.zip"
+    },
+    {
+      "id": "yamby-mpv-plugin",
+      "version": "0.3.3",
+      "status": "released",
+      "filename": "RK3588-Mpv-Fix-0.3.3.apk",
+      "sha256": "acf8a2d4f721552ccfe95c67388e7f1fe5c54de3410b61183e5c30f0558aa23e",
+      "url": "https://github.com/sw1313/rk3588-playback-fix/releases/download/v0.3.3-yamby/RK3588-Mpv-Fix-0.3.3.apk"
+    },
+    {
+      "id": "frameguard",
+      "version": "0.1.0",
+      "status": "released",
+      "filename": "rk3588-frameguard-0.1.0.zip",
+      "sha256": "30d816e2a704cfb8004184c5be879e45ca1858ae42887f20e29c8150a8d07480",
+      "url": "https://github.com/sw1313/rk3588-playback-fix/releases/download/v0.3.3-yamby/rk3588-frameguard-0.1.0.zip"
+    }
+  ]
+}

@@ -32,6 +32,7 @@ else
 fi
 if [ -d "$STACKROOT/components/codec2_sdk" ]; then default_sdk=1; else default_sdk=0; fi
 grep -q '^codec2_sdk=' "$STACKROOT/config" || printf 'codec2_sdk=%s\n' "$default_sdk" >> "$STACKROOT/config"
+grep -q '^codec2_buffer=' "$STACKROOT/config" || printf 'codec2_buffer=1\n' >> "$STACKROOT/config"
 sh "$STACKROOT/assemble.sh" || abort "Cannot prepare the selected overlays."
 # Prevent overlapping mounts, including a previous update waiting for reboot.
 # Original modules are retained disabled until migration tests pass.

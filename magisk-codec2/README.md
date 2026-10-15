@@ -6,7 +6,7 @@ the unified installer to preflight against hash-verified staged dependencies.
 See [the unified module](../magisk-decode/README.md) for the recommended install.
 
 
-[中文说明](README.zh-CN.md) · [Download](https://github.com/sw1313/rk3588-playback-fix/releases/tag/codec2-v0.1.0)
+[中文说明](README.zh-CN.md) · [Download](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.1.0-codec2)
 
 For the **hash-matched AGTV Android 12 / API32 stack on H96Max V58**. This is a firmware-specific userspace compatibility module, not a universal RK3588 driver update. Android, the kernel, GPU, gralloc HAL, Yamby APK/native components and LSPosed 0.3.3 stay unchanged.
 
@@ -22,7 +22,7 @@ Original Yamby's FFmpeg copy-back path cannot consume P010. This module therefor
 
 ## Installation and controls
 
-1. Install the verified [MPP 1.1.0](https://github.com/sw1313/rk3588-playback-fix/releases/tag/mpp-v0.1.1) and [RGA 1.10.6](https://github.com/sw1313/rk3588-playback-fix/releases/tag/rga-v0.1.0) modules, then reboot so their libraries are active.
+1. Install the verified [MPP 1.1.0](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.1.1-mpp) and [RGA 1.10.6](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.1.0-rga) modules, then reboot so their libraries are active.
 2. Install `rk3588-codec2-compat-v0.1.0.zip` in Magisk and reboot.
 3. Check `/data/adb/modules/rk3588_codec2_upgrade/status.txt`. Default `quality` mode selects the highest verified compatible precision.
 

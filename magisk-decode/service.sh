@@ -11,6 +11,7 @@ SDK=$(value codec2_sdk)
 recover() {
  touch "$MODROOT/disable"
  resetprop debug.rkcodec2.surface_upgrade 0
+ resetprop -n debug.rkcodec2.buffer_upgrade 0
  resetprop -n debug.rkcodec2.hdr_static_buffer 0
  resetprop -n debug.rkcodec2.hdr10plus 0
  resetprop -n debug.rkhdr.static 0

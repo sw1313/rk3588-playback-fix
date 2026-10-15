@@ -20,6 +20,8 @@ struct State {
  std::set<uint32_t> sk,qk;
  bool selected=false,started=false,queued=false,released=false,surface=false,p010=false;
  const bool upgradeSurface=property_get_bool("debug.rkcodec2.surface_upgrade",true);
+ const bool upgradeBuffer=property_get_bool("debug.rkcodec2.buffer_upgrade",false);
+ bool buffer8=false;
  State(std::shared_ptr<C2Component>s,std::shared_ptr<C2Component>q):stock(s),quality(q){
   std::vector<std::shared_ptr<C2ParamDescriptor>> ps;
   stock->intf()->querySupportedParams_nb(&ps);for(auto &p:ps)sk.insert(p->index().type());ps.clear();
@@ -71,13 +73,22 @@ struct Interface : C2ComponentInterface {
  }
  c2_status_t config_vb(const std::vector<C2Param*>&params,c2_blocking_t block,std::vector<std::unique_ptr<C2SettingResult>>*failures)override{
   std::lock_guard<std::mutex>g(s->control);if(s->released)return C2_BAD_STATE;
-  bool oldP=s->p010,oldSurface=s->surface;
+  bool oldP=s->p010,oldSurface=s->surface,oldBuffer=s->buffer8;
   for(auto*p:params){
    if(auto f=C2StreamPixelFormatInfo::output::From(p))s->p010=f->value==54;
    if(auto pools=C2PortBlockPoolsTuning::output::From(p)){s->surface=false;for(size_t i=0;i<pools->flexCount();i++)s->surface|=CompatSurfacePool(pools->m.values[i]);}
+   if(auto profile=C2StreamProfileLevelInfo::input::From(p)){
+    auto name=s->stock->intf()->getName();auto value=profile->profile;
+    s->buffer8=(name.find(".hevc.")!=C2String::npos &&
+            (value==C2Config::PROFILE_HEVC_MAIN || value==C2Config::PROFILE_HEVC_MAIN_STILL)) ||
+        (name.find(".avc.")!=C2String::npos &&
+            (value==C2Config::PROFILE_AVC_BASELINE || value==C2Config::PROFILE_AVC_CONSTRAINED_BASELINE ||
+             value==C2Config::PROFILE_AVC_MAIN || value==C2Config::PROFILE_AVC_EXTENDED ||
+             value==C2Config::PROFILE_AVC_HIGH || value==C2Config::PROFILE_AVC_CONSTRAINED_HIGH));
+   }
   }
-  bool next=s->p010||(s->surface&&s->upgradeSurface);
-  auto rc=s->choose(next);if(rc!=C2_OK){s->p010=oldP;s->surface=oldSurface;return rc;}
+  bool next=s->p010||(s->surface?s->upgradeSurface:(s->upgradeBuffer&&s->buffer8));
+  auto rc=s->choose(next);if(rc!=C2_OK){s->p010=oldP;s->surface=oldSurface;s->buffer8=oldBuffer;return rc;}
   std::vector<std::unique_ptr<C2Param>> copies;std::vector<C2Param*> mirror,active,extra;
   auto&otherKeys=s->selected?s->sk:s->qk;
   for(auto*p:params){copies.push_back(C2Param::Copy(*p));if(otherKeys.count(p->type().type()))mirror.push_back(copies.back().get());(s->keys().count(p->type().type())?active:extra).push_back(p);}
@@ -109,7 +120,7 @@ struct Component : C2Component {
  c2_status_t drain_nb(drain_mode_t m)override{std::lock_guard<std::mutex>g(s->control);return s->active()->drain_nb(m);}
  c2_status_t start()override{std::lock_guard<std::mutex>g(s->control);auto r=s->active()->start();if(r==C2_OK)s->started=true;return r;}
  c2_status_t stop()override{std::lock_guard<std::mutex>g(s->control);auto r=s->active()->stop();if(r==C2_OK){s->started=false;s->queued=false;}return r;}
- c2_status_t reset()override{std::lock_guard<std::mutex>g(s->control);auto r=s->stock->reset(),q=s->quality->reset();s->started=s->queued=s->p010=s->surface=s->selected=false;return r!=C2_OK?r:q;}
+ c2_status_t reset()override{std::lock_guard<std::mutex>g(s->control);auto r=s->stock->reset(),q=s->quality->reset();s->started=s->queued=s->p010=s->surface=s->selected=s->buffer8=false;return r!=C2_OK?r:q;}
  c2_status_t release()override{std::lock_guard<std::mutex>g(s->control);s->released=true;auto r=s->stock->release(),q=s->quality->release();s->started=false;return r!=C2_OK?r:q;}
  std::shared_ptr<C2ComponentInterface>intf()override{return i;}
 };

@@ -11,6 +11,13 @@ the previous backend independently. See the [SDK scope, port and kernel-driver
 boundary](../docs/decode-sdk-050.zh-CN.md). This is a userspace multimedia port;
 the original system framework, HIDL implementation and kernel remain.
 
+Version 0.5.1 adds a separately selectable SDK buffer-output route for explicitly
+configured eight-bit AVC/HEVC profiles, avoiding the legacy asynchronous stop/drain
+failure exposed by 4K decoding. Unknown/ten-bit and AV1/VP9 buffer profiles retain
+their existing route. It retains
+Surface/P010 selection and full pixel precision. See the
+[original-stack comparison, repair and rollback scope](../docs/decode-buffer-051.zh-CN.md).
+
 Version 0.4.0 added six selected upstream MPP decoder fixes and the libyuv
 scaling integer-overflow fix while retaining the existing system ABI. See the
 [upgrade scope, exact commits and tests](../docs/decode-upgrade-040.zh-CN.md).
@@ -42,7 +49,7 @@ retained.
 
 ## Installation and switches
 
-Install `rk3588-decode-stack-0.5.0.zip` in Magisk and reboot. The installer checks
+Install `rk3588-decode-stack-0.5.1.zip` in Magisk and reboot. The installer checks
 all components before disabling overlapping standalone MPP, RGA, Codec2 and
 libyuv modules. It also works from the original component state: Codec2's
 preflight uses the hash-verified staged dependencies. No vendor partition is
@@ -58,7 +65,9 @@ su -c 'sh /data/adb/modules/rk3588_decode_stack/mode-control.sh libyuv off'
 su -c 'sh /data/adb/modules/rk3588_decode_stack/mode-control.sh libyuv on'
 ```
 
-Replace `libyuv` with `mpp`, `rga`, `codec2`, `codec2_sdk`, `software`, `hdr_static` or `hdr10plus` for the other selections, and reboot.
+Replace `libyuv` with `mpp`, `rga`, `codec2`, `codec2_sdk`, `codec2_buffer`, `software`, `hdr_static` or `hdr10plus` for the other selections, and reboot.
+`codec2_buffer` requires the effective SDK core. Turning it off restores the
+legacy buffer route, including the failure reproduced with that upgrade combination.
 Turning `codec2_sdk` off restores the prior 0.4.0 core; turning `codec2` off
 suppresses both the SDK core and its dependent platform/software/HDR upgrades.
 Selections prepare the next boot; they never replace a running process's library.
@@ -78,6 +87,24 @@ modified. The shared libvpx encoder ABI is never replaced. A failed temporary
 mount rolls back its mounts before the unified recovery disables the module.
 
 ## Validation
+
+For 0.5.1, the final build passes 100 asynchronous early-stop cycles per AVC/HEVC
+codec without a HAL restart. Both ARM32/ARM64 clients decode the complete 4K
+fixtures to EOS; first-frame visible samples match independent software references.
+Fourteen playback captures match 0.5.0 exactly, and the complete P010 reference
+remains byte-identical, including its ten-bit low-order information. HDR switching,
+HDR10+ metadata, original encoders, the buffer switch and whole-stack rollback are
+covered. Actual AnTuTu decode activities complete without the recorded HAL crash;
+this is not a claim about a new full benchmark score. See `buffer_051` in
+`VALIDATION.json`; previous manual confirmations are not counted for this version.
+
+The complete AnTuTu editing pipeline is **not** declared fixed: premature
+application EOS was reproduced on the original decode stack under controlled
+source-callback scheduling pressure. One upgraded run finished with 449 of 450
+source frames. The separate image-effects exit crash is also unresolved.
+No EOS suppression, score adjustment or frame duplication is included. See
+[editing evidence](../docs/antutu-editing-eos.zh-CN.md) and
+[image-effects evidence](../docs/antutu-image-effects.zh-CN.md).
 
 For 0.5.0, fourteen system playback cases pass and all fourteen captured RGB
 frames match 0.4.0 exactly. Eleven native reference cases retain every tested

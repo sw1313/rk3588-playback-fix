@@ -39,5 +39,5 @@ rm -rf "$MODROOT/system.previous"
 mv system.next system
 mv active.next.sha256 active.sha256
 rm -rf "$MODROOT/system.previous"
-printf 'mpp=%s\nrga=%s\ncodec2=%s\nlibyuv=%s\nsoftware=%s\nhdr_static=%s\nhdr10plus=%s\ncodec2_sdk=%s\n' "$MPP" "$RGA" "$C2" "$YUV" "$SOFT" "$HDR_STATIC" "$HDR_PLUS" "$SDK" > active-config
+printf 'mpp=%s\nrga=%s\ncodec2=%s\nlibyuv=%s\nsoftware=%s\nhdr_static=%s\nhdr10plus=%s\ncodec2_sdk=%s\ncodec2_buffer=%s\n' "$MPP" "$RGA" "$C2" "$YUV" "$SOFT" "$HDR_STATIC" "$HDR_PLUS" "$SDK" "$BUFFER" > active-config
 rm -f skip_mount selected.sha256

@@ -5,7 +5,7 @@
 驱动包。桌面、SurfaceFlinger、播放器与普通应用均通过全局系统路径使用 g18p0。
 应用自行加载私有驱动或纯软件渲染的路径不经过这些系统入口。
 
-[下载安装包与 SHA256](https://github.com/sw1313/rk3588-playback-fix/releases/tag/system-v2026.10.15)。
+[下载安装包与 SHA256](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.3.2-system)。
 
 | 部件 | 处理 |
 | --- | --- |

@@ -8,8 +8,10 @@ resolve() {
  MPP=$(flag mpp) && RGA=$(flag rga) && C2=$(flag codec2) && YUV=$(flag libyuv) && SOFT=$(flag software) || return 1
  HDR_STATIC=$(flag hdr_static) && HDR_PLUS=$(flag hdr10plus) || return 1
  SDK=$(flag codec2_sdk) || return 1
+ BUFFER=$(flag codec2_buffer) || return 1
  [ "$MPP" = 1 ] && [ "$RGA" = 1 ] || C2=0
  if [ "$C2" != 1 ]; then SDK=0; SOFT=0; HDR_STATIC=0; HDR_PLUS=0; fi
+ [ "$SDK" = 1 ] || BUFFER=0
  [ "$SDK" != 1 ] || [ -s "$MODROOT/components/codec2_sdk/system/vendor/lib/hw/libcodec2_rx_component.so" ] || return 1
 }
 selected() {

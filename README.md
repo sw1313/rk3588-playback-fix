@@ -1,70 +1,81 @@
 # RK3588 Playback Fix
 
-The current decoder upgrade is [decode-stack 0.5.0](https://github.com/sw1313/rk3588-playback-fix/releases/tag/decode-v0.5.0),
-with the same-platform SDK14 Codec2 core ported to the verified API32 ABI.
-It retains the newer MPP/RGA compatibility stack and provides an independent
-prior-backend switch plus whole-module rollback. The global GPU module and
-original Yamby/LSPosed components are retained; see the
-[SDK scope, tests and kernel boundary](docs/decode-sdk-050.zh-CN.md).
+[**Current downloads / 当前下载**](DOWNLOADS.md) · [Download table](https://github.com/sw1313/rk3588-playback-fix/blob/main/DOWNLOADS.md) · [中文说明](README.zh-CN.md)
 
-The [Native Mali Global module 0.2.0](magisk-mali-global/README.md) upgrades both
-ARM32/ARM64 system graphics paths to g18p0 on the hash-verified API32 firmware,
-including SurfaceFlinger. It retains the original mapper/allocator services,
-CSF firmware, kernel and boot. The public installer fetches hash-pinned native
-drivers upstream; all included interface libraries are built from AOSP source.
-The older app-scoped experiment is superseded and must stay disabled.
+This repository contains four independently versioned components. A version
+number belongs to its named component; it is not a shared project version.
+Release tags and titles start with their version number; component suffixes
+distinguish equal version numbers. System modules remain pre-releases, restricted
+to the firmware hashes in their contracts.
 
-[中文说明](README.zh-CN.md) · [Current system packages](https://github.com/sw1313/rk3588-playback-fix/releases/tag/system-v2026.10.15) · [LSPosed release](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.3.3)
-
-The earlier system collection contains the global GPU module, decode-stack 0.3.2,
-and unchanged LSPosed/Frame Guard packages; use decode-stack 0.4.0 linked above
-for the decoder upgrade. GPU and decode ZIPs accept only the
-exact firmware hashes recorded in their contracts, not arbitrary RK3588 ROMs.
-Use the unified decode stack instead of overlapping standalone decode modules.
-
-The LSPosed module restores a selectable HW+ default in Yamby on any chipset, while its generic mpv decoder override is restricted to RK3588. A separate Magisk module prevents problematic content frame-rate switching observed on an H96Max V58 running RK3588 Android 12.
-
-## Unified system decode module
-
-The [unified decode stack](magisk-decode/README.md) combines MPP/VPU compatibility,
-RGA 1.10.6, the verified Codec2 Surface/P010 paths, system libyuv 1974 and pinned
-libvpx/libgav1 software decoder backends into one
-firmware-pinned module. It offers whole-module rollback and individual component
-switches with dependency handling. Earlier standalone releases remain available
-for reproducibility; keep them disabled when using the unified module.
-Yamby components and LSPosed 0.3.3 remain unchanged. See its validation record for
-precision, playback, migration and rollback results and remaining limits.
-
-## Downloads and installation
-
-| Asset | Version | Purpose |
+| Component | Current version | Purpose |
 | --- | --- | --- |
-| `rk3588-mali-global-0.2.0.zip` | 0.2.0 | System-wide native g18p0, both ABIs; Magisk Action selects global/original for the next reboot |
-| `rk3588-decode-stack-0.4.0.zip` | 0.4.0 | Unified decode updates, selected MPP decoder backports, libyuv hardening and component/whole-stack rollback |
-| `RK3588-Mpv-Fix-0.3.3.apk` | 0.3.3 | Yamby HW+ defaults on any chipset; optional RK3588 white-edge correction |
-| `rk3588-frameguard-0.1.0.zip` | 0.1.0 | Magisk module to keep refresh-rate requests at 60Hz |
+| [Decode Stack](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.5.1) | **0.5.1 — pre-release** | Unified system decode updates; guarded 8-bit AVC/HEVC buffer route repairs the reproduced 4K asynchronous stop/drain crash |
+| [Native Mali Global](magisk-mali-global/README.md) | **0.2.0 — pre-release** | Global ARM32/ARM64 native Mali g18p0 userspace graphics paths |
+| [Yamby/mpv LSPosed plugin](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.3.3-yamby) | **0.3.3** | Default HW+ setting and optional RK3588 edge correction; this is the plugin version, not the LSPosed framework version |
+| [Frame Guard](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.3.3-yamby) | **0.1.0** | Optional fixed-refresh workaround for the reproduced HDMI blackouts |
 
-The global GPU ZIP downloads approximately 69 MiB of SHA256-pinned Mali libraries
-from upstream on first installation; verified device-local cache can be reused.
-Closed Mali binaries, raw device logs, connection addresses and signing keys are
-not included in this release. Read each module's firmware guards and validation
-limits before installation. These system packages are pre-releases.
+## Choose and install
 
-Install the APK, enable it in LSPosed, and select Yamby as its scope. Open the module's settings once, then force-stop and reopen Yamby. In **Settings → MPV Player → Default decoding mode**, choose **HW+**. The adapter was tested with Yamby **2.1.0.11 (20010012)** and LSPosed **2.2.1**. Future Yamby releases may need a new adapter.
+Use the exact filenames and links in [DOWNLOADS.md](DOWNLOADS.md). The Mali,
+LSPosed and Frame Guard packages are unchanged; they do not need a new version
+number when Decode Stack changes. Old releases remain available for rollback
+and source history. The old system collection contains Decode Stack **0.3.2**,
+not the current decoder package.
 
-Yamby's settings adapter has no chipset restriction. The APK requires Android 8.0 or later and a working LSPosed installation. Actual HW+ playback still depends on the device's MediaCodec implementation and supported formats. Cross-chipset scope is enabled in code; physical-device playback has only been tested on RK3588. Yamby never receives the generic forced decoder override, including when its settings adapter cannot be installed.
+For a system decoder upgrade, install only the unified Decode Stack ZIP in
+Magisk and reboot. Keep the superseded standalone MPP/RGA/Codec2/libyuv modules
+disabled. The installer validates dependencies before disabling overlapping
+modules. [Switches, dependency handling and rollback](magisk-decode/README.md)
+remain available; changes take effect after reboot.
 
-Install the ZIP using Magisk. Its service runs after boot completes. It requires **RK3588 and Android API 32**. Each module can be used independently.
+Decode Stack and global Mali accept only the firmware hashes in their
+contracts. Testing targets an H96Max V58 with RK3588, Android 12/API32 and the
+original 5.10.66 kernel. These packages do not flash boot, replace the kernel,
+modify Yamby files or add LSPosed features. Global Mali's installer downloads
+about 69 MiB of SHA256-pinned upstream libraries; closed Mali binaries are not
+included in the public ZIP. The retired app-scoped Mali experiment must remain
+disabled when using the global module.
 
-A separate [experimental MPP userspace upgrade](https://github.com/sw1313/rk3588-playback-fix/releases/tag/mpp-v0.1.1) provides MPP 1.1.0 ARM32/ARM64 libraries for the exact tested Android 12 vendor stack. Version 0.1.1 fixes a false boot-check failure; installation, reboot and active-library checks passed on the physical device. It is independent of Frame Guard and the LSPosed APK. Read its [compatibility, validation and rollback instructions](magisk-mpp/README.md) before installation. Later short MediaCodec tests passed for H.264 and AV1 8/10-bit; the pre-existing HEVC Main10 copy-back failure remains unresolved. These are limited synthetic tests, not full player validation.
+## Decode Stack 0.5.1 and known limits
 
-A separate [RGA userspace upgrade](magisk-rga/README.md) rebuilds librga 1.10.6 for the verified Android 12 gralloc4/system ABI. Both ABIs passed actual RGA jobs; installed MediaCodec H.264 and AV1 8/10-bit copy-back samples match their baseline output. The existing HEVC Main10 copy-back failure remains unresolved. The module includes strict firmware guards and a verified disable/reboot rollback. See its validation limits before installation.
+0.5.1 repairs the reproduced legacy AVC/HEVC 8-bit buffer-output stop/drain
+failure through a guarded SDK14/API32 backend route. It adds a `codec2_buffer`
+switch and retains the backend and whole-module rollback controls. Surface,
+P010, ten-bit samples, resolution and bitrate are preserved. Unknown/ten-bit
+buffer profiles and AV1/VP9 retain their prior selection; this is not a fix
+for every copy-back client. Read the [0.5.1 comparison and validation](docs/decode-buffer-051.zh-CN.md).
 
-## System Codec2 compatibility
+The AnTuTu 12.0.2 full editing pipeline still has a premature-EOS/completion
+problem. It was also reproduced with the original decode stack under controlled
+source-callback scheduling pressure. An activity finishing does not prove all
+450 source frames were preserved; a 449-frame result was observed. No global
+EOS suppression, frame duplication or score workaround is shipped. See the
+[complete editing investigation](docs/antutu-editing-eos.zh-CN.md).
 
-The [Codec2 compatibility module 0.1.0](magisk-codec2/README.md) adds verified full-precision Surface/P010 paths, AV1 color-range handling and HDR static metadata on the exact tested API32 firmware. All 21 original component entries are retained. Fourteen playback cases, AVC/HEVC encoding, pixel-precision checks, reboot rollback and automatic recovery passed; the user also confirmed normal Yamby HW+ playback. Yamby components and LSPosed 0.3.3 are unchanged. Original Yamby HEVC Main10 **HW copy-back** remains limited by its lack of P010 support; use **HW+**.
+The image-effects process also has an unresolved exit-path crash. It reports
+test results, logs test exit, then encounters a native SIGSEGV; its crash
+reporting thread subsequently aborts on a destroyed mutex. The first-fault
+callback is not fully identified; no original-Mali comparison or fix is claimed.
+See the [exit-path evidence](docs/antutu-image-effects.zh-CN.md).
 
-Install the existing [MPP 1.1.0 module](https://github.com/sw1313/rk3588-playback-fix/releases/tag/mpp-v0.1.1) and [RGA 1.10.6 module](https://github.com/sw1313/rk3588-playback-fix/releases/tag/rga-v0.1.0), reboot to activate them, then install [Codec2 0.1.0](https://github.com/sw1313/rk3588-playback-fix/releases/tag/codec2-v0.1.0) and reboot. The installer rejects unverified firmware and SELinux Enforcing configurations; it never changes enforcement. These system modules are published as pre-releases because other firmware and all content are not validated.
+0.5.1 automated playback, precision, lifecycle and reboot rollback tests passed.
+Fresh manual Yamby confirmation for 0.5.1 is pending; earlier confirmations are
+historical. Finite sample coverage does not establish universal compatibility.
+HDR10+ refers to the standard Codec2 metadata bridge, not native HDMI HDR10+
+output. Dolby Vision/LLDV/FEL and kernel-driver upgrades are not included.
+
+## Component documentation
+
+- [Unified decode contents, switches and rollback](magisk-decode/README.md)
+- [SDK core port and kernel boundary](docs/decode-sdk-050.zh-CN.md)
+- [MPP/libyuv upgrade scope](docs/decode-upgrade-040.zh-CN.md)
+- [Native Mali Global installation and validation](magisk-mali-global/README.md)
+
+Historical standalone releases are not the current installation path. Their
+firmware-specific experiments and validation remain under `magisk-mpp`,
+`magisk-rga` and `magisk-codec2` for reference. Do not stack them on the unified
+module.
 
 ## HW versus HW+
 
@@ -127,31 +138,6 @@ On Windows use `gradlew.bat` and `python`. The APK is generated under `lsposed/a
 - Magisk installation and Android shell syntax checks passed. Isolated settings-store checks covered backup, repeated application, manual changes, unset values, pause/resume, and uninstall restoration.
 - Automatic application following a full device reboot still needs verification. Other players and firmware versions have not been verified.
 
-The modules have no Internet permission or telemetry. Decoder diagnostics use `RKPlaybackFix` and record codec/render options rather than media URLs. This repository and its release assets exclude device logs, screenshots, network addresses, local user paths, and private signing keys.
+The LSPosed APK and Frame Guard have no Internet permission or telemetry. The separate global Mali installer downloads its pinned upstream libraries. Decoder diagnostics use `RKPlaybackFix` and record codec/render options rather than media URLs. This repository and its release assets exclude device logs, screenshots, network addresses, local user paths, and private signing keys.
 
 Gradle wrapper files originate from Gradle and carry their Apache-2.0 notices; the license text is included in `third_party/Apache-2.0.txt`. The Xposed API is provided by [rovo89/XposedBridge](https://github.com/rovo89/XposedBridge), under Apache-2.0, and is supplied by the installed framework at runtime. Neither Yamby nor mpv binaries are distributed here.
-
-## HDR metadata integration 0.3.0
-
-The unified decode stack now includes independently switchable HDR10 static
-metadata propagation and a standard Codec2 HEVC HDR10+ metadata bridge. The latter
-is not native HDMI HDR10+ output. Original Yamby and LSPosed remain unchanged.
-See [implementation and measurements](docs/hdr-metadata-030.zh-CN.md)
-and [unified controls/rollback](magisk-decode/README.md).
-
-
-## HDR transition repair 0.3.1
-
-Dolby experimental staging, kernel-probe tooling and their development reports
-have been removed. The unified module repairs stale HDR10/HLG output EOTF on the
-verified direct hardware path, under the existing HDR static switch. Decoder
-components, original Yamby and LSPosed are retained.
-See [implementation, tests and remaining limits](docs/hdr-transition-031.zh-CN.md).
-
-## Native client output repair 0.3.2
-
-The verified managed SDR client-composition path now clears stale source HDR
-output state through the original HWC's scoped policy. Hardware HDR remains
-preferred; no pixel conversion or extra precision reduction is introduced.
-See [implementation and limits](docs/hdr-client-032.zh-CN.md) and
-[decoder upgrade audit](docs/decode-upgrade-audit-032.zh-CN.md).

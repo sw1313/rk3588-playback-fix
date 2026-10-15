@@ -544,7 +544,7 @@
  
          mWidth = width;
          mHeight = height;
-@@ -1874,17 +1948,22 @@
+@@ -1874,19 +1948,29 @@
          goto cleanUp;
      }
  
@@ -567,10 +567,17 @@
 +            ret = ensureDecoderState();
 +            if (ret != C2_OK) goto cleanUp;
 +        }
++        // A failed/canceled pool fetch must never become a null block access.
++        if (!mOutBlock) { ret = C2_NO_MEMORY; goto cleanUp; }
          if (MPP_FRAME_FMT_IS_YUV_10BIT(mColorFormat)) {
              C2GraphicView wView = mOutBlock->map().get();
++            if (wView.error() != C2_OK || wView.layout().numPlanes != 3) {
++                ret = C2_CORRUPTED; goto cleanUp;
++            }
              C2PlanarLayout layout = wView.layout();
-@@ -1894,9 +1973,37 @@
+             uint8_t *src = (uint8_t*)mpp_buffer_get_ptr(mppBuffer);
+             uint8_t *dstY = const_cast<uint8_t *>(wView.data()[C2PlanarLayout::PLANE_Y]);
+@@ -1894,9 +1978,53 @@
              size_t dstYStride = layout.planes[C2PlanarLayout::PLANE_Y].rowInc;
              size_t dstUVStride = layout.planes[C2PlanarLayout::PLANE_U].rowInc;
  
@@ -603,15 +610,31 @@
 +                const uint32_t rows = plane ? height / 2 : height;
 +                const uint32_t cols = plane ? width / 2 : width;
 +                const auto base = src + (plane ? size_t(hstride) * vstride : 0);
-+                for (uint32_t y = 0; y < rows; ++y)
-+                    for (uint32_t x = 0; x < cols; ++x)
-+                        dst[size_t(y) * desc.rowInc + size_t(x) * desc.colInc] =
-+                                base[size_t(y) * hstride + (plane ? x * 2 + plane - 1 : x)];
++                if (!plane && desc.colInc == 1 && uint32_t(desc.rowInc) >= width) {
++                    for (uint32_t y = 0; y < rows; ++y)
++                        memcpy(dst + size_t(y) * desc.rowInc, base + size_t(y) * hstride, width);
++                } else if (plane == 1 && desc.colInc == 2 &&
++                        layout.planes[2].colInc == 2 &&
++                        layout.planes[2].rowInc == desc.rowInc &&
++                        uint32_t(desc.rowInc) >= cols * 2 &&
++                        view.data()[2] == view.data()[1] + 1 &&
++                        layout.planes[2].bitDepth == 8 && layout.planes[2].allocatedDepth == 8) {
++                    // NV12 destination: copy both chroma planes without per-pixel
++                    // addressing. Respect mapped row strides and visible width.
++                    for (uint32_t y = 0; y < rows; ++y)
++                        memcpy(dst + size_t(y) * desc.rowInc, base + size_t(y) * hstride, cols * 2);
++                    break;
++                } else {
++                    for (uint32_t y = 0; y < rows; ++y)
++                        for (uint32_t x = 0; x < cols; ++x)
++                            dst[size_t(y) * desc.rowInc + size_t(x) * desc.colInc] =
++                                    base[size_t(y) * hstride + (plane ? x * 2 + plane - 1 : x)];
++                }
 +            }
          } else {
              RgaInfo srcInfo, dstInfo;
              int32_t srcFd = 0, dstFd = 0;
-@@ -1916,7 +2023,6 @@
+@@ -1916,7 +2044,6 @@
                  memcpy(dstPtr, srcPtr, mHorStride * mVerStride * 3 / 2);
              }
          }
@@ -619,7 +642,7 @@
      } else {
          outBuffer->site = BUFFER_SITE_BY_US;
          // signal buffer occupied by users
-@@ -1935,6 +2041,54 @@
+@@ -1935,6 +2062,54 @@
          mCodingType == MPP_VIDEO_CodingAV1 ||
          mCodingType == MPP_VIDEO_CodingMPEG2) {
          getVuiParams(frame);
@@ -674,7 +697,7 @@
      }
  
      /* dump output data if neccessary */
-@@ -2047,7 +2201,7 @@
+@@ -2047,7 +2222,7 @@
  public:
      explicit C2RKMpiDecFactory(std::string name)
              : mHelper(std::static_pointer_cast<C2ReflectorHelper>(

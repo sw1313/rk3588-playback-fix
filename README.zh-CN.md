@@ -1,52 +1,64 @@
 # RK3588 播放兼容修复
 
-当前解码模块为 [decode-stack 0.5.0](https://github.com/sw1313/rk3588-playback-fix/releases/tag/decode-v0.5.0)，
-加入同平台 Android14 SDK 的 Codec2 核心 API32 移植，保留较新的现用 MPP／RGA，
-提供新版后端独立开关与原系统整包回退。全局 Mali、Yamby 和 LSPosed 保持不动。
-移植范围、内核 VPU 边界与测试见[SDK 专项说明](docs/decode-sdk-050.zh-CN.md)；
-0.4.0 的 MPP／libyuv 升级继续保留。
+[**当前下载与版本表**](DOWNLOADS.md) · [GitHub 下载导航](https://github.com/sw1313/rk3588-playback-fix/blob/main/DOWNLOADS.md) · [English](README.md)
 
-[English](README.md) · [当前系统组件安装包](https://github.com/sw1313/rk3588-playback-fix/releases/tag/system-v2026.10.15) · [LSPosed 发布页](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.3.3)
+项目包含四个独立版本的组件。版本号只属于对应组件，不是整个项目共用的版本。
+Release 的 Tag 和标题统一以版本号开头，同版本组件使用后缀区分。
+系统模块仍为预发布，只能安装到契约匹配的固件。
 
-此前系统组件合集提供全局 Mali 0.2.0、统一解码模块 0.3.2，以及保持原版的
-LSPosed 0.3.3 和 Frame Guard 0.1.0。GPU／解码模块只接受各自契约中匹配的固件哈希，
-不通用于所有 RK3588 ROM；统一解码模块替代旧独立解码模块，避免同时覆盖。
-全局 Mali 首次安装需联网下载约 69 MiB 的固定上游库，校验后的设备本地缓存可复用。
-公开包不包含闭源 Mali 库、设备原始日志、连接地址或签名密钥。系统模块以预发布形式提供，
-安装前请阅读对应组件的适用范围、测试记录和回退方法。
+| 组件 | 当前版本 | 用途 |
+| --- | --- | --- |
+| [Decode Stack 解码合并模块](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.5.1) | **0.5.1，预发布** | 合并系统解码升级，修复已复现的 AVC／HEVC 八位缓冲区异步停止／排空崩溃 |
+| [原厂 Mali 全局模块](magisk-mali-global/README.md) | **0.2.0，预发布** | 32／64 位系统标准图形路径使用原厂 g18p0 用户态驱动 |
+| [Yamby／mpv LSPosed 插件](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.3.3-yamby) | **0.3.3** | 默认 HW+ 设置与可选灰白边修正；这是插件版本，不是 LSPosed 框架版本 |
+| [Frame Guard 刷新率模块](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.3.3-yamby) | **0.1.0** | 可选的固定刷新率黑屏规避 |
 
-LSPosed 模块为所有芯片开放 Yamby 默认 HW+ 设置补全，其他 mpv 应用的强制 HW+ 仅限 RK3588。另有独立 Magisk 模块处理刷新率切换导致的整屏短暂黑屏。实体设备测试为 H96Max V58、RK3588、Android 12（API 32）。
+## 安装与历史版本
 
-另有独立的 [MPP 1.1.0 用户态升级实验版](https://github.com/sw1313/rk3588-playback-fix/releases/tag/mpp-v0.1.1)，提供 32／64 位解码库，只接受当前已验证的 Android 12 厂商组件。0.1.1 修正了启动自检的路径误报，已在实体设备验证安装、重启和实际加载。与 Frame Guard、LSPosed 模块分开使用；安装范围、测试结果和回退方法见 [模块说明](magisk-mpp/README.md)。后续小样本 MediaCodec 测试中 H.264、AV1 8／10 位正常；原有 HEVC Main10 复制回内存路径问题仍未解决，这不代表完整播放器验证。
+安装包文件名、直接下载链接和校验值统一见 [DOWNLOADS.md](DOWNLOADS.md)。
+本次只有 Decode Stack 更新；Mali、Yamby 插件与 Frame Guard 使用已发布的原包，
+不跟随解码模块更改版本号。旧系统合集包含的解码模块是 **0.3.2**，已不是当前版本。
+旧版保留用于回退和核对历史，不再作为当前安装入口。
 
-独立的 [RGA 1.10.6 用户态升级模块](https://github.com/sw1313/rk3588-playback-fix/releases/tag/rga-v0.1.0) 已按当前 Android 12 的系统 C++ ABI 和 gralloc4 接口编译，提供 32／64 位库。实体设备已通过真实 RGA 图像任务、Codec2 加载，以及停用后重启恢复原库的回退测试。模块包含严格的固件检查，不替换现有 TV 定制 Codec2，也不升级内核；具体适用范围和测试限制见模块说明。
+升级系统解码时，在 Magisk 安装统一 Decode Stack ZIP 并重启，保持旧独立
+MPP／RGA／Codec2／libyuv 模块停用，避免重复覆盖。安装器先检查依赖，
+再停用重叠模块。[分项开关、依赖与整包回退](magisk-decode/README.md)继续保留，
+选择在重启后生效。
 
-另有独立的 [Codec2 系统兼容模块 0.1.0](https://github.com/sw1313/rk3588-playback-fix/releases/tag/codec2-v0.1.0)：只针对匹配哈希的 API32 固件，保留原厂组件库，改进 Surface、完整 10 位 P010、AV1 色彩范围与 HDR 静态信息。14 组系统播放测试、模式切换和重启回退已通过；不修改 Yamby 或增加 LSPosed 功能。原版 Yamby 的 HEVC Main10 HW 复制路径仍受其 P010 支持限制；最高精度播放继续使用 HW+。测试范围见 [系统升级说明](docs/decoder-upgrade-scope.zh-CN.md)。
+解码和全局 Mali 模块只接受契约匹配的固件哈希。实测设备为 H96Max V58、
+RK3588、Android 12／API32、原 5.10.66 内核。不刷 boot，不替换内核，不改 Yamby 文件，
+不增加 LSPosed 功能。全局 Mali 首次安装联网下载约 69 MiB 的固定上游库并校验 SHA256；
+公开 ZIP 不包含闭源 Mali 库。原按应用 Mali 实验已被全局模块替代，使用全局模块时保持旧实验停用。
 
-## 合并的系统解码模块
+## 0.5.1 更新与已知限制
 
-[统一解码模块](magisk-decode/README.md)将 MPP／VPU 兼容升级、RGA 1.10.6、
-Codec2 Surface／P010 修正、系统 libyuv 1974 和 libvpx／libgav1 软件解码后端合并为一个面具模块，保留分项开关、
-依赖处理和整包重启回退。使用合并版时保持旧独立模块停用，避免重复覆盖。
-Yamby 原版组件和 LSPosed 0.3.3 不变。完整测试结果及尚未纳入的组件见模块说明。
-0.2.0 增加 MPP 动态 HDR 元数据生命周期修正和保持完整 10 位的系统软件解码升级。
-HDR10／HLG 的实际输出与 HDR10+／杜比视界的能力边界见[专项测试说明](docs/hdr-software-upgrade.zh-CN.md)。
+通过受保护的 SDK14／API32 后端选择，处理已复现的 AVC／HEVC 八位缓冲区输出
+停止／排空崩溃；新增 `codec2_buffer` 分项开关，保留 SDK 后端开关和整包回退。
+Surface、P010、完整十位样本、分辨率和码率保持原样。未知／十位缓冲区 profile
+及 AV1／VP9 继续使用原有选择，不代表所有 HW 复制路径都已修复。
+详见 [0.5.1 原厂对照、修改范围与测试](docs/decode-buffer-051.zh-CN.md)。
 
-## 原厂 Mali 全局升级
+安兔兔 12.0.2 的完整剪辑流程仍有提前 EOS／完成条件问题；原厂解码栈在受控源回调
+调度压力下也能复现。测试界面结束不代表保留全部 450 帧，新版曾观察到 449 帧结果。
+本次没有加入全局忽略 EOS、补帧或修改分数的规避。见[完整剪辑对照](docs/antutu-editing-eos.zh-CN.md)。
 
-[全局 Mali 模块 0.2.0](magisk-mali-global/README.md)覆盖系统标准图形路径的
-32／64 位原厂 Mali g18p0，包括桌面和 SurfaceFlinger，不设置应用名单。
-保留内核、boot、CSF 固件和原 allocator／mapper，提供全局／原厂开关及重启回退。
-公开安装包从固定上游下载并校验闭源驱动，随包接口库均由 AOSP 冻结源码构建。
-安装、精确固件范围与最终测试记录见组件说明。
+图像特效子进程另有尚未解决的退出异常：输出结果并打印退出后先发生 native SIGSEGV，
+崩溃统计线程随后又访问已销毁的锁。第一次异常的故障回调尚未完整定位，未做原厂 Mali 对照，
+不宣称已经修复或排除驱动退出清理影响。见[退出路径证据](docs/antutu-image-effects.zh-CN.md)。
 
-原按应用实验现已被全局模块替代：
+0.5.1 自动播放、精度、生命周期和重启回退测试已通过，针对 0.5.1 的新一轮手动 Yamby
+验收仍待确认，历史版本确认不重复计入。有限样本不等于通用兼容性。
+HDR10+ 指标准 Codec2 元数据桥，不代表原生 HDMI HDR10+ 输出；不包含杜比视界／LLDV／FEL 或内核驱动升级。
 
-[独立 Mali 模块源码与测试记录](magisk-mali-native/README.md)支持已校验的 API32／5.10.66
-固件，提供原厂 g15p0／g18p0 与原版切换。采用 Android 按应用驱动命名空间，
-保留系统 GPU 库、CSF 固件、内核、Yamby、LSPosed 和解码模块；仅 ARM64 明确加入的应用生效。
-真实窗口绘制、暂停恢复、Vulkan GPU 缓冲任务及运行时回退已验证，具体游戏验收见
-该组件的 `VALIDATION.json`。固件二进制为用户提供的本地输入，此处不发布通用驱动安装包。
+## 组件说明
+
+- [解码组件、开关和回退](magisk-decode/README.md)
+- [SDK 移植与内核边界](docs/decode-sdk-050.zh-CN.md)
+- [MPP／libyuv 升级范围](docs/decode-upgrade-040.zh-CN.md)
+- [全局 Mali 安装与验证](magisk-mali-global/README.md)
+
+旧独立模块源码和测试记录保留在 `magisk-mpp`、`magisk-rga`、`magisk-codec2`，
+用于历史核查；不与当前解码合并模块叠加安装。
 
 ## LSPosed 模块 0.3.3
 
@@ -78,7 +90,7 @@ RGB 着色器使用实际报告的顶部／左侧偏移，同时兼容填充纹�
 
 这是渲染补偿，不是厂商驱动补丁；不放大画面、不改变宽高比，也无法恢复前面处理已经丢弃的边缘像素。此前已在 `gpu` 确认 1080p H.264／HEVC 修正有效，本次用户已确认自动版在 `gpu-next` 下消除灰线。720p／4K 与其他编码通过了元数据和着色器测试，不等于已经实测播放。仅针对已观察到的 RK3588 AImageReader 填充问题，不能处理所有类型的白边。
 
-## Magisk 模块 0.1.0
+## Frame Guard 刷新率模块 0.1.0
 
 用 Magisk 安装 `rk3588-frameguard-0.1.0.zip`，服务在开机完成后运行。仅允许 RK3588、API 32。
 
@@ -107,27 +119,6 @@ Windows 使用 `gradlew.bat` 和 `python`。APK 输出在 `lsposed/app/build/out
 
 APK 构建和 Lint 已通过；默认 HW+ 经应用重启后仍保留，之前绿屏的视频画面正常。Magisk 安装和 Android shell 语法检查通过；隔离设置存储测试覆盖备份、重复应用、手动修改保护、恢复未设置值、暂停／恢复、卸载恢复。完整设备重启后的自动应用待验证，其他播放器和固件未实测。
 
-模块没有网络权限和遥测。`RKPlaybackFix` 日志只记录解码／渲染选项。仓库和附件不含设备日志、截图、网络地址、本机用户名路径或签名私钥。
+LSPosed 插件和 Frame Guard 没有网络权限和遥测；独立的全局 Mali 安装器会下载固定上游驱动。`RKPlaybackFix` 日志只记录解码／渲染选项。仓库和附件不含设备日志、截图、网络地址、本机用户名路径或签名私钥。
 
 第三方组件来源及许可说明见 [英文 README](README.md)。这里不分发 Yamby 或 mpv 的二进制文件。
-
-## HDR metadata integration 0.3.0
-
-The unified decode stack now includes independently switchable HDR10 static
-metadata propagation and a standard Codec2 HEVC HDR10+ metadata bridge. The latter
-is not native HDMI HDR10+ output. Original Yamby and LSPosed remain unchanged.
-See [implementation and measurements](docs/hdr-metadata-030.zh-CN.md)
-and [unified controls/rollback](magisk-decode/README.md).
-
-## HDR 切换修正 0.3.1
-
-已移除独立 Dolby 移植实验、内核探针工具和相应开发报告。统一模块在已验证的
-硬解直出路径修复同一 Surface 中 HDR10／HLG 输出模式残留，沿用 `hdr_static`
-开关和重启回退。其他解码组件、Yamby 原版组件与 LSPosed 保持原状。
-实现、测试与尚未修复的客户端合成限制见[0.3.1 记录](docs/hdr-transition-031.zh-CN.md)。
-
-## 客户端合成修正 0.3.2
-
-原生 SDR 客户端合成路径现在会清理源视频残留的 HDR 输出状态；可直接硬解的视频
-继续保留十位 HDR。修正不新增降位转换，Yamby 和 LSPosed 保持原状。
-见[实现与限制](docs/hdr-client-032.zh-CN.md)及[可升级组件核查](docs/decode-upgrade-audit-032.zh-CN.md)。
