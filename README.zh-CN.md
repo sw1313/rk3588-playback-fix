@@ -1,8 +1,10 @@
 # RK3588 播放兼容修复
 
-当前解码模块为 [decode-stack 0.4.0](https://github.com/sw1313/rk3588-playback-fix/releases/tag/decode-v0.4.0)，
-回移六项上游 MPP 解码修正并更新 libyuv 缩放实现，替代此前组件合集里的解码模块 0.3.2。
-全局 Mali 和 Yamby／LSPosed 原版组件保留；具体升级范围与测试见[专项说明](docs/decode-upgrade-040.zh-CN.md)。
+当前解码模块为 [decode-stack 0.5.0](https://github.com/sw1313/rk3588-playback-fix/releases/tag/decode-v0.5.0)，
+加入同平台 Android14 SDK 的 Codec2 核心 API32 移植，保留较新的现用 MPP／RGA，
+提供新版后端独立开关与原系统整包回退。全局 Mali、Yamby 和 LSPosed 保持不动。
+移植范围、内核 VPU 边界与测试见[SDK 专项说明](docs/decode-sdk-050.zh-CN.md)；
+0.4.0 的 MPP／libyuv 升级继续保留。
 
 [English](README.md) · [当前系统组件安装包](https://github.com/sw1313/rk3588-playback-fix/releases/tag/system-v2026.10.15) · [LSPosed 发布页](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.3.3)
 

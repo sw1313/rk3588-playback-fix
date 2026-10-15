@@ -16,11 +16,12 @@ def package(folder,output):
 def main():
  parser=argparse.ArgumentParser(description=__doc__)
  for name in ['mpp','rga','codec2','libyuv','software','hdr','work']:parser.add_argument('--'+name,type=Path,required=True)
+ parser.add_argument('--codec2-sdk',type=Path,help='Optional SDK14/API32 core; retains the prior Codec2 backend for rollback')
  a=parser.parse_args();w=a.work.resolve();w.mkdir(parents=True,exist_ok=True);out=w/'package'
  if out.exists():raise SystemExit('Use a fresh package directory')
  shutil.copytree(MODULE,out,ignore=shutil.ignore_patterns('system','components','config','disable','status.txt','active*','checksums.sha256'))
  files=[]
- for name in ['mpp','rga','codec2','libyuv','software','hdr']:
+ for name in ['mpp','rga','codec2','libyuv','software','hdr']+(['codec2_sdk'] if a.codec2_sdk else []):
   src=getattr(a,name).resolve();dest=out/'components'/name
   for line in (src/'checksums.sha256').read_text(encoding='utf-8').splitlines():
    expected,rel=line.split(None,1)
@@ -28,6 +29,7 @@ def main():
   if name=='codec2':
    allowed={'system/vendor/bin/hw/android.hardware.media.c2@1.1-service','system/vendor/lib/hw/libcodec2_rx_component.so'}
    if {p.relative_to(src).as_posix() for p in (src/'system').rglob('*') if p.is_file()}!=allowed:raise SystemExit('Codec2 input contains generated firmware patches; use the clean pre-install package')
+  if name=='codec2_sdk' and {p.relative_to(src).as_posix() for p in (src/'system').rglob('*') if p.is_file()}!={'system/vendor/lib/hw/libcodec2_rx_component.so'}:raise SystemExit('SDK core must contain only the source-built plugin')
   if name=='hdr' and (src/'system/vendor/lib64/hw/hwcomposer.rk30board.rkhdr.so').exists():raise SystemExit('HDR input contains a generated original HWC; use the clean pre-install package')
   shutil.copytree(src,dest,ignore=shutil.ignore_patterns('disable','status.txt','preflight.txt','mode','resume-codec2'))
   # Normalize nested text before generating its installer manifest. A Windows

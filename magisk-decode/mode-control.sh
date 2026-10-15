@@ -16,7 +16,7 @@ case "$1" in
   if [ -e "$MODROOT/disable" ]; then echo "Whole module: disabled for next boot"; else echo "Whole module: enabled for next boot"; fi
   echo "Requested next boot:"; cat "$MODROOT/config"
   resolve || exit 1
-  echo "Effective next boot: mpp=$MPP rga=$RGA codec2=$C2 libyuv=$YUV software=$SOFT hdr_static=$HDR_STATIC hdr10plus=$HDR_PLUS"
+  echo "Effective next boot: mpp=$MPP rga=$RGA codec2=$C2 libyuv=$YUV software=$SOFT hdr_static=$HDR_STATIC hdr10plus=$HDR_PLUS codec2_sdk=$SDK"
   echo "Active boot:"; cat "$CURRENTROOT/active-config" 2>/dev/null
   cat "$CURRENTROOT/status.txt" 2>/dev/null
   ;;
@@ -28,7 +28,7 @@ case "$1" in
   esac
   sync_selection || exit 1
   ;;
- mpp|rga|codec2|libyuv|software|hdr_static|hdr10plus)
+ mpp|rga|codec2|libyuv|software|hdr_static|hdr10plus|codec2_sdk)
   case "$2" in on) value=1 ;; off) value=0 ;; *) exit 2 ;; esac
   resolve || exit 1
   sed "s/^$1=.*/$1=$value/" "$MODROOT/config" > "$MODROOT/config.next" || exit 1
@@ -36,5 +36,5 @@ case "$1" in
   sync_selection || exit 1
   echo "$1=$value saved. Reboot to apply. Codec2 requires MPP/RGA; software P010 requires Codec2. Selections are preserved when dependencies are off."
   ;;
- *) echo "Usage: sh mode-control.sh status | all on|off | mpp|rga|codec2|libyuv|software|hdr_static|hdr10plus on|off"; exit 2 ;;
+ *) echo "Usage: sh mode-control.sh status | all on|off | mpp|rga|codec2|libyuv|software|hdr_static|hdr10plus|codec2_sdk on|off"; exit 2 ;;
 esac

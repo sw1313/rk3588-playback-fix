@@ -41,6 +41,8 @@ magisk-decode/disable
 magisk-decode/status.txt
 magisk-decode/active*
 magisk-decode/checksums.sha256
+magisk-codec2-sdk/system/
+magisk-codec2-sdk/checksums.sha256
 magisk-software/apex/
 magisk-software/bin/
 magisk-software/system/

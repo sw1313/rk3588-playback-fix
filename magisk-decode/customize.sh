@@ -12,6 +12,14 @@ for component in mpp rga codec2 libyuv software hdr; do
  ui_print "Checking decode component: $component"
  (MODPATH="$STACKROOT/components/$component"; RK_DECODE_STAGE="$STACKROOT/components"; . "$MODPATH/customize.sh") || abort "Component preflight failed: $component"
 done
+if [ -d "$STACKROOT/components/codec2_sdk" ]; then
+ ui_print "Checking SDK14 Codec2 on the existing API32 service and MPP profile"
+ c="$STACKROOT/components/codec2_sdk"
+ (cd "$c" && sha256sum -c checksums.sha256 >/dev/null 2>&1) || abort "SDK Codec2 payload differs."
+ sha256sum -c "$c/contracts/platform.sha256" >/dev/null 2>&1 || abort "SDK Codec2 additional API32 dependencies differ."
+ timeout 25 /system/bin/env LD_LIBRARY_PATH="$STACKROOT/components/mpp/system/vendor/lib:$STACKROOT/components/rga/system/vendor/lib:/vendor/lib:/system/lib:/apex/com.android.vndk.v32/lib" RK_CODEC2_P010_LIBRARY="$c/system/vendor/lib/hw/libcodec2_rx_component.so" "$STACKROOT/components/codec2/system/vendor/bin/hw/android.hardware.media.c2@1.1-service" --check-only > "$c/preflight.txt" 2>&1 || abort "SDK Codec2 interface/HIDL preflight failed."
+ grep -q HIDL_CONSTRUCTION_PASS "$c/preflight.txt" || abort "SDK HIDL contract check failed."
+fi
 cd "$STACKROOT" || abort "Module directory unavailable."
 sha256sum -c files.sha256 >/dev/null 2>&1 || abort "Generated platform patches or component payload differ."
 if [ -f /data/adb/modules/rk3588_decode_stack/config ]; then
@@ -22,6 +30,8 @@ if [ -f /data/adb/modules/rk3588_decode_stack/config ]; then
 else
  printf 'mpp=1\nrga=1\ncodec2=1\nlibyuv=1\nsoftware=1\nhdr_static=1\nhdr10plus=1\n' > "$STACKROOT/config"
 fi
+if [ -d "$STACKROOT/components/codec2_sdk" ]; then default_sdk=1; else default_sdk=0; fi
+grep -q '^codec2_sdk=' "$STACKROOT/config" || printf 'codec2_sdk=%s\n' "$default_sdk" >> "$STACKROOT/config"
 sh "$STACKROOT/assemble.sh" || abort "Cannot prepare the selected overlays."
 # Prevent overlapping mounts, including a previous update waiting for reboot.
 # Original modules are retained disabled until migration tests pass.

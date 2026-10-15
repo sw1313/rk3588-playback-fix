@@ -1,0 +1,10 @@
+{
+  "repository": "https://github.com/khadas/android_vendor_rockchip_hardware_interfaces_codec2",
+  "commit": "076fe2f6ec28546d329964ae9e175301717df6ab",
+  "sdk": "khadas-edge2-android14",
+  "reported_version": "1.14.3_[2]",
+  "target": "ARM32 vendor HIDL service on verified Android12 API32 firmware",
+  "scope": "Complete component factory/base/video/OSAL/store core; ordinary AVC/HEVC/VP9/AV1 Surface and explicit P010 decoding selected by existing compatibility router. Existing 21-entry registry, HIDL ABI, encoders, secure and legacy paths retained.",
+  "mpp": "Existing newer source-built MPP 1.1.0 compatibility pair retained; 2024 SDK MPP evaluated privately and not bundled.",
+  "kernel": "Original 5.10.66 built-in Rockchip VPU driver, no kernel replacement or clock changes."
+}

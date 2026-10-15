@@ -1,6 +1,6 @@
 id=rk3588_decode_stack
 name=RK3588 Decode Stack
-version=0.4.0
-versionCode=400
+version=0.5.0
+versionCode=500
 author=sw1313
-description=Unified API32 decoder stack with selected upstream MPP/VPU decoder fixes, libyuv overflow hardening and verified Codec2/HDR/software paths. Full precision, component switches and reboot rollback retained. Original kernel ABI; no Dolby/HDR10+ HDMI claim.
+description=SDK14 Codec2 core port for verified API32 firmware, paired with newer MPP 1.1.0 compatibility stack. Full ten-bit/HDR metadata, selectable prior Codec2 backend and reboot rollback. Original kernel, HIDL service ABI and legacy codec paths retained.

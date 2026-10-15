@@ -1,10 +1,11 @@
 # RK3588 Playback Fix
 
-The current decoder upgrade is [decode-stack 0.4.0](https://github.com/sw1313/rk3588-playback-fix/releases/tag/decode-v0.4.0),
-with selected upstream MPP decoder fixes and libyuv scaling hardening. It
-supersedes decode-stack 0.3.2 in the earlier system collection. The global GPU
-module and original Yamby/LSPosed components are retained; see the
-[scope and validation](docs/decode-upgrade-040.zh-CN.md).
+The current decoder upgrade is [decode-stack 0.5.0](https://github.com/sw1313/rk3588-playback-fix/releases/tag/decode-v0.5.0),
+with the same-platform SDK14 Codec2 core ported to the verified API32 ABI.
+It retains the newer MPP/RGA compatibility stack and provides an independent
+prior-backend switch plus whole-module rollback. The global GPU module and
+original Yamby/LSPosed components are retained; see the
+[SDK scope, tests and kernel boundary](docs/decode-sdk-050.zh-CN.md).
 
 The [Native Mali Global module 0.2.0](magisk-mali-global/README.md) upgrades both
 ARM32/ARM64 system graphics paths to g18p0 on the hash-verified API32 firmware,

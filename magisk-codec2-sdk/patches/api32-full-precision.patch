@@ -1,0 +1,706 @@
+--- a/component/C2RKComponentFactory.cpp
++++ b/component/C2RKComponentFactory.cpp
+@@ -27,6 +27,8 @@
+ using namespace android;
+ 
+ extern "C" ::C2ComponentFactory* CreateRKCodec2Factory(std::string componentName) {
++    // The retained API32 registry also publishes these four legacy aliases.
++    if (componentName.compare(0, 4, "OMX.") == 0) componentName.erase(0, 4);
+     C2RKComponentEntry *entry = NULL;
+     C2ComponentFactory *factory = NULL;
+ 
+--- a/component/osal/C2RKMediaUtils.cpp
++++ b/component/osal/C2RKMediaUtils.cpp
+@@ -287,7 +287,11 @@
+         boardFirstApiLevel != 0 ? boardFirstApiLevel :
+         productFirstApiLevel;
+ 
+-    return kFirstApiLevel >= 33;
++    // The firmware-pinned API32 module already validates its P010 allocator,
++    // descriptor and copy implementation before enabling this component.
++    return kFirstApiLevel >= 33 ||
++            (property_get_int32("ro.build.version.sdk", 0) == 32 &&
++             property_get_bool("debug.rkcodec2.surface_upgrade", false));
+ }
+ 
+ void C2RKMediaUtils::convert10BitNV12ToRequestFmt(
+--- /dev/null
++++ b/component/osal/include/Hdr10PlusPayload.h
+@@ -0,0 +1,38 @@
++// SPDX-License-Identifier: Apache-2.0
++#pragma once
++#include <stdint.h>
++#include <stddef.h>
++namespace android { namespace rk_hdr {
++// Bounded structural validation of the ST2094-40 payload after its six-byte
++// T.35 prefix. Never read padding beyond the MPP metadata's declared length.
++inline bool validPlus(const uint8_t *p, size_t bytes) {
++    if (!p || bytes < 16 || bytes > 907) return false;
++    size_t bit=0; bool ok=true;
++    auto get=[&](size_t n)->uint32_t {
++        if (n>32 || bit+n>bytes*8) {ok=false;return 0;}
++        uint32_t v=0;while(n--){v=(v<<1)|((p[bit/8]>>(7-bit%8))&1);++bit;}return v;
++    };
++    auto skip=[&](size_t n) {if(bit+n>bytes*8)ok=false;else bit+=n;};
++    if (get(8)>1) return false;
++    uint32_t windows=get(2);if(windows<1 || windows>3)return false;
++    skip(153*(windows-1));skip(27);
++    auto grid=[&]() {
++        uint32_t rows=get(5), cols=get(5);
++        if(rows<2 || rows>25 || cols<2 || cols>25)ok=false;
++        else skip(rows*cols*4);
++    };
++    if(get(1))grid();
++    for(uint32_t w=0;w<windows && ok;++w){
++        skip(68);uint32_t count=get(4);
++        for(uint32_t n=0;n<count && ok;++n){if(get(7)>100)ok=false;skip(17);}
++        skip(10);
++    }
++    if(get(1))grid();
++    for(uint32_t w=0;w<windows && ok;++w){
++        if(get(1)){skip(24);uint32_t anchors=get(4);skip(anchors*10);}
++        if(get(1))skip(6);
++    }
++    return ok;
++}
++
++} }
+--- /dev/null
++++ b/component/osal/include/RKHdrBridge.h
+@@ -0,0 +1,93 @@
++// SPDX-License-Identifier: Apache-2.0
++#pragma once
++#include <C2Config.h>
++#include <C2AllocatorGralloc.h>
++#include "mpp/mpp_frame.h"
++#include "Hdr10PlusPayload.h"
++#include <android/hardware/graphics/mapper/4.0/IMapper.h>
++#include <gralloctypes/Gralloc4.h>
++#include <ui/GraphicBufferMapper.h>
++#include <cutils/properties.h>
++#include <dlfcn.h>
++#include <android/log.h>
++#include <cstring>
++#include <optional>
++#include <vector>
++
++namespace android { namespace rk_hdr {
++
++inline std::shared_ptr<C2StreamHdr10PlusInfo::output> plus(MppFrame frame) {
++    struct Dynamic {uint32_t format, size;uint8_t data[];};
++    using Getter=Dynamic *(*)(MppFrame);
++    static Getter getter=reinterpret_cast<Getter>(dlsym(RTLD_DEFAULT,"mpp_frame_get_hdr_dynamic_meta"));
++    auto info=C2StreamHdr10PlusInfo::output::AllocShared(0,0u);
++    if(!getter)return info;
++    const Dynamic *meta=getter(frame);
++    if(!meta || meta->format!=8 || !validPlus(meta->data,meta->size))return info;
++    static const uint8_t prefix[]={0xb5,0x00,0x3c,0x00,0x01,0x04};
++    info=C2StreamHdr10PlusInfo::output::AllocShared(sizeof(prefix)+meta->size,0u);
++    std::memcpy(info->m.value,prefix,sizeof(prefix));
++    std::memcpy(info->m.value+sizeof(prefix),meta->data,meta->size);
++    return info;
++}
++
++// Only metadata is touched. No buffer allocation, pixel lock, conversion or
++// additional image copy is performed. Import and release a duplicate handle.
++inline bool store(const std::shared_ptr<C2GraphicBlock> &block,
++                  const std::shared_ptr<C2StreamHdrStaticInfo::output> &hdr,
++                  const std::shared_ptr<C2StreamHdr10PlusInfo::output> &dynamic) {
++    (void)dynamic;
++    // Dynamic metadata travels in the C2Buffer/BufferQueue standard info,
++    // including explicit empty frames. The stock mapper rejects clearing its
++    // variable-size HDR10+ field, so never populate that separate buffer field.
++    if(!property_get_bool("debug.rkcodec2.hdr_static_buffer",false))return true;
++    using android::hardware::graphics::mapper::V4_0::IMapper;
++    using android::hardware::graphics::mapper::V4_0::Error;
++    using android::hardware::hidl_vec;
++    static sp<IMapper> mapper=IMapper::getService();
++    if(!mapper || !block || !block->handle()) {
++        __android_log_print(ANDROID_LOG_ERROR,"RKHdrBridge","missing mapper=%d block=%d",!!mapper,!!block);return false;
++    }
++    auto c2=block->handle();uint32_t width,height,format,stride,generation,slot;
++    uint64_t usage,id;
++    _UnwrapNativeCodec2GrallocMetadata(c2,&width,&height,&format,&usage,&stride,&generation,&id,&slot);
++    native_handle_t *raw=UnwrapNativeCodec2GrallocHandle(c2);
++    if(!raw)return false;
++    buffer_handle_t imported=nullptr;
++    auto &gm=GraphicBufferMapper::get();
++    status_t status=gm.importBuffer(raw,width,height,1,format,usage,stride,&imported);
++    native_handle_delete(raw);
++    if(status!=OK || !imported) {
++        __android_log_print(ANDROID_LOG_ERROR,"RKHdrBridge","import=%d %ux%u fmt=%u stride=%u",status,width,height,format,stride);return false;
++    }
++    bool ok=true;
++    auto set=[&](const IMapper::MetadataType &type,const hidl_vec<uint8_t> &encoded) {
++        auto r=mapper->set(const_cast<native_handle_t*>(imported),type,encoded);
++        if(!r.isOk() || r.withDefault(Error::NO_RESOURCES)!=Error::NONE) {
++            __android_log_print(ANDROID_LOG_ERROR,"RKHdrBridge","set %s/%lld len=%zu error=%d",type.name.c_str(),(long long)type.value,encoded.size(),int(r.withDefault(Error::NO_RESOURCES)));ok=false;
++        }
++    };
++    if(property_get_bool("debug.rkcodec2.hdr_static_buffer",false)) {
++        // This firmware rejects zero-length (nullopt) encoded metadata. Encode
++        // explicit zero values to clear a reused buffer without stale HDR data.
++        std::optional<ui::Smpte2086> mastering=ui::Smpte2086{};
++        std::optional<ui::Cta861_3> light=ui::Cta861_3{};
++        if(hdr && hdr->mastering.maxLuminance>0) {
++            ui::Smpte2086 v;
++            v.primaryRed={hdr->mastering.red.x,hdr->mastering.red.y};
++            v.primaryGreen={hdr->mastering.green.x,hdr->mastering.green.y};
++            v.primaryBlue={hdr->mastering.blue.x,hdr->mastering.blue.y};
++            v.whitePoint={hdr->mastering.white.x,hdr->mastering.white.y};
++            v.maxLuminance=hdr->mastering.maxLuminance;
++            v.minLuminance=hdr->mastering.minLuminance;mastering=v;
++        }
++        if(hdr && (hdr->maxCll>0 || hdr->maxFall>0)) {
++            ui::Cta861_3 v;v.maxContentLightLevel=hdr->maxCll;v.maxFrameAverageLightLevel=hdr->maxFall;light=v;
++        }
++        hidl_vec<uint8_t> bytes;
++        if(gralloc4::encodeSmpte2086(mastering,&bytes)==OK)set(gralloc4::MetadataType_Smpte2086,bytes);else ok=false;
++        if(gralloc4::encodeCta861_3(light,&bytes)==OK)set(gralloc4::MetadataType_Cta861_3,bytes);else ok=false;
++    }
++    gm.freeBuffer(imported);return ok;
++}
++} }
+--- /dev/null
++++ b/component/osal/include/RKPacked10.h
+@@ -0,0 +1,28 @@
++// SPDX-License-Identifier: Apache-2.0
++#pragma once
++#include <stddef.h>
++#include <stdint.h>
++// Rockchip linear NV15: contiguous little-endian 10-bit samples, then UV.
++// Full source and row bounds are validated before any destination write.
++static inline bool rkPacked10ToP010(const uint8_t *src, size_t srcSize,
++        size_t srcStride, size_t srcHeight, uint8_t *dstY, uint8_t *dstUV,
++        size_t yStride, size_t uvStride, size_t width, size_t height) {
++    if (!src || !dstY || !dstUV || !width || !height || (width & 1) || (height & 1) ||
++        width > 8192 || height > 8192 || srcHeight < height ||
++        srcStride < (width * 10 + 7) / 8 || yStride < width * 2 || uvStride < width * 2 ||
++        !srcHeight || srcStride > SIZE_MAX / srcHeight) return false;
++    size_t chromaOffset=srcStride*srcHeight;
++    if (chromaOffset > srcSize || srcStride > (srcSize-chromaOffset)/(height/2)) return false;
++    for (size_t plane=0;plane<2;plane++) {
++        const uint8_t *base=src+(plane?chromaOffset:0);
++        uint8_t *dst=plane?dstUV:dstY;size_t stride=plane?uvStride:yStride;
++        for(size_t y=0;y<(plane?height/2:height);y++)for(size_t x=0;x<width;x++) {
++            size_t bit=x*10, off=bit/8;
++            uint16_t word=uint16_t(base[y*srcStride+off])|
++                (uint16_t(base[y*srcStride+off+1])<<8);
++            uint16_t sample=((word>>(bit%8))&1023)<<6;
++            dst[y*stride+x*2]=uint8_t(sample);dst[y*stride+x*2+1]=uint8_t(sample>>8);
++        }
++    }
++    return true;
++}
+--- a/component/video/C2RKMpiDec.cpp
++++ b/component/video/C2RKMpiDec.cpp
+@@ -37,6 +37,9 @@
+ #include "C2RKGrallocOps.h"
+ #include "C2RKMemTrace.h"
+ #include "C2RKVersion.h"
++#include <C2PlatformSupport.h>
++#include "RKHdrBridge.h"
++#include "RKPacked10.h"
+ 
+ namespace android {
+ 
+@@ -360,6 +363,37 @@
+                 .withSetter(DefaultColorAspectsSetter)
+                 .build());
+ 
++        helper->addStructDescriptors<C2MasteringDisplayColorVolumeStruct, C2ColorXyStruct>();
++        mHdrStaticInfo = std::make_shared<C2StreamHdrStaticInfo::output>(0u);
++        mHdrStaticInfo->mastering = {{0,0},{0,0},{0,0},{0,0},0,0};
++        mHdrStaticInfo->maxCll = mHdrStaticInfo->maxFall = 0;
++        mHdrStaticInfo->mastering.maxLuminance = -1.0f;
++        addParameter(
++                DefineParam(mHdrStaticInfo, C2_PARAMKEY_HDR_STATIC_INFO)
++                .withDefault(mHdrStaticInfo)
++                .withFields({
++                    C2F(mHdrStaticInfo, mastering.red.x).inRange(0.0f, 1.0f),
++                    C2F(mHdrStaticInfo, mastering.red.y).inRange(0.0f, 1.0f),
++                    C2F(mHdrStaticInfo, mastering.green.x).inRange(0.0f, 1.0f),
++                    C2F(mHdrStaticInfo, mastering.green.y).inRange(0.0f, 1.0f),
++                    C2F(mHdrStaticInfo, mastering.blue.x).inRange(0.0f, 1.0f),
++                    C2F(mHdrStaticInfo, mastering.blue.y).inRange(0.0f, 1.0f),
++                    C2F(mHdrStaticInfo, mastering.white.x).inRange(0.0f, 1.0f),
++                    C2F(mHdrStaticInfo, mastering.white.y).inRange(0.0f, 1.0f),
++                    C2F(mHdrStaticInfo, mastering.maxLuminance).inRange(-1.0f, 100000.0f),
++                    C2F(mHdrStaticInfo, mastering.minLuminance).inRange(0.0f, 100000.0f),
++                    C2F(mHdrStaticInfo, maxCll).inRange(0.0f, 100000.0f),
++                    C2F(mHdrStaticInfo, maxFall).inRange(0.0f, 100000.0f),
++                })
++                .withSetter(HdrStaticInfoSetter)
++                .build());
++
++        mHdr10PlusInfo = C2StreamHdr10PlusInfo::output::AllocShared(0, 0u);
++        addParameter(DefineParam(mHdr10PlusInfo, C2_PARAMKEY_OUTPUT_HDR10_PLUS_INFO)
++                .withDefault(mHdr10PlusInfo)
++                .withFields({C2F(mHdr10PlusInfo, m.value).any()})
++                .withSetter(Hdr10PlusInfoSetter).build());
++
+         // vui colorAspects
+         if (mediaType == MEDIA_MIMETYPE_VIDEO_AVC ||
+             mediaType == MEDIA_MIMETYPE_VIDEO_HEVC ||
+@@ -425,6 +459,28 @@
+         }
+     }
+ 
++    static C2R Hdr10PlusInfoSetter(bool, C2P<C2StreamHdr10PlusInfo::output>&) {
++        return C2R::Ok();
++    }
++
++    static C2R HdrStaticInfoSetter(bool mayBlock, C2P<C2StreamHdrStaticInfo::output> &me) {
++        (void)mayBlock;
++        C2R result = C2R::Ok();
++        result = result.plus(me.F(me.v.mastering.red.x).validatePossible(me.v.mastering.red.x));
++        result = result.plus(me.F(me.v.mastering.red.y).validatePossible(me.v.mastering.red.y));
++        result = result.plus(me.F(me.v.mastering.green.x).validatePossible(me.v.mastering.green.x));
++        result = result.plus(me.F(me.v.mastering.green.y).validatePossible(me.v.mastering.green.y));
++        result = result.plus(me.F(me.v.mastering.blue.x).validatePossible(me.v.mastering.blue.x));
++        result = result.plus(me.F(me.v.mastering.blue.y).validatePossible(me.v.mastering.blue.y));
++        result = result.plus(me.F(me.v.mastering.white.x).validatePossible(me.v.mastering.white.x));
++        result = result.plus(me.F(me.v.mastering.white.y).validatePossible(me.v.mastering.white.y));
++        result = result.plus(me.F(me.v.mastering.maxLuminance).validatePossible(me.v.mastering.maxLuminance));
++        result = result.plus(me.F(me.v.mastering.minLuminance).validatePossible(me.v.mastering.minLuminance));
++        result = result.plus(me.F(me.v.maxCll).validatePossible(me.v.maxCll));
++        result = result.plus(me.F(me.v.maxFall).validatePossible(me.v.maxFall));
++        return result;
++    }
++
+     static C2R SizeSetter(bool mayBlock, const C2P<C2StreamPictureSizeInfo::output> &oldMe,
+                           C2P<C2StreamPictureSizeInfo::output> &me) {
+         (void)mayBlock;
+@@ -603,6 +659,8 @@
+     std::shared_ptr<C2StreamFrameRateInfo::output> mFrameRate;
+     std::shared_ptr<C2StreamBlockSizeInfo::output> mBlockSize;
+     std::shared_ptr<C2StreamPixelFormatInfo::output> mPixelFormat;
++    std::shared_ptr<C2StreamHdrStaticInfo::output> mHdrStaticInfo;
++    std::shared_ptr<C2StreamHdr10PlusInfo::output> mHdr10PlusInfo;
+     std::shared_ptr<C2StreamProfileLevelInfo::input> mProfileLevel;
+     std::shared_ptr<C2StreamMaxBufferSizeInfo::input> mMaxInputSize;
+     std::shared_ptr<C2StreamColorInfo::output> mColorInfo;
+@@ -795,7 +853,7 @@
+ 
+         Mutex::Autolock autoLock(mBufferLock);
+         clearOutBuffers();
+-        mpp_buffer_group_clear(mFrmGrp);
++        if (mFrmGrp) mpp_buffer_group_clear(mFrmGrp);
+ 
+         mFlushed = true;
+     }
+@@ -837,37 +895,8 @@
+         return 0;
+     }
+ 
+-    if (fbcMode == C2_COMPRESS_AFBC_16x16) {
+-        if (MPP_FRAME_FMT_IS_YUV_10BIT(mColorFormat)) {
+-            c2_info("10bit video source, perfer afbc output mode");
+-            return fbcMode;
+-        }
+-
+-        /*
+-         * For 10bit flim source, we agreed that force fbc rendering.
+-         * Some apps(Kodi/Photos/Files) does not transmit profile info, so do extra
+-         * detection from spspps to search bitInfo in this case.
+-         */
+-        if (work != nullptr && work->input.flags & C2FrameData::FLAG_CODEC_CONFIG) {
+-            if (!work->input.buffers.empty()) {
+-                C2ReadView rView = mDummyReadView;
+-                rView = work->input.buffers[0]->data().linearBlocks().front().map().get();
+-                int32_t depth = C2RKNaluParser::detectBitDepth(
+-                        const_cast<uint8_t *>(rView.data()), rView.capacity(), mCodingType);
+-                if (depth == 10) {
+-                    c2_info("10bit video profile detached, prefer afbc output mode");
+-                    return fbcMode;
+-                }
+-            }
+-        }
+-    }
+-
+-    uint32_t minStride = C2RKChipCapDef::get()->getFbcMinStride(fbcMode);
+-
+-    if (mWidth <= minStride && mHeight <= minStride) {
+-        c2_info("within fbc min stirde %d, disable fbc otuput mode", minStride);
+-        return 0;
+-    }
++    // Retain the verified API32 AFBC policy. SDK14's size threshold
++    // selects a different linear import on this older mapper, changing colors.
+ 
+     return fbcMode;
+ }
+@@ -1055,9 +1084,9 @@
+     {
+         MppFrame frame  = nullptr;
+ 
+-        // av1 support convert to user-set format internally.
+-        if (mCodingType == MPP_VIDEO_CodingAV1
+-                && mPixelFormat == HAL_PIXEL_FORMAT_YCBCR_P010) {
++        // Preserve native AV1 precision for Surface copies as well as explicit
++        // P010 requests. The parser still reports genuine 8-bit streams as NV12.
++        if (mCodingType == MPP_VIDEO_CodingAV1 && mBufferMode) {
+             mColorFormat = MPP_FMT_YUV420SP_10BIT;
+         }
+ 
+@@ -1104,10 +1133,19 @@
+         mFbcCfg.mode = fbcMode;
+ 
+         mpp_frame_deinit(&frame);
++        // SET_FRAME_INFO can overwrite AV1's requested output depth.
++        if (mCodingType == MPP_VIDEO_CodingAV1 && mBufferMode) {
++            uint32_t native10 = MPP_FMT_YUV420SP_10BIT;
++            if (mMppMpi->control(mMppCtx, MPP_DEC_SET_OUTPUT_FORMAT, &native10) != MPP_OK)
++                goto error;
++        }
+ 
+         c2_info("init: hor %d ver %d color 0x%08x", mHorStride, mVerStride, mColorFormat);
+     }
+ 
++    // API32's gralloc does not reserve the SDK's private decoder tail area.
++    // Copy output uses MPP's internal buffers; Surface output keeps imports.
++    if (!mBufferMode) {
+     err = mpp_buffer_group_get_external(&mFrmGrp, MPP_BUFFER_TYPE_ION);
+     if (err != MPP_OK) {
+         c2_err("failed to get buffer_group, err %d", err);
+@@ -1115,6 +1153,7 @@
+     }
+ 
+     mMppMpi->control(mMppCtx, MPP_DEC_SET_EXT_BUF_GROUP, mFrmGrp);
++    }
+     if (err != MPP_OK) {
+         c2_err("failed to set buffer group, err %d", err);
+         goto error;
+@@ -1170,6 +1209,12 @@
+ 
+         c2Buffer = createGraphicBuffer(
+                 std::move(outblock), C2Rect(mWidth, mHeight).at(left, top));
++        if (mBufferMode) {
++            c2Buffer->setInfo(std::make_shared<C2StreamPixelFormatInfo::output>(0u, mCopyBlockFormat));
++        }
++        if (entry.hdrInfo && entry.hdrInfo->mastering.maxLuminance >= 0)
++            c2Buffer->setInfo(entry.hdrInfo);
++        if (entry.hdr10Plus) c2Buffer->setInfo(entry.hdr10Plus);
+ 
+         mOutBlock = nullptr;
+ 
+@@ -1190,7 +1235,9 @@
+         inFlags = C2FrameData::FLAG_DROP_FRAME;
+     }
+ 
+-    auto fillWork = [c2Buffer, inFlags, outFlags, timestamp]
++    const bool copyMode = mBufferMode;
++    const uint32_t copyPixel = mCopyBlockFormat;
++    auto fillWork = [c2Buffer, inFlags, outFlags, timestamp, copyMode, copyPixel, hdrInfo=entry.hdrInfo, hdr10Plus=entry.hdr10Plus]
+             (const std::unique_ptr<C2Work> &work) {
+         work->input.ordinal.timestamp = 0;
+         work->input.ordinal.frameIndex = OUTPUT_WORK_INDEX;
+@@ -1201,6 +1248,12 @@
+         work->worklets.front()->output.ordinal = work->input.ordinal;
+         work->worklets.front()->output.ordinal.timestamp = timestamp;
+         work->worklets.front()->output.buffers.clear();
++        if (hdrInfo) work->worklets.front()->output.configUpdate.push_back(C2Param::Copy(*hdrInfo));
++        if (hdr10Plus) work->worklets.front()->output.configUpdate.push_back(C2Param::Copy(*hdr10Plus));
++        if (copyMode && c2Buffer) {
++            C2StreamPixelFormatInfo::output pixel(0u, copyPixel);
++            work->worklets.front()->output.configUpdate.push_back(C2Param::Copy(pixel));
++        }
+         if (c2Buffer) {
+             work->worklets.front()->output.buffers.push_back(c2Buffer);
+         }
+@@ -1251,7 +1304,9 @@
+     // Initialize decoder if not already initialized
+     if (!mStarted) {
+         mBlockPool = pool;
+-        mBufferMode = (pool->getLocalId() <= C2BlockPool::PLATFORM_START);
++        mSurfaceP010Copy = mCodingType == MPP_VIDEO_CodingAV1 &&
++                pool->getLocalId() > C2BlockPool::PLATFORM_START;
++        mBufferMode = mSurfaceP010Copy || (pool->getLocalId() <= C2BlockPool::PLATFORM_START);
+         err = initDecoder(work);
+         if (err != C2_OK) {
+             work->result = C2_BAD_VALUE;
+@@ -1622,24 +1677,9 @@
+                 break;
+         }
+ 
+-        switch (colorAspects->primaries) {
+-            case C2Color::PRIMARIES_BT601_525:
+-                usage |= MALI_GRALLOC_USAGE_YUV_COLOR_SPACE_BT601;
+-                break;
+-            case C2Color::PRIMARIES_BT709:
+-                usage |= MALI_GRALLOC_USAGE_YUV_COLOR_SPACE_BT709;
+-                break;
+-            default:
+-                break;
+-        }
+-        switch (colorAspects->range) {
+-            case C2Color::RANGE_FULL:
+-                usage |= MALI_GRALLOC_USAGE_RANGE_WIDE;
+-                break;
+-            default:
+-                usage |= MALI_GRALLOC_USAGE_RANGE_NARROW;
+-                break;
+-        }
++        // API32's existing Mali/gralloc direct import uses its original
++        // conversion policy. SDK14 range/primaries usage hints change that
++        // policy on this older allocator; only P010 copies need explicit hints.
+     }
+ 
+     // only large than gralloc 4 can support int64 usage.
+@@ -1654,20 +1694,35 @@
+     }
+ 
+     if (mBufferMode) {
+-        uint32_t bFormat = (MPP_FRAME_FMT_IS_YUV_10BIT(mppFmt)) ? mPixelFormat : format;
++        if (MPP_FRAME_FMT_IS_YUV_10BIT(mppFmt)) {
++            if (mFbcCfg.mode) return C2_CORRUPTED;
++            blockW = videoW; blockH = videoH;
++            usage = GRALLOC_USAGE_SW_READ_OFTEN | GRALLOC_USAGE_SW_WRITE_OFTEN;
++        }
++        if (mSurfaceP010Copy) {
++            auto color = mIntf->getColorAspects_l();
++            usage &= ~(MALI_GRALLOC_USAGE_YUV_COLOR_SPACE_MASK | MALI_GRALLOC_USAGE_RANGE_MASK);
++            usage |= color && color->range == C2Color::RANGE_FULL
++                    ? MALI_GRALLOC_USAGE_RANGE_WIDE : MALI_GRALLOC_USAGE_RANGE_NARROW;
++            usage |= color && color->matrix == C2Color::MATRIX_BT2020
++                    ? MALI_GRALLOC_USAGE_YUV_COLOR_SPACE_BT2020
++                    : color && color->matrix == C2Color::MATRIX_BT709
++                    ? MALI_GRALLOC_USAGE_YUV_COLOR_SPACE_BT709
++                    : MALI_GRALLOC_USAGE_YUV_COLOR_SPACE_BT601;
++        }
++        uint32_t bFormat = MPP_FRAME_FMT_IS_YUV_10BIT(mppFmt)
++                ? (mSurfaceP010Copy ? HAL_PIXEL_FORMAT_YCBCR_P010 : mPixelFormat) : format;
+         uint64_t bUsage  = (usage | GRALLOC_USAGE_SW_READ_OFTEN | GRALLOC_USAGE_SW_WRITE_OFTEN);
+ 
+-        // allocate buffer within 4G to avoid rga2 error.
+-        if (C2RKChipCapDef::get()->getChipType() == RK_CHIP_3588 ||
+-            C2RKChipCapDef::get()->getChipType() == RK_CHIP_356X) {
+-            bUsage |= RK_GRALLOC_USAGE_WITHIN_4G;
+-        }
++        // This copy path is CPU based and does not submit to RGA2. Retain
++        // the verified API32 P010 allocator usage without SDK14 DMA hints.
+         /*
+          * For buffer mode, since we don't konw when the last buffer will use
+          * up by user, so we chose to copy output to another dst block.
+          */
+         if (mOutBlock &&
+-                (mOutBlock->width() != blockW || mOutBlock->height() != blockH)) {
++                (mOutBlock->width() != blockW || mOutBlock->height() != blockH ||
++                 mCopyBlockFormat != bFormat || mCopyBlockUsage != bUsage)) {
+             mOutBlock.reset();
+         }
+         if (!mOutBlock) {
+@@ -1679,6 +1734,11 @@
+                 return err;
+             }
+         }
++        mCopyBlockFormat = bFormat; mCopyBlockUsage = bUsage;
++    }
++
++    if (mBufferMode) {
++        return C2_OK;
+     }
+ 
+     std::shared_ptr<C2GraphicBlock> outblock;
+@@ -1717,8 +1777,7 @@
+     c2_status_t err = C2_OK;
+ 
+ outframe:
+-    OutWorkEntry entry;
+-    memset(&entry, 0, sizeof(entry));
++    OutWorkEntry entry{};
+ 
+     err = getoutframe(&entry);
+     if (err == C2_OK) {
+@@ -1785,6 +1844,7 @@
+     c2_status_t ret = C2_OK;
+     MPP_RET     err = MPP_OK;
+     MppFrame  frame = nullptr;
++    entry->hdrInfo.reset(); entry->hdr10Plus.reset();
+ 
+     err = mMppMpi->decode_get_frame(mMppCtx, &frame);
+     if (err != MPP_OK || frame == nullptr) {
+@@ -1817,9 +1877,23 @@
+         }
+ 
+         Mutex::Autolock autoLock(mBufferLock);
++        if (!mBufferMode && !MPP_FRAME_FMT_IS_FBC(format) &&
++                (format & MPP_FRAME_FMT_MASK) == MPP_FMT_YUV420SP_10BIT) {
++            MppBufferGroup internal = nullptr;
++            if (mpp_buffer_group_get_internal(&internal, MPP_BUFFER_TYPE_ION) != MPP_OK ||
++                    mMppMpi->control(mMppCtx, MPP_DEC_SET_EXT_BUF_GROUP, internal) != MPP_OK) {
++                if (internal) mpp_buffer_group_put(internal);
++                ret = C2_CORRUPTED; goto cleanUp;
++            }
++            clearOutBuffers();
++            if (mFrmGrp) mpp_buffer_group_put(mFrmGrp);
++            mFrmGrp = internal;
++            mSurfaceP010Copy = true;
++            mBufferMode = true;
++        }
+ 
+         clearOutBuffers();
+-        mpp_buffer_group_clear(mFrmGrp);
++        if (mFrmGrp) mpp_buffer_group_clear(mFrmGrp);
+ 
+         mWidth = width;
+         mHeight = height;
+@@ -1874,17 +1948,22 @@
+         goto cleanUp;
+     }
+ 
+-    outBuffer = findOutBuffer(mppBuffer);
+-    if (!outBuffer) {
++    outBuffer = mBufferMode ? nullptr : findOutBuffer(mppBuffer);
++    if (!mBufferMode && !outBuffer) {
+         ret = C2_CORRUPTED;
+         c2_err("get outdated mppBuffer %p", mppBuffer);
+         goto cleanUp;
+     }
+ 
+     c2_trace("get one frame [%d:%d] stride [%d:%d] pts %lld err %d index %d",
+-             width, height, hstride, vstride, pts, error, outBuffer->index);
++             width, height, hstride, vstride, pts, error, outBuffer ? outBuffer->index : -1);
+ 
+     if (mBufferMode) {
++        if (mSurfaceP010Copy) {
++            getVuiParams(frame);
++            ret = ensureDecoderState();
++            if (ret != C2_OK) goto cleanUp;
++        }
+         if (MPP_FRAME_FMT_IS_YUV_10BIT(mColorFormat)) {
+             C2GraphicView wView = mOutBlock->map().get();
+             C2PlanarLayout layout = wView.layout();
+@@ -1894,9 +1973,37 @@
+             size_t dstYStride = layout.planes[C2PlanarLayout::PLANE_Y].rowInc;
+             size_t dstUVStride = layout.planes[C2PlanarLayout::PLANE_U].rowInc;
+ 
+-            C2RKMediaUtils::convert10BitNV12ToRequestFmt(
+-                    mPixelFormat, dstY, dstUV, dstYStride,
+-                    dstUVStride, src, hstride, vstride, width, height);
++            if (mCopyBlockFormat != HAL_PIXEL_FORMAT_YCBCR_P010 ||
++                    !rkPacked10ToP010(src, mpp_buffer_get_size(mppBuffer), hstride, vstride,
++                            dstY, dstUV, dstYStride, dstUVStride, width, height)) {
++                ret = C2_CORRUPTED; goto cleanUp;
++            }
++        } else if ((mColorFormat & MPP_FRAME_FMT_MASK) == MPP_FMT_YUV420SP) {
++            // The old allocator's plane offsets are authoritative. Copy visible
++            // rows into its mapped layout instead of assuming SDK RGA strides.
++            C2GraphicView view = mOutBlock->map().get();
++            const auto layout = view.layout();
++            auto src = static_cast<const uint8_t*>(mpp_buffer_get_ptr(mppBuffer));
++            const size_t size = mpp_buffer_get_size(mppBuffer);
++            if (view.error() != C2_OK || !src || hstride < width || vstride < height ||
++                    size < size_t(hstride) * vstride * 3 / 2 || layout.numPlanes != 3) {
++                ret = C2_CORRUPTED; goto cleanUp;
++            }
++            for (uint32_t plane = 0; plane < 3; ++plane) {
++                const auto &desc = layout.planes[plane];
++                auto dst = const_cast<uint8_t*>(view.data()[plane]);
++                if (!dst || desc.rowInc <= 0 || desc.colInc <= 0 ||
++                        desc.bitDepth != 8 || desc.allocatedDepth != 8) {
++                    ret = C2_CORRUPTED; goto cleanUp;
++                }
++                const uint32_t rows = plane ? height / 2 : height;
++                const uint32_t cols = plane ? width / 2 : width;
++                const auto base = src + (plane ? size_t(hstride) * vstride : 0);
++                for (uint32_t y = 0; y < rows; ++y)
++                    for (uint32_t x = 0; x < cols; ++x)
++                        dst[size_t(y) * desc.rowInc + size_t(x) * desc.colInc] =
++                                base[size_t(y) * hstride + (plane ? x * 2 + plane - 1 : x)];
++            }
+         } else {
+             RgaInfo srcInfo, dstInfo;
+             int32_t srcFd = 0, dstFd = 0;
+@@ -1916,7 +2023,6 @@
+                 memcpy(dstPtr, srcPtr, mHorStride * mVerStride * 3 / 2);
+             }
+         }
+-        outBuffer->site = BUFFER_SITE_BY_MPP;
+     } else {
+         outBuffer->site = BUFFER_SITE_BY_US;
+         // signal buffer occupied by users
+@@ -1935,6 +2041,54 @@
+         mCodingType == MPP_VIDEO_CodingAV1 ||
+         mCodingType == MPP_VIDEO_CodingMPEG2) {
+         getVuiParams(frame);
++    }
++
++    {
++        // Preserve the decoder's HDR10 static metadata without tone mapping.
++        if (mCodingType == MPP_VIDEO_CodingHEVC || mCodingType == MPP_VIDEO_CodingAV1) {
++            auto md = mpp_frame_get_mastering_display(frame);
++            auto cl = mpp_frame_get_content_light(frame);
++            if (md.max_luminance || cl.MaxCLL || cl.MaxFALL) {
++                auto hdr = std::make_shared<C2StreamHdrStaticInfo::output>(0u);
++                const bool av1 = mCodingType == MPP_VIDEO_CodingAV1;
++                const float xyScale = av1 ? 65536.0f : 50000.0f;
++                int red = av1 ? 0 : 2, green = av1 ? 1 : 0, blue = av1 ? 2 : 1;
++                hdr->mastering.red = {md.display_primaries[red][0]/xyScale, md.display_primaries[red][1]/xyScale};
++                hdr->mastering.green = {md.display_primaries[green][0]/xyScale, md.display_primaries[green][1]/xyScale};
++                hdr->mastering.blue = {md.display_primaries[blue][0]/xyScale, md.display_primaries[blue][1]/xyScale};
++                hdr->mastering.white = {md.white_point[0]/xyScale, md.white_point[1]/xyScale};
++                hdr->mastering.maxLuminance = md.max_luminance/(av1?256.0f:10000.0f);
++                hdr->mastering.minLuminance = md.min_luminance/(av1?16384.0f:10000.0f);
++                hdr->maxCll = cl.MaxCLL; hdr->maxFall = cl.MaxFALL;
++                std::vector<std::unique_ptr<C2SettingResult>> hdrFailures;
++                if (mIntf->config({hdr.get()}, C2_MAY_BLOCK, &hdrFailures) == C2_OK)
++                    entry->hdrInfo = hdr;
++            } else {
++                auto absent = std::make_shared<C2StreamHdrStaticInfo::output>(0u);
++                absent->mastering = {{0,0},{0,0},{0,0},{0,0},-1.0f,0};
++                absent->maxCll = absent->maxFall = 0;
++                std::vector<std::unique_ptr<C2SettingResult>> failures;
++                if (mIntf->config({absent.get()}, C2_MAY_BLOCK, &failures) == C2_OK)
++                    entry->hdrInfo = absent;
++            }
++        }
++
++        const bool plusEnabled = mCodingType == MPP_VIDEO_CodingHEVC &&
++                property_get_bool("debug.rkcodec2.hdr10plus", false);
++        if (plusEnabled) {
++            entry->hdr10Plus = rk_hdr::plus(frame);
++            std::vector<std::unique_ptr<C2SettingResult>> failures;
++            mIntf->config({entry->hdr10Plus.get()}, C2_MAY_BLOCK, &failures);
++        }
++        if (plusEnabled || property_get_bool("debug.rkcodec2.hdr_static_buffer", false)) {
++            bool stored = rk_hdr::store(mBufferMode ? mOutBlock : outBuffer->block, entry->hdrInfo, entry->hdr10Plus);
++            if (!stored) c2_err("HDR bridge metadata store failed");
++            if (property_get_bool("debug.rkcodec2.hdr_trace", false))
++                c2_info("HDR_BRIDGE pts=%lld static=%d plus=%zu store=%d", (long long)pts,
++                        !!entry->hdrInfo, entry->hdr10Plus ? entry->hdr10Plus->flexCount() : 0, stored);
++        }
++
++
+     }
+ 
+     /* dump output data if neccessary */
+@@ -2047,7 +2201,7 @@
+ public:
+     explicit C2RKMpiDecFactory(std::string name)
+             : mHelper(std::static_pointer_cast<C2ReflectorHelper>(
+-                  GetCodec2RKComponentStore()->getParamReflector())),
++                  GetCodec2PlatformComponentStore()->getParamReflector())),
+               mComponentName(name) {
+         C2RKComponentEntry *entry = GetRKComponentEntry(name);
+         if (entry != nullptr) {
+--- a/component/video/C2RKMpiDec.h
++++ b/component/video/C2RKMpiDec.h
+@@ -83,6 +83,8 @@
+         std::shared_ptr<C2GraphicBlock> outblock;
+         uint64_t timestamp;
+         uint32_t flags;
++        std::shared_ptr<C2StreamHdrStaticInfo::output> hdrInfo;
++        std::shared_ptr<C2StreamHdr10PlusInfo::output> hdr10Plus;
+     } OutWorkEntry;
+ 
+     class WorkHandler : public AHandler {
+@@ -163,6 +165,9 @@
+     } mScaleInfo;
+ 
+     std::shared_ptr<C2GraphicBlock> mOutBlock;
++    uint32_t mCopyBlockFormat = 0;
++    uint64_t mCopyBlockUsage = 0;
++    bool mSurfaceP010Copy = false;
+     std::shared_ptr<C2BlockPool>    mBlockPool;
+ 
+     // Color aspects. These are ISO values and are meant to detect changes

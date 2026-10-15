@@ -5,7 +5,13 @@ components. It is restricted to the tested RK3588 firmware hashes and original
 5.10 kernel interfaces. Yamby files, LSPosed 0.3.3, the GPU driver, clocks and
 Frame Guard are retained.
 
-Version 0.4.0 adds six selected upstream MPP decoder fixes and the libyuv
+Version 0.5.0 ports the pinned SDK14 Codec2 core to this API32 stack, retains
+the newer MPP compatibility pair and adds a `codec2_sdk` switch to restore
+the previous backend independently. See the [SDK scope, port and kernel-driver
+boundary](../docs/decode-sdk-050.zh-CN.md). This is a userspace multimedia port;
+the original system framework, HIDL implementation and kernel remain.
+
+Version 0.4.0 added six selected upstream MPP decoder fixes and the libyuv
 scaling integer-overflow fix while retaining the existing system ABI. See the
 [upgrade scope, exact commits and tests](../docs/decode-upgrade-040.zh-CN.md).
 It does not replace the kernel VPU/RGA drivers or add unsupported hardware
@@ -15,7 +21,7 @@ formats. The independent global Mali module is retained.
 | --- | --- |
 | MPP + VPU, ARM32/ARM64 | MPP 1.1.0 plus selected upstream VP9 probability, reset/CSD replay, empty CSD, AV1 metadata capacity/gating and HEVC first-task PS/RPS fixes; retains verified JPEG/PREP/HDR compatibility |
 | RGA, ARM32/ARM64 | Existing validated librga 1.10.6 for this firmware's gralloc4 ABI |
-| Codec2 | Existing full-precision Surface/P010 implementation and six narrowly guarded platform patches; all 21 original codec entries remain available |
+| Codec2 | Selectable SDK14 core port with full-precision Surface/P010 and HDR metadata; previous backend and six guarded platform patches retained; all 21 original entries remain available |
 | libyuv, system ARM64 | Version 1974 plus upstream scaling overflow fix `0b9e5c922dee`; all 710 original exports retained; 59 removed APIs use isolated Android 12 source implementations |
 | HDR metadata | Full HDR10 static mastering/light values on the verified direct Surface path; standard per-frame Codec2 HDR10+ metadata bridge, with independent switches; no native HDR10+/Dolby HDMI claim |
 | Software Codec2, ARM64 APEX | libvpx 1.17.0 decoder-only backend and pinned libgav1; API32 wrappers retain CFI and use full-precision P010 for tested ten-bit output; original shared libvpx and VP8/VP9 encoders remain original |
@@ -36,7 +42,7 @@ retained.
 
 ## Installation and switches
 
-Install `rk3588-decode-stack-0.4.0.zip` in Magisk and reboot. The installer checks
+Install `rk3588-decode-stack-0.5.0.zip` in Magisk and reboot. The installer checks
 all components before disabling overlapping standalone MPP, RGA, Codec2 and
 libyuv modules. It also works from the original component state: Codec2's
 preflight uses the hash-verified staged dependencies. No vendor partition is
@@ -52,7 +58,9 @@ su -c 'sh /data/adb/modules/rk3588_decode_stack/mode-control.sh libyuv off'
 su -c 'sh /data/adb/modules/rk3588_decode_stack/mode-control.sh libyuv on'
 ```
 
-Replace `libyuv` with `mpp`, `rga`, `codec2`, `software`, `hdr_static` or `hdr10plus` for the other selections, and reboot.
+Replace `libyuv` with `mpp`, `rga`, `codec2`, `codec2_sdk`, `software`, `hdr_static` or `hdr10plus` for the other selections, and reboot.
+Turning `codec2_sdk` off restores the prior 0.4.0 core; turning `codec2` off
+suppresses both the SDK core and its dependent platform/software/HDR upgrades.
 Selections prepare the next boot; they never replace a running process's library.
 Disabling or uninstalling the unified module and rebooting restores the firmware
 originals. Standalone modules remain disabled, so they cannot silently remount
@@ -70,6 +78,16 @@ modified. The shared libvpx encoder ABI is never replaced. A failed temporary
 mount rolls back its mounts before the unified recovery disables the module.
 
 ## Validation
+
+For 0.5.0, fourteen system playback cases pass and all fourteen captured RGB
+frames match 0.4.0 exactly. Eleven native reference cases retain every tested
+sample, including 4K ten-bit output. A five-size HEVC ten-bit adaptive stream
+produces 33 exact-reference frames, and four original OMX aliases decode exact
+reference pixels. Full P010, four software playback cases, static HDR, standard
+per-frame HDR10+ metadata and direct/client HDR transitions are covered. Clean
+source rebuilds reproduce the installed core byte-for-byte. Version-specific
+rollback and manual playback status are recorded under `sdk_050`; earlier
+manual confirmations are not counted for the new core. The user confirmed normal original-Yamby HW+ playback of usual ten-bit and second-video content, pause/seek/switch/reopen, picture and sound, without gray edges or whole-display blackouts on 2026-10-15.
 
 For 0.4.0, both MPP/VPU ABIs retain every previous export and libyuv retains
 all 710 original exports. Four native reset/reference cases, 288 scaling-boundary
@@ -129,6 +147,10 @@ pre-install directories with `tools/build_decode_stack.py --mpp ... --rga ...
 already contains generated firmware patches, or an HDR input containing a copied original HWC. Those six files and the codec XML
 are generated only on the device from exact-byte/hash-verified originals.
 
+For the optional SDK core, also build `tools/build_codec2_sdk.py` from the
+pinned source and pass its clean package using `--codec2-sdk ...` to the
+combiner. The original Codec2 package is still required as the fallback.
+
 Component source revisions, licenses, source patches and build recipes are
 included in their directories. The package contains newly built open-source
 binaries and patch recipes; it contains no copied firmware libraries, personal
@@ -152,6 +174,11 @@ Codec2 会暂时停用；重新开启依赖后会恢复原先选择。10 位视�
 它们不代表原生 HDR10+ HDMI 或 Dolby Vision 已开启。HDR 静态适配启用时，
 冷启动可能额外重载一次显示与框架服务，以处理原固件早于 Magisk 挂载启动 HWC 的顺序。
 具体测试、应用输出边界见上面的实现文档。
+
+0.5.0 增加同平台 Android14 SDK 的 Codec2 核心移植及 `codec2_sdk` 开关。
+关闭此分项并重启可恢复 0.4.0 后端；整包关闭并重启恢复原固件组件。
+保留较新的现用 MPP，没有回退到 SDK 随带的旧版 MPP，不替换内核 VPU。
+具体适配范围与测试见[SDK 移植说明](../docs/decode-sdk-050.zh-CN.md)。
 
 ## 0.3.1 HDR transfer repair
 
