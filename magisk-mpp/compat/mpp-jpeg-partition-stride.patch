@@ -1,0 +1,15 @@
+--- a/mpp/hal/vpu/jpege/hal_jpege_vepu2_v2.c
++++ b/mpp/hal/vpu/jpege/hal_jpege_vepu2_v2.c
+@@ -655,7 +655,11 @@
+         cfg.fmt = syntax->format;
+         cfg.width = syntax->width;
+         cfg.height = syntax->height;
+-        cfg.hor_stride = syntax->hor_stride;
++        /* Register 61 uses pixels, but partition offsets use bytes.
++         * The legacy Android JPEG caller supplies a pixel stride for packed
++         * YUYV/RGB; gen_regs already resolves it in stride_cfg. Reuse that
++         * result instead of treating the original value as bytes. */
++        cfg.hor_stride = ctx->stride_cfg.pixel_stride * ctx->stride_cfg.pixel_size;
+         cfg.ver_stride = syntax->ver_stride;
+         cfg.offset_x = syntax->offset_x;
+         cfg.offset_y = syntax->offset_y + mcu_y * 16;

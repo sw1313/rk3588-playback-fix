@@ -1,0 +1,8 @@
+1b2115c8ac2029070b8f0e14f01b3f885d67ca32d5727a75a5f1f2c59fc09e86  /system/lib64/libui.so
+382d6f541397c254f79719f8328e9f709f45cda6f94019bf22f540e12ede4aea  /system/lib64/libutils.so
+8ca57a3aa9b0edee49f54c02445e194e69db146ce73ea6d09c5655cab4fa6595  /system/lib64/libcutils.so
+c38a57de7b44bccc27bdffd58de033edcc5584c116fc303ec62e80416e9b2d7a  /system/lib64/libc++.so
+492131aea15e8e991d6bd0ea495130bba0c4ae14e23bbb9972ed15b7fbd7b73a  /vendor/lib64/hw/android.hardware.graphics.mapper@4.0-impl-bifrost.so
+53134e922675620f79ad32676c5414f9deb304420951edfeafd72931753e990a  /vendor/lib64/libdrm.so
+f778573a92a199bb97a1118e029c819f3085d13e89bf6992561d9bcb253e6106  /system/lib64/libdrm.so
+fddde345b957a0898c44cf1c62d23e9736d98d246e46bb3f39244c0e7d6b0d1a  /system/bin/surfaceflinger

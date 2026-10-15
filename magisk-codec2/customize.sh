@@ -6,12 +6,18 @@
 cd "$MODPATH" || abort "Module directory unavailable."
 sha256sum -c checksums.sha256 >/dev/null 2>&1 || abort "Payload verification failed."
 sha256sum -c contracts/platform.sha256 >/dev/null 2>&1 || abort "Untested Codec2/HIDL/gralloc ABI."
-sha256sum -c contracts/runtime.sha256 >/dev/null 2>&1 || abort "Requires the tested active MPP 1.1.0 and RGA 1.10.6 libraries."
+codec2_dependencies=/vendor/lib:/system/lib:/apex/com.android.vndk.v32/lib
+if [ -n "$RK_DECODE_STAGE" ]; then
+ sh "$MODPATH/check-runtime.sh" --staged "$RK_DECODE_STAGE" >/dev/null 2>&1 || abort "Unified MPP/RGA payload differs from the verified profile."
+ codec2_dependencies="$RK_DECODE_STAGE/mpp/system/vendor/lib:$RK_DECODE_STAGE/rga/system/vendor/lib:$codec2_dependencies"
+else
+ sh "$MODPATH/check-runtime.sh" >/dev/null 2>&1 || abort "Requires the tested active MPP 1.1.0 and RGA 1.10.6 libraries."
+fi
 set_perm "$MODPATH/bin/patcher" 0 0 0755
 sha() { value=$(sha256sum "$1") || return 1; echo "${value%% *}"; }
 service_hash=$(sha /vendor/bin/hw/android.hardware.media.c2@1.1-service) || abort "Cannot read service."
 payload_hash=$(sha "$MODPATH/system/vendor/bin/hw/android.hardware.media.c2@1.1-service")
-[ "$service_hash" = 4c3586e5b54b67f98eb15772ef215380d51f34b52efd8dca80a2f17bad124746 ] || [ "$service_hash" = "$payload_hash" ] || [ "$service_hash" = 796d3ac07a1341e8bca0551132b0c844ee37572b9bbeb20571b12bcc5e58b9a3 ] || abort "Unknown service baseline."
+[ "$service_hash" = 4c3586e5b54b67f98eb15772ef215380d51f34b52efd8dca80a2f17bad124746 ] || [ "$service_hash" = "$payload_hash" ] || [ "$service_hash" = 796d3ac07a1341e8bca0551132b0c844ee37572b9bbeb20571b12bcc5e58b9a3 ] || [ "$service_hash" = f07d9c70d10f2157aaef3db4ca6cf2858bfdeb8f286190467c0a639c4bd07d84 ] || abort "Unknown service baseline."
 # The final alternative is our earlier locally tested service, permitting an
 # upgrade without weakening the pinned original HIDL and platform ABI checks.
 ui_print "Generating narrow P010 fixes from this device's verified original files..."
@@ -43,7 +49,7 @@ set_perm_recursive "$MODPATH" 0 0 0755 0644
 set_perm "$MODPATH/bin/patcher" 0 0 0755
 set_perm "$MODPATH/system/vendor/bin/hw/android.hardware.media.c2@1.1-service" 0 0 0755 u:object_r:mediacodec_exec:s0
 ui_print "Checking installed HIDL ABI and all original/candidate interfaces..."
-timeout 25 /system/bin/env LD_LIBRARY_PATH=/vendor/lib:/system/lib:/apex/com.android.vndk.v32/lib RK_CODEC2_P010_LIBRARY="$MODPATH/system/vendor/lib/hw/libcodec2_rx_component.so" "$MODPATH/system/vendor/bin/hw/android.hardware.media.c2@1.1-service" --check-only > "$MODPATH/preflight.txt" 2>&1 || abort "HIDL/Codec2 preflight failed."
+timeout 25 /system/bin/env LD_LIBRARY_PATH="$codec2_dependencies" RK_CODEC2_P010_LIBRARY="$MODPATH/system/vendor/lib/hw/libcodec2_rx_component.so" "$MODPATH/system/vendor/bin/hw/android.hardware.media.c2@1.1-service" --check-only > "$MODPATH/preflight.txt" 2>&1 || abort "HIDL/Codec2 preflight failed."
 cat "$MODPATH/preflight.txt"
 while read -r name; do
  grep -F "COMPONENT $name rank=" "$MODPATH/preflight.txt" >/dev/null || abort "Missing stock component: $name"

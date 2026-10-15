@@ -22,7 +22,9 @@ def main():
  source=work/'source'
  if source.exists():raise SystemExit('Use a fresh build directory; existing source is never overwritten')
  shutil.copytree(upstream,source,ignore=shutil.ignore_patterns('.git'))
- run('git','-C',source,'apply',MODULE/'patches/codec2-p010.patch')
+ run('git','-C',source,'--git-dir='+str(upstream/'.git'),'--work-tree='+str(source),'apply',MODULE/'patches/codec2-p010.patch')
+ run('git','-C',source,'--git-dir='+str(upstream/'.git'),'--work-tree='+str(source),'apply',MODULE/'patches/codec2-hdr-bridge.patch')
+ for header in (MODULE/'bridge-src').glob('*.h'):shutil.copyfile(header,source/'component/include'/header.name)
  for name in ['aosp-codec2','aosp-hardware','platform-private','vendor32']:
   if not (sdk/name).is_dir():raise SystemExit('Missing prepared SDK directory: '+name)
  host='windows-x86_64' if os.name=='nt' else 'darwin-x86_64' if os.uname().sysname=='Darwin' else 'linux-x86_64';ext='.exe' if os.name=='nt' else '';llvm=a.ndk.resolve()/'toolchains/llvm/prebuilt'/host/'bin'
@@ -31,8 +33,8 @@ def main():
  includes+=sorted(p for p in headers.rglob('*') if p.is_dir() and p.name in names and 'external/libcxx' not in p.as_posix() and 'bionic' not in p.as_posix())
  includes+=sorted(p for p in (headers/'generated-headers').rglob('gen') if (p/'android').exists())
  includes+=[headers/'system/libfmq/base',headers/'frameworks/native/libs/binder/ndk/include_cpp',headers/'frameworks/native/libs/binder/ndk/include_ndk']
- generated=work/'generated';generated.mkdir();(generated/'C2RKVersion.h').write_text('#define C2_GIT_BUILD_VERSION "RK3588 Codec2 compatibility 0.1.0 API32"\n')
- vendor=sdk/'vendor32';links=['libmpp.so','librga.so','libbase.so','libcodec2.so','libcodec2_vndk.so','libsfplugin_ccodec_utils.so','libstagefright_foundation.so','libgralloc_priv.so','libutils.so','libcutils.so','libui.so','libc++.so','liblog.so']
+ generated=work/'generated';generated.mkdir();(generated/'C2RKVersion.h').write_text('#define C2_GIT_BUILD_VERSION "RK3588 Codec2 compatibility 0.1.2 API32 HDR"\n')
+ vendor=sdk/'vendor32';links=['libmpp.so','librga.so','libbase.so','libcodec2.so','libcodec2_vndk.so','libsfplugin_ccodec_utils.so','libstagefright_foundation.so','libgralloc_priv.so','libutils.so','libcutils.so','libui.so','libc++.so','liblog.so','libhidlbase.so','libgralloctypes.so','android.hardware.graphics.mapper@4.0.so']
  svc_links=links+['libhidlbase.so','libbinder.so','libavservices_minijail.so','libdmabufheap.so']
  for name in svc_links:
   if not (vendor/name).is_file():raise SystemExit('Missing private link input '+name)
@@ -60,7 +62,8 @@ def main():
  (payload/'bin').mkdir();run(llvm/('clang'+ext),'--target=aarch64-linux-android32','-O2','-s','-fPIE','-pie',MODULE/'src/patcher.c','-o',payload/'bin/patcher')
  for script in [*payload.glob('*.sh'),payload/'contracts/stock-components.txt']:script.write_bytes(script.read_bytes().replace(b'\r\n',b'\n'))
  files=sorted(p for p in payload.rglob('*') if p.is_file());(payload/'checksums.sha256').write_text(''.join(sha(p)+'  '+p.relative_to(payload).as_posix()+'\n' for p in files))
- archive=work/'rk3588-codec2-compat-v0.1.0.zip'
+ version=dict(line.split('=',1) for line in (MODULE/'module.prop').read_text(encoding='utf-8').splitlines() if '=' in line)['version']
+ archive=work/('rk3588-codec2-compat-v'+version+'.zip')
  with zipfile.ZipFile(archive,'w',zipfile.ZIP_DEFLATED) as z:
   for f in sorted(payload.rglob('*')):
    if f.is_file():z.write(f,f.relative_to(payload).as_posix())

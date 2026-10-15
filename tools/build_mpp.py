@@ -37,6 +37,26 @@ def main():
         raise SystemExit("MPP source does not match the pinned revision")
     if subprocess.check_output(["git", "-C", str(source), "diff", "--name-only"], text=True).strip():
         raise SystemExit("Tracked MPP source modifications are not supported by this build")
+    # Keep the verified upstream checkout clean; build compatibility additions
+    # from a separate source tree so rebuilding cannot modify release inputs.
+    patched = work / "source-compat"
+    if patched.exists():
+        raise SystemExit("Use a fresh work directory for the compatibility build")
+    shutil.copytree(source, patched, ignore=shutil.ignore_patterns(".git"))
+    for patch in sorted((MODULE / "compat").glob("*.patch")):
+        run("git", "-C", patched, "--git-dir=" + str(source / ".git"),
+            "--work-tree=" + str(patched), "apply", patch)
+    shutil.copyfile(MODULE / "compat" / "mpi_legacy_prep.h", patched / "mpp" / "mpi_legacy_prep.h")
+    # Upstream uses .git to generate its runtime revision. A source-only copy
+    # has no VCS directory, so declare the already-verified base plus patches.
+    cmake_file = patched / "CMakeLists.txt"
+    cmake_text = cmake_file.read_text(encoding='utf-8')
+    needle = 'set(VERSION_INFO        "\\\"unknown mpp version for missing VCS info\\\"")'
+    replacement = 'set(VERSION_INFO "\\\"c08762eb MPP 1.1.0 + RK3588 compatibility 0.3.0\\\"")'
+    if cmake_text.count(needle) != 1:
+        raise SystemExit("Unexpected upstream revision-generation template")
+    cmake_file.write_bytes(cmake_text.replace(needle, replacement).encode())
+    source = patched
     toolchain = ndk / "build" / "cmake" / "android.toolchain.cmake"
     host = "windows-x86_64" if os.name == "nt" else "darwin-x86_64" if os.uname().sysname == "Darwin" else "linux-x86_64"
     llvm = ndk / "toolchains" / "llvm" / "prebuilt" / host
@@ -53,15 +73,22 @@ def main():
             "-DANDROID_PLATFORM=android-32", "-DANDROID_STL=c++_static", "-DCMAKE_BUILD_TYPE=Release",
             "-DMPP_PROJECT_NAME=mpp", "-DVPU_PROJECT_NAME=vpu", "-DBUILD_TEST=OFF",
             "-DCMAKE_C_FLAGS=" + maps, "-DCMAKE_CXX_FLAGS=" + maps)
-        run("cmake", "--build", build, "--target", "mpp", "--parallel", "6")
+        run("cmake", "--build", build, "--target", "mpp", "vpu", "--parallel", "6")
         destination = MODULE / "system" / "vendor" / library_dir
         destination.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(build / "mpp" / "libmpp.so", destination / "libmpp.so")
+        shutil.copyfile(build / "mpp" / "legacy" / "libvpu.so", destination / "libvpu.so")
         run(llvm / "bin" / ("llvm-strip" + extension), "--strip-unneeded", destination / "libmpp.so")
+        run(llvm / "bin" / ("llvm-strip" + extension), "--strip-unneeded", destination / "libvpu.so")
         run(llvm / "bin" / ("clang" + extension), "--target=" + target,
             "--sysroot=" + str(llvm / "sysroot"), "-O2", "-fPIE", "-pie", "-s",
             "-I" + str(source / "inc"), "-ffile-prefix-map=" + ROOT.as_posix() + "=module",
             MODULE / "src" / "compat_probe.c", "-ldl", "-o", MODULE / "bin" / probe)
+        run(llvm / "bin" / ("clang" + extension), "--target=" + target,
+            "--sysroot=" + str(llvm / "sysroot"), "-O2", "-fPIE", "-pie", "-s",
+            "-I" + str(source / "inc"), "-ffile-prefix-map=" + ROOT.as_posix() + "=module",
+            MODULE / "src" / "hdr_lifetime_probe.c", "-ldl", "-o",
+            MODULE / "bin" / ("hdr_lifetime" + ("64" if label == "arm64" else "32")))
     (MODULE / "licenses").mkdir(exist_ok=True)
     for name in ("Apache-2.0", "MIT"):
         shutil.copyfile(source / "LICENSES" / name, MODULE / "licenses" / name)
@@ -69,10 +96,12 @@ def main():
 
 
 def package():
-    for name in ("system/vendor/lib64/libmpp.so", "system/vendor/lib/libmpp.so", "bin/probe64", "bin/probe32", "contracts/arm64-symbols.txt", "contracts/arm-symbols.txt", "contracts/vendor.sha256"):
+    for name in ("system/vendor/lib64/libmpp.so", "system/vendor/lib/libmpp.so", "system/vendor/lib64/libvpu.so", "system/vendor/lib/libvpu.so", "bin/probe64", "bin/probe32", "contracts/arm64-symbols.txt", "contracts/arm-symbols.txt", "contracts/vendor.sha256"):
         if not (MODULE / name).is_file():
             raise SystemExit("Missing module payload: " + name)
-    paths = sorted(path for path in MODULE.rglob("*") if path.is_file() and path.name not in {"checksums.sha256", "status.txt", "disable"})
+    active = [MODULE / "system" / "vendor" / abi / lib for abi in ("lib", "lib64") for lib in ("libmpp.so", "libvpu.so")]
+    (MODULE / "contracts" / "active.sha256").write_bytes("".join(hashlib.sha256(p.read_bytes()).hexdigest() + "  /vendor/" + p.parent.name + "/" + p.name + "\n" for p in active).encode())
+    paths = sorted(path for path in MODULE.rglob("*") if path.is_file() and path.name not in {"checksums.sha256", "status.txt", "disable", "resume-codec2"})
     # Hash the same LF-normalized bytes that Magisk will extract.
     for path in paths:
         if path.suffix in {".sh", ".md", ".txt", ".prop", ".sha256", ".c", ".json"}:
@@ -83,7 +112,7 @@ def package():
     paths.append(MODULE / "checksums.sha256")
     destination = ROOT / "dist"
     destination.mkdir(exist_ok=True)
-    properties = dict(line.split("=", 1) for line in (MODULE / "module.prop").read_text().splitlines() if "=" in line)
+    properties = dict(line.split("=", 1) for line in (MODULE / "module.prop").read_text(encoding='utf-8').splitlines() if "=" in line)
     archive = destination / ("rk3588-mpp-upgrade-" + properties["version"] + ".zip")
     with zipfile.ZipFile(archive, "w", zipfile.ZIP_DEFLATED) as output:
         for path in paths:

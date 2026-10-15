@@ -1,5 +1,9 @@
 # 当前固件的解码升级范围
 
+> 本页保留 Codec2 初版阶段的历史验证记录。当前组件已合并，libvpu/JPEG 兼容已补齐，
+> 系统软件解码已另行升级；最新范围以 [统一模块](../magisk-decode/README.md) 和
+> [HDR／软件解码专项结果](hdr-software-upgrade.zh-CN.md) 为准。下表中的“候选未安装”不是当前状态。
+
 保留 Android 12/API 32 和 5.10.66 内核。Yamby APK、内置 mpv、FFmpeg 保持原版，LSPosed 0.3.3 不增加功能。系统用户态组件依据实际兼容性测试决定启用，优先完整位深与正确色彩。
 
 | 组件 | 当前处理 | 验证边界 |

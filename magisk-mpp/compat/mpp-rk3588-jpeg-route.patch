@@ -1,0 +1,21 @@
+--- a/mpp/hal/mpp_enc_hal.c
++++ b/mpp/hal/mpp_enc_hal.c
+@@ -172,6 +172,18 @@
+         TRY_GET_ENC_HAL_API(VPU_CLIENT_RKVENC);
+         if (coding == MPP_VIDEO_CodingMJPEG)
+             TRY_GET_ENC_HAL_API(VPU_CLIENT_JPEG_ENC);
++        /* RK3588 exposes enhanced VEPU2 JPEG as client 19, not VEPU2.
++         * The existing VEPU2 JPEG HAL already selects that client in init;
++         * retain its API lookup while recognizing the actual kernel bit. */
++        if (coding == MPP_VIDEO_CodingMJPEG &&
++            mpp_get_soc_type() == ROCKCHIP_SOC_RK3588 &&
++            (vcodec_type & HAVE_VEPU2_JPEG)) {
++            api = mpp_enc_hal_api_get(coding, VPU_CLIENT_VEPU2);
++            if (api) {
++                ret = hal_impl_init(p, api, cfg);
++                break;
++            }
++        }
+         TRY_GET_ENC_HAL_API(VPU_CLIENT_VEPU2);
+         TRY_GET_ENC_HAL_API(VPU_CLIENT_VEPU1);
+         TRY_GET_ENC_HAL_API(VPU_CLIENT_VEPU22);

@@ -1,6 +1,6 @@
 id=rk3588_mpp_upgrade
-name=RK3588 MPP Upgrade (AGTV Android 12)
-version=0.1.1-mpp1.1.0
-versionCode=2
+name=RK3588 MPP & VPU Compatibility (Android 12)
+version=0.3.0-mpp1.1.0
+versionCode=4
 author=sw1313
-description=Experimental MPP 1.1.0 userspace library upgrade for the verified RK3588 Android 12 vendor stack. Includes ARM32/ARM64 libraries and install-time checks. Action disables it for rollback after reboot.
+description=Paired MPP 1.1.0/VPU compatibility with upstream dynamic HDR lifetime/reference fixes, legacy JPEG configuration and partition-stride fixes. Guarded systemless rollback.

@@ -1,0 +1,6 @@
+id=rk3588_libyuv_upgrade
+name=RK3588 System libyuv Compatibility
+version=0.1.0-yuv1974
+versionCode=100
+author=sw1313
+description=Firmware-pinned system ARM64 libyuv 1974 with original API compatibility. Full precision 10-bit conversion; independent systemless rollback after reboot.

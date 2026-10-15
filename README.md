@@ -1,15 +1,46 @@
 # RK3588 Playback Fix
 
-[中文说明](README.zh-CN.md) · [Downloads](https://github.com/sw1313/rk3588-playback-fix/releases/latest)
+The [Native Mali Global module 0.2.0](magisk-mali-global/README.md) upgrades both
+ARM32/ARM64 system graphics paths to g18p0 on the hash-verified API32 firmware,
+including SurfaceFlinger. It retains the original mapper/allocator services,
+CSF firmware, kernel and boot. The public installer fetches hash-pinned native
+drivers upstream; all included interface libraries are built from AOSP source.
+The older app-scoped experiment is superseded and must stay disabled.
+
+[中文说明](README.zh-CN.md) · [Current system packages](https://github.com/sw1313/rk3588-playback-fix/releases/tag/system-v2026.10.15) · [LSPosed release](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.3.3)
+
+The current system release collects the global GPU module, unified decode stack,
+and unchanged LSPosed/Frame Guard packages. GPU and decode ZIPs accept only the
+exact firmware hashes recorded in their contracts, not arbitrary RK3588 ROMs.
+Use the unified decode stack instead of overlapping standalone decode modules.
 
 The LSPosed module restores a selectable HW+ default in Yamby on any chipset, while its generic mpv decoder override is restricted to RK3588. A separate Magisk module prevents problematic content frame-rate switching observed on an H96Max V58 running RK3588 Android 12.
+
+## Unified system decode module
+
+The [unified decode stack](magisk-decode/README.md) combines MPP/VPU compatibility,
+RGA 1.10.6, the verified Codec2 Surface/P010 paths, system libyuv 1974 and pinned
+libvpx/libgav1 software decoder backends into one
+firmware-pinned module. It offers whole-module rollback and individual component
+switches with dependency handling. Earlier standalone releases remain available
+for reproducibility; keep them disabled when using the unified module.
+Yamby components and LSPosed 0.3.3 remain unchanged. See its validation record for
+precision, playback, migration and rollback results and remaining limits.
 
 ## Downloads and installation
 
 | Asset | Version | Purpose |
 | --- | --- | --- |
+| `rk3588-mali-global-0.2.0.zip` | 0.2.0 | System-wide native g18p0, both ABIs; Magisk Action selects global/original for the next reboot |
+| `rk3588-decode-stack-0.3.2.zip` | 0.3.2 | Unified decode updates, metadata fixes and component/whole-stack rollback |
 | `RK3588-Mpv-Fix-0.3.3.apk` | 0.3.3 | Yamby HW+ defaults on any chipset; optional RK3588 white-edge correction |
 | `rk3588-frameguard-0.1.0.zip` | 0.1.0 | Magisk module to keep refresh-rate requests at 60Hz |
+
+The global GPU ZIP downloads approximately 69 MiB of SHA256-pinned Mali libraries
+from upstream on first installation; verified device-local cache can be reused.
+Closed Mali binaries, raw device logs, connection addresses and signing keys are
+not included in this release. Read each module's firmware guards and validation
+limits before installation. These system packages are pre-releases.
 
 Install the APK, enable it in LSPosed, and select Yamby as its scope. Open the module's settings once, then force-stop and reopen Yamby. In **Settings → MPV Player → Default decoding mode**, choose **HW+**. The adapter was tested with Yamby **2.1.0.11 (20010012)** and LSPosed **2.2.1**. Future Yamby releases may need a new adapter.
 
@@ -91,3 +122,28 @@ On Windows use `gradlew.bat` and `python`. The APK is generated under `lsposed/a
 The modules have no Internet permission or telemetry. Decoder diagnostics use `RKPlaybackFix` and record codec/render options rather than media URLs. This repository and its release assets exclude device logs, screenshots, network addresses, local user paths, and private signing keys.
 
 Gradle wrapper files originate from Gradle and carry their Apache-2.0 notices; the license text is included in `third_party/Apache-2.0.txt`. The Xposed API is provided by [rovo89/XposedBridge](https://github.com/rovo89/XposedBridge), under Apache-2.0, and is supplied by the installed framework at runtime. Neither Yamby nor mpv binaries are distributed here.
+
+## HDR metadata integration 0.3.0
+
+The unified decode stack now includes independently switchable HDR10 static
+metadata propagation and a standard Codec2 HEVC HDR10+ metadata bridge. The latter
+is not native HDMI HDR10+ output. Original Yamby and LSPosed remain unchanged.
+See [implementation and measurements](docs/hdr-metadata-030.zh-CN.md)
+and [unified controls/rollback](magisk-decode/README.md).
+
+
+## HDR transition repair 0.3.1
+
+Dolby experimental staging, kernel-probe tooling and their development reports
+have been removed. The unified module repairs stale HDR10/HLG output EOTF on the
+verified direct hardware path, under the existing HDR static switch. Decoder
+components, original Yamby and LSPosed are retained.
+See [implementation, tests and remaining limits](docs/hdr-transition-031.zh-CN.md).
+
+## Native client output repair 0.3.2
+
+The verified managed SDR client-composition path now clears stale source HDR
+output state through the original HWC's scoped policy. Hardware HDR remains
+preferred; no pixel conversion or extra precision reduction is introduced.
+See [implementation and limits](docs/hdr-client-032.zh-CN.md) and
+[decoder upgrade audit](docs/decode-upgrade-audit-032.zh-CN.md).

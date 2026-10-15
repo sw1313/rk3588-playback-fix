@@ -1,0 +1,6 @@
+id=rk3588_software_codecs
+name=RK3588 API32 Software Codec Backends
+version=0.1.0
+versionCode=100
+author=sw1313
+description=Internal unified-stack component: pinned libvpx/libgav1 decoders, API32 wrappers and full ten-bit P010. Original encoders and shared libvpx are preserved.

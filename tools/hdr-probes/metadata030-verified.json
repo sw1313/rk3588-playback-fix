@@ -1,0 +1,202 @@
+{
+  "version": "0.3.0",
+  "date": "2026-10-15",
+  "hdr_030": {
+    "static_direct_surface": {
+      "path": "Rockchip Codec2 standard gralloc metadata -> original-HWC adapter -> DRM HDR_OUTPUT_METADATA -> HDMI InfoFrame registers",
+      "same_surface_cases": [
+        {
+          "input": "hevc10-hdr-720",
+          "frames": 100,
+          "metadata_fields": [
+            34000,
+            16000,
+            13250,
+            34500,
+            7500,
+            3000,
+            15635,
+            16450,
+            1000,
+            50,
+            1000,
+            400
+          ],
+          "checksum_valid": true,
+          "matches_mediacodec_bytes": true,
+          "pause_seek_eos": true
+        },
+        {
+          "input": "hdr4000",
+          "frames": 130,
+          "metadata_fields": [
+            35400,
+            14600,
+            8500,
+            39850,
+            6550,
+            2300,
+            15635,
+            16450,
+            4000,
+            10,
+            3500,
+            650
+          ],
+          "checksum_valid": true,
+          "matches_mediacodec_bytes": true,
+          "pause_seek_eos": true
+        },
+        {
+          "input": "hevc10-hdr-720",
+          "frames": 100,
+          "metadata_fields": [
+            34000,
+            16000,
+            13250,
+            34500,
+            7500,
+            3000,
+            15635,
+            16450,
+            1000,
+            50,
+            1000,
+            400
+          ],
+          "checksum_valid": true,
+          "matches_mediacodec_bytes": true,
+          "pause_seek_eos": true
+        },
+        {
+          "input": "pq-no-master",
+          "frames": 130,
+          "metadata_fields": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "checksum_valid": true,
+          "matches_mediacodec_bytes": "absent metadata cleared to zeros",
+          "pause_seek_eos": true
+        }
+      ],
+      "exit_returns_sdr": true,
+      "wire_measurement": false,
+      "kernel_debug_status": "Static fields are one byte early; complete raw InfoFrame/checksum used instead"
+    },
+    "fresh_surface_outputs": [
+      {
+        "input": "hevc10-hlg-720",
+        "expected_eotf": 3,
+        "pass": true,
+        "hdr_ten_bit_bt2020": true
+      },
+      {
+        "input": "hevc10-hdr-720",
+        "expected_eotf": 2,
+        "pass": true,
+        "hdr_ten_bit_bt2020": true
+      },
+      {
+        "input": "hevc8-720",
+        "expected_eotf": 0,
+        "pass": true,
+        "hdr_ten_bit_bt2020": "SDR stock output"
+      }
+    ],
+    "standard_codec2_hdr10plus": {
+      "codec": "HEVC",
+      "frames": 12,
+      "exact_source_payload_frames": 3,
+      "explicit_empty_frames": 9,
+      "t35_payload_bytes": 64,
+      "payload_sha256": "06dd3bfa8bacf645b48924d71801841b49debbc7ffe7d9863d86c48427f8cda9",
+      "long_pause_seek_flush_eos": {
+        "frames": 199,
+        "exact_payload_frames": 49,
+        "explicit_empty_frames": 150,
+        "paused": true,
+        "sought": true,
+        "eos": true,
+        "all_nonempty_payloads_match_source": true
+      },
+      "static_switch_off_dynamic_still_works": true,
+      "dynamic_switch_off_outputs_no_payload": true,
+      "portable_payload_guard_random_cases": 20000,
+      "native_hdmi_hdr10plus_enabled": false
+    },
+    "original_same_surface_eotf_limit": {
+      "result": "HLG/PQ transitions without Surface recreation can retain original EOTF; observed with original HWC and identical with adapter in four-case comparison",
+      "fixed_by_this_module": false,
+      "fresh_surface_hlg_pq_sdr_passed": true
+    },
+    "full_rollback": {
+      "fresh_boot": true,
+      "original_files_verified": 31,
+      "original_hwc_restored": true,
+      "generated_hwc_companion_absent": true,
+      "re_enabled_fresh_boot_active_files_verified": 19,
+      "original_kernel_unchanged": true
+    },
+    "independent_switches": {
+      "config_combinations_passed": 128,
+      "real_hdr_static_off_boot_verified_files": 17,
+      "hdr10plus_stays_enabled_with_static_off": true,
+      "all_seven_flags_final_enabled": true
+    },
+    "quality_regression": {
+      "surface_cases": 14,
+      "surface_cases_all_passed": true,
+      "software_cases": 7,
+      "software_cases_all_passed": true,
+      "pause_seek_eos": true,
+      "all_14_hardware_suite_captures_identical_to_verified_020": true,
+      "p010": {
+        "frames": 12,
+        "visible_samples": 4147200,
+        "all_visible_samples_identical_to_verified_020": true,
+        "low_two_bits_nonzero": 1884604,
+        "max_sample_error": 0,
+        "storage": "P010 MSB aligned, padding excluded"
+      },
+      "no_pixel_transform_in_hdr_adapter": true,
+      "software_hdr_client_composition_limit": "Stock HWC may compose through eight-bit AB24 despite ten-bit decoder P010; unchanged, not end-to-end ten-bit passed"
+    },
+    "cold_boot": {
+      "adapter_active": true,
+      "composer_reload_once_if_started_before_magic_mount": true,
+      "final_health_passed": true,
+      "clean_hwc_rebuild_exactly_matches_tested_binaries": 3
+    },
+    "dolby": {
+      "native_dv_ll_dv_fel_module_integrated": false,
+      "kernel_commit": "a8f0dc0b74e7af0f569190d6b72e11f2ae77f98e",
+      "supported_variants_in_upstream_commit": "RK3588*-*V*, e.g. RK3588S2-DV",
+      "device_missing_drm_interfaces": [
+        "DOVI_INPUT_TYPE",
+        "VSIF_DATA",
+        "HDR_EXT_DATA"
+      ],
+      "original_kernel_drm_built_in": true,
+      "reason": "Missing kernel/hardware/display processing chain cannot be supplied by ordinary Magisk file overlays; FEL software needs player pipeline changes excluded from scope"
+    }
+  },
+  "preserved": {
+    "yamby_original_native_hashes_verified": 9,
+    "lsposed_module": "0.3.3",
+    "kernel": "5.10.66",
+    "selinux": "original Permissive unchanged",
+    "gpu_and_frameguard": "unchanged",
+    "picture_quality_reduction_added": false
+  }
+}

@@ -9,3 +9,7 @@ ff05926207f4d5adb21e0498e1e5d5a271e372e372ce411f52ab822af8b110e0  /vendor/lib/li
 aa71d15f6189bab43e91d073f0c01670572e94d9837623f2fa4f905ab297502e  /vendor/lib64/libgralloc_priv.so
 749cc4a3f1cb9888f3d2b6e40c0fe8c73ee14eb5d0f277a8ad3e27d545bf0123  /system/lib/libc++.so
 c38a57de7b44bccc27bdffd58de033edcc5584c116fc303ec62e80416e9b2d7a  /system/lib64/libc++.so
+c4c0ae8781996e91c2160481b40cd7ad476345e77232ab7dadaf306755152e94  /system/lib/libui.so
+0b8d2d3e80e5e7b1d983ce2ffc1a50819a105ba73c8b7f26d8912742c5350c9e  /apex/com.android.vndk.v32/lib/android.hardware.graphics.mapper@4.0.so
+f98125657b8051b76804e2fbe391a07bd563ef8257e80c9ade2f768eb546b7cf  /apex/com.android.vndk.v32/lib/libgralloctypes.so
+b18f02b983ad413a15dcadc05f641bcfe7ec8525371a13ae64f246b6aaf2e6df  /vendor/lib/hw/android.hardware.graphics.mapper@4.0-impl-bifrost.so

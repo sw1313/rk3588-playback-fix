@@ -1,5 +1,11 @@
 # RK3588 Codec2 compatibility module 0.1.0
 
+Control update 0.1.1 keeps the tested service and component binaries unchanged.
+It additionally accepts the verified MPP/VPU compatibility profile and allows
+the unified installer to preflight against hash-verified staged dependencies.
+See [the unified module](../magisk-decode/README.md) for the recommended install.
+
+
 [中文说明](README.zh-CN.md) · [Download](https://github.com/sw1313/rk3588-playback-fix/releases/tag/codec2-v0.1.0)
 
 For the **hash-matched AGTV Android 12 / API32 stack on H96Max V58**. This is a firmware-specific userspace compatibility module, not a universal RK3588 driver update. Android, the kernel, GPU, gralloc HAL, Yamby APK/native components and LSPosed 0.3.3 stay unchanged.
@@ -49,3 +55,14 @@ Screenshots cannot establish 10-bit precision; raw samples provide that evidence
 Use `tools/build_codec2.py` with NDK29 and a prepared API32 SDK. Upstream Codec2 revision: `1e9d80a10b09c9a6e0bf5cc1dbe4b6d3e66dbc2b`. Source changes are in `patches/codec2-p010.patch`, service code in `service-src/`, and the exact-byte patch generator in `src/patcher.c`. See `UPSTREAM.json` and `licenses/Apache-2.0`.
 
 The service reuses this firmware's private ARM32 HIDL constructor ABI, including its verified 100-byte object size. Hash pinning is mandatory. The complete stock component registry is checked against the private original factory input during the build, then checked again on installation and boot. Firmware binaries are private build/link inputs and never enter the release ZIP. A clean rebuild reproduced the device-tested runtime binaries byte-for-byte.
+
+## Unified stack 0.3.0 HDR bridge
+
+The unified module adds `patches/codec2-hdr-bridge.patch` and the bounded helpers
+in `bridge-src/`. HEVC MPP dynamic metadata is reconstructed into the original
+T.35 payload and emitted through standard C2 per-frame info, including explicit
+empty values. Static SMPTE2086/CTA861.3 metadata is written to compatible gralloc
+buffers for the optional original-HWC adapter. These paths are controlled by the
+unified module's `hdr_static` and `hdr10plus` selections. They preserve pixels
+and do not imply native HDMI HDR10+ support. The old standalone installation
+instructions above describe the published 0.1.0 release, not the unified build.

@@ -1,0 +1,477 @@
+From 11ab1900b8bd741954b8fbf543cc14d81160be42 Mon Sep 17 00:00:00 2001
+From: Yandong Lin <yandong.lin@rock-chips.com>
+Date: Tue, 18 Aug 2026 17:24:04 +0800
+Subject: [PATCH 2/2] fix[h265d]: Drop hdr meta pool
+
+Depends on: b99c8e9704e8323cca476001b2fad6b91488dbb9
+"fix[mpp_frame]: Refcount hdr dynamic meta for copy"
+
+Since that commit, mpp_frame_set_hdr_dynamic_meta() copies the
+meta into a refcounted wrapper owned by the frame, so frames no
+longer depend on the parser side buffer lifetime. Replace the
+hdr meta pool and its reference accounting with a plain reusable
+current buffer:
+
+- fill_dynamic_meta() just fills (and grows) the current buffer;
+- h265d_frame_create() sets it on the frame, which copies it in;
+- unref/recycle no longer touch meta, the stale meta pointer on
+  the recycled frame is cleared at create.
+
+This also removes the original pool leak where fill replaced
+hdr_meta_current without putting the old slot, growing the pool
+on every dynamic meta update. mpp_ref_pool has no other user and
+is removed.
+
+Signed-off-by: Yandong Lin <yandong.lin@rock-chips.com>
+Change-Id: I82a56182e7a357b01d9a08688f09792d1817395f
+---
+ mpp/base/CMakeLists.txt         |   1 -
+ mpp/base/inc/mpp_ref_pool.h     |  37 -------
+ mpp/base/mpp_ref_pool.c         | 181 --------------------------------
+ mpp/codec/dec/h265/h265d_ctx.h  |   6 +-
+ mpp/codec/dec/h265/h265d_dpb.c  |  28 +----
+ mpp/codec/dec/h265/h265d_flow.c |  41 +++-----
+ 6 files changed, 21 insertions(+), 273 deletions(-)
+ delete mode 100644 mpp/base/inc/mpp_ref_pool.h
+ delete mode 100644 mpp/base/mpp_ref_pool.c
+
+diff --git a/mpp/base/CMakeLists.txt b/mpp/base/CMakeLists.txt
+index 20b66755e..cdb820b70 100644
+--- a/mpp/base/CMakeLists.txt
++++ b/mpp/base/CMakeLists.txt
+@@ -27,7 +27,6 @@ add_library(mpp_base OBJECT
+     mpp_cfg.c
+     mpp_2str.c
+     mpp_dec_hdr_meta.c
+-    mpp_ref_pool.c
+     )
+ 
+ set_target_properties(mpp_base PROPERTIES FOLDER "mpp/base")
+diff --git a/mpp/base/inc/mpp_ref_pool.h b/mpp/base/inc/mpp_ref_pool.h
+deleted file mode 100644
+index caa63bd48..000000000
+--- a/mpp/base/inc/mpp_ref_pool.h
++++ /dev/null
+@@ -1,37 +0,0 @@
+-/* SPDX-License-Identifier: Apache-2.0 OR MIT */
+-/*
+- * Copyright (c) 2026 Rockchip Electronics Co., Ltd.
+- */
+-
+-#ifndef MPP_REF_POOL_H
+-#define MPP_REF_POOL_H
+-
+-#include "rk_type.h"
+-
+-/* header of reference pool */
+-typedef struct MppRefPool_t {
+-    RK_S32 capacity;
+-    RK_S32 count;
+-    void *slots;
+-} MppRefPool;
+-
+-#ifdef __cplusplus
+-extern "C" {
+-#endif
+-
+-RK_S32 mpp_ref_pool_init(MppRefPool *pool, RK_U32 capacity);
+-void mpp_ref_pool_deinit(MppRefPool *pool);
+-void mpp_ref_pool_cleanup(MppRefPool *pool);
+-
+-RK_S32 mpp_ref_pool_get(MppRefPool *pool, RK_U32 size);
+-void mpp_ref_pool_ref(MppRefPool *pool, RK_S32 idx);
+-void mpp_ref_pool_put(MppRefPool *pool, RK_S32 idx);
+-
+-void *mpp_ref_pool_ptr(MppRefPool *pool, RK_S32 idx);
+-RK_U32 mpp_ref_pool_size(MppRefPool *pool, RK_S32 idx);
+-
+-#ifdef __cplusplus
+-}
+-#endif
+-
+-#endif /* MPP_REF_POOL_H */
+diff --git a/mpp/base/mpp_ref_pool.c b/mpp/base/mpp_ref_pool.c
+deleted file mode 100644
+index 591c4eac8..000000000
+--- a/mpp/base/mpp_ref_pool.c
++++ /dev/null
+@@ -1,181 +0,0 @@
+-/* SPDX-License-Identifier: Apache-2.0 OR MIT */
+-/*
+- * Copyright (c) 2026 Rockchip Electronics Co., Ltd.
+- */
+-
+-#define MODULE_TAG "mpp_ref_pool"
+-
+-#include <string.h>
+-
+-#include "mpp_log.h"
+-#include "mpp_mem.h"
+-
+-#include "mpp_ref_pool.h"
+-
+-typedef struct MppRefSlot_t {
+-    void   *ptr;
+-    RK_U32 size;
+-    RK_U32 ref_count;
+-} MppRefSlot;
+-
+-RK_S32 mpp_ref_pool_init(MppRefPool *pool, RK_U32 capacity)
+-{
+-    if (!pool || !capacity)
+-        return MPP_NOK;
+-
+-    pool->slots = mpp_calloc(MppRefSlot, capacity);
+-    if (!pool->slots) {
+-        mpp_loge_f("failed to alloc pool slots for %u\n", capacity);
+-        return MPP_NOK;
+-    }
+-
+-    pool->count = 0;
+-    pool->capacity = capacity;
+-
+-    return MPP_OK;
+-}
+-
+-void mpp_ref_pool_deinit(MppRefPool *pool)
+-{
+-    MppRefSlot *slots;
+-    RK_S32 i;
+-
+-    if (!pool)
+-        return;
+-
+-    slots = (MppRefSlot *)pool->slots;
+-    if (slots) {
+-        for (i = 0; i < pool->count; i++)
+-            MPP_FREE(slots[i].ptr);
+-
+-        MPP_FREE(pool->slots);
+-    }
+-}
+-
+-void mpp_ref_pool_cleanup(MppRefPool *pool)
+-{
+-    MppRefSlot *slots;
+-    RK_S32 i;
+-
+-    if (!pool || !pool->slots)
+-        return;
+-
+-    slots = (MppRefSlot *)pool->slots;
+-    for (i = 0; i < pool->count; i++) {
+-        MppRefSlot *slot = &slots[i];
+-
+-        if (slot->ref_count == 0) {
+-            MPP_FREE(slot->ptr);
+-            slot->size = 0;
+-        }
+-    }
+-}
+-
+-RK_S32 mpp_ref_pool_get(MppRefPool *pool, RK_U32 size)
+-{
+-    MppRefSlot *slots;
+-    RK_S32 i;
+-
+-    if (!pool)
+-        return -1;
+-
+-    slots = (MppRefSlot *)pool->slots;
+-    for (i = 0; i < pool->count; i++) {
+-        MppRefSlot *slot = &slots[i];
+-
+-        if (slot->ref_count == 0) {
+-            if (slot->ptr && slot->size >= size) {
+-                slot->ref_count = 1;
+-                return i;
+-            }
+-            if (slot->ptr) {
+-                MPP_FREE(slot->ptr);
+-                slot->ptr = NULL;
+-                slot->size = 0;
+-            }
+-            break;
+-        }
+-    }
+-
+-    if (i >= pool->count) {
+-        if (pool->count >= pool->capacity) {
+-            RK_U32 new_capacity = pool->capacity * 2;
+-            MppRefSlot *new_slots;
+-
+-            new_slots = mpp_realloc(slots, MppRefSlot, new_capacity);
+-            if (!new_slots) {
+-                mpp_loge_f("failed to expand pool from %u to %u\n",
+-                           pool->capacity, new_capacity);
+-                return -1;
+-            }
+-
+-            pool->slots = new_slots;
+-            slots = new_slots;
+-            pool->capacity = new_capacity;
+-        }
+-        pool->count++;
+-        i = pool->count - 1;
+-    }
+-
+-    slots[i].ptr = mpp_malloc_size(void, size);
+-    if (!slots[i].ptr) {
+-        mpp_loge_f("failed to allocate buffer size %u\n", size);
+-        return -1;
+-    }
+-
+-    slots[i].ref_count = 1;
+-    slots[i].size = size;
+-
+-    return (RK_S32)i;
+-}
+-
+-void mpp_ref_pool_ref(MppRefPool *pool, RK_S32 idx)
+-{
+-    MppRefSlot *slots;
+-
+-    if (!pool || idx < 0 || idx >= pool->count)
+-        return;
+-
+-    slots = (MppRefSlot *)pool->slots;
+-    slots[idx].ref_count++;
+-}
+-
+-void mpp_ref_pool_put(MppRefPool *pool, RK_S32 idx)
+-{
+-    MppRefSlot *slots;
+-
+-    if (!pool || idx < 0 || idx >= pool->count)
+-        return;
+-
+-    slots = (MppRefSlot *)pool->slots;
+-    if (slots[idx].ref_count > 0) {
+-        slots[idx].ref_count--;
+-
+-        if (slots[idx].ref_count == 0 && pool->count >= pool->capacity) {
+-            MPP_FREE(slots[idx].ptr);
+-            slots[idx].size = 0;
+-        }
+-    }
+-}
+-
+-void *mpp_ref_pool_ptr(MppRefPool *pool, RK_S32 idx)
+-{
+-    MppRefSlot *slots;
+-
+-    if (!pool || idx < 0 || idx >= pool->count)
+-        return NULL;
+-
+-    slots = (MppRefSlot *)pool->slots;
+-    return slots[idx].ptr;
+-}
+-
+-RK_U32 mpp_ref_pool_size(MppRefPool *pool, RK_S32 idx)
+-{
+-    MppRefSlot *slots;
+-
+-    if (!pool || idx < 0 || idx >= pool->count)
+-        return 0;
+-
+-    slots = (MppRefSlot *)pool->slots;
+-    return slots[idx].size;
+-}
+diff --git a/mpp/codec/dec/h265/h265d_ctx.h b/mpp/codec/dec/h265/h265d_ctx.h
+index 72b218819..0f9cfd35a 100644
+--- a/mpp/codec/dec/h265/h265d_ctx.h
++++ b/mpp/codec/dec/h265/h265d_ctx.h
+@@ -12,7 +12,6 @@
+ #include "mpp_bitread.h"
+ #include "mpp_buf_slot.h"
+ #include "mpp_mem_pool.h"
+-#include "mpp_ref_pool.h"
+ 
+ #include "parser_api.h"
+ 
+@@ -73,7 +72,6 @@ typedef struct H265dFrame_t {
+ 
+     RK_S32 poc;
+     RK_S32 slot_index;
+-    RK_S32 hdr_meta_index;          /* HDR metadata index in pool (-1 = none) */
+ 
+     RK_U16 sequence;
+     H265dFrmRefStatus ref_status;   /* Reference/output status */
+@@ -165,8 +163,8 @@ typedef struct H265dPrs_t {
+ 
+     MppFrameMasteringDisplayMetadata mastering_display;
+     MppFrameContentLightMetadata content_light;
+-    MppRefPool hdr_meta_pool;       /* HDR dynamic metadata pool */
+-    RK_S32 hdr_meta_current;            /* current active meta index in pool */
++    MppFrameHdrDynamicMeta *hdr_meta_cur;   /* current HDR dynamic metadata */
++    RK_U32 hdr_meta_cur_size;               /* allocated payload capacity */
+     HEVCSEIAlternativeTransfer alternative_transfer;
+ 
+     RK_S64 pts;
+diff --git a/mpp/codec/dec/h265/h265d_dpb.c b/mpp/codec/dec/h265/h265d_dpb.c
+index e49a7427c..ed5405cd6 100644
+--- a/mpp/codec/dec/h265/h265d_dpb.c
++++ b/mpp/codec/dec/h265/h265d_dpb.c
+@@ -8,7 +8,6 @@
+ #include "mpp_log.h"
+ #include "mpp_bit.h"
+ #include "mpp_compat_impl.h"
+-#include "mpp_ref_pool.h"
+ 
+ #include "h265d_debug.h"
+ #include "h265d_dpb.h"
+@@ -32,19 +31,11 @@ void h265d_frame_unref(H265dPrs *p, RK_U32 dpb_idx, H265dFrmRefStatus clear_mask
+ 
+     /* When frame is fully unreferenced, clear error status */
+     if (!frame->ref_status.flags) {
+-        RK_S32 hdr_meta_index = frame->hdr_meta_index;
+-
+         if (frame->slot_index <= 0x7f) {
+             h265d_dbg_ref("poc %d clr ref index %d", frame->poc, frame->slot_index);
+             mpp_buf_slot_clr_flag(p->slots, frame->slot_index, SLOT_CODEC_USE);
+         }
+ 
+-        /* Release HDR metadata reference */
+-        if (hdr_meta_index >= 0) {
+-            mpp_ref_pool_put(&p->hdr_meta_pool, hdr_meta_index);
+-            frame->hdr_meta_index = -1;
+-        }
+-
+         h265d_dbg_ref("unref_frame poc %d slot_index %d\n", frame->poc, frame->slot_index);
+         frame->poc = INT_MAX;
+         frame->slot_index = 0xff;
+@@ -141,6 +132,7 @@ static H265dFrame *h265d_frame_create(H265dPrs *p, RK_S32 poc, RK_U32 ref_only)
+         mpp_frame_set_colorspace(frame->frame, ctx->colorspace);
+         mpp_frame_set_mastering_display(frame->frame, p->mastering_display);
+         mpp_frame_set_content_light(frame->frame, p->content_light);
++        mpp_frame_set_hdr_dynamic_meta(frame->frame, NULL);
+ 
+         h265d_dbg_global("width:height [%d:%d] [%d:%d] poc %d\n",
+                          ctx->width, ctx->height, ctx->coded_width, ctx->coded_height, poc);
+@@ -151,9 +143,6 @@ static H265dFrame *h265d_frame_create(H265dPrs *p, RK_S32 poc, RK_U32 ref_only)
+         frame->poc = poc;
+         frame->sequence = p->seq_decode;
+ 
+-        /* Initialize HDR metadata index */
+-        frame->hdr_meta_index = -1;
+-
+         if (ref_only) {
+             mpp_buf_slot_set_prop(p->slots, frame->slot_index, SLOT_FRAME, frame->frame);
+             mpp_buf_slot_set_flag(p->slots, frame->slot_index, SLOT_CODEC_READY);
+@@ -163,18 +152,11 @@ static H265dFrame *h265d_frame_create(H265dPrs *p, RK_S32 poc, RK_U32 ref_only)
+             frame->ref_status.st_ref = 0;
+             frame->ref_status.lt_ref = 0;
+         } else {
+-            /* Use index-based HDR metadata reference */
+-            RK_S32 hdr_meta_index = p->hdr_meta_current;
+-            MppRefPool *hdr_meta_pool = &p->hdr_meta_pool;
+-
+-            if (hdr_meta_index >= 0 && p->hdr_dynamic) {
+-                frame->hdr_meta_index = hdr_meta_index;
+-                mpp_ref_pool_ref(hdr_meta_pool, hdr_meta_index);
+-                mpp_frame_set_hdr_dynamic_meta(frame->frame,
+-                                               (MppFrameHdrDynamicMeta*)mpp_ref_pool_ptr(hdr_meta_pool, hdr_meta_index));
++            /* the setter copies the meta in, so the parser buffer can
++             * be reused by the next fill right away */
++            if (p->hdr_dynamic && p->hdr_meta_cur) {
++                mpp_frame_set_hdr_dynamic_meta(frame->frame, p->hdr_meta_cur);
+                 p->hdr_dynamic = 0;
+-                h265d_dbg_ref("h265d_frame_create poc %d slot %d hdr_meta_index %d",
+-                              poc, frame->slot_index, hdr_meta_index);
+             }
+ 
+             h265d_dbg_ref("h265d_frame_create poc %d slot_index %d", poc, frame->slot_index);
+diff --git a/mpp/codec/dec/h265/h265d_flow.c b/mpp/codec/dec/h265/h265d_flow.c
+index 01ddab089..e0c083671 100644
+--- a/mpp/codec/dec/h265/h265d_flow.c
++++ b/mpp/codec/dec/h265/h265d_flow.c
+@@ -11,7 +11,6 @@
+ #include "mpp_bit.h"
+ #include "mpp_packet_impl.h"
+ #include "rk_hdr_meta_com.h"
+-#include "mpp_ref_pool.h"
+ 
+ #include "mpp_parser.h"
+ #include "h265d_debug.h"
+@@ -1184,23 +1183,23 @@ typedef union {
+ 
+ void h265d_fill_dynamic_meta(H265dPrs *p, const RK_U8 *data, RK_U32 size, RK_U32 hdr_fmt)
+ {
+-    MppRefPool *pool = &p->hdr_meta_pool;
+-    RK_S32 idx;
+-    MppFrameHdrDynamicMeta *meta;
++    MppFrameHdrDynamicMeta *meta = p->hdr_meta_cur;
+     RK_U8 start_code[4] = {0, 0, 0, 1};
+     RK_U32 extra_size = (hdr_fmt == DLBY) ? sizeof(start_code) : 0;
+-
+-    /* Cleanup unused slots in pool */
+-    mpp_ref_pool_cleanup(pool);
+-
+-    /* Allocate a new slot from pool (include struct header size) */
+-    idx = mpp_ref_pool_get(pool, sizeof(MppFrameHdrDynamicMeta) + size + extra_size);
+-    if (idx < 0) {
+-        mpp_loge_f("failed to allocate hdr meta slot\n");
+-        return;
++    RK_U32 need = size + extra_size;
++
++    /* grow the reusable buffer if needed */
++    if (!meta || p->hdr_meta_cur_size < need) {
++        meta = mpp_malloc_size(MppFrameHdrDynamicMeta, sizeof(MppFrameHdrDynamicMeta) + need);
++        if (!meta) {
++            mpp_loge_f("failed to allocate hdr meta size %u\n", need);
++            return;
++        }
++        MPP_FREE(p->hdr_meta_cur);
++        p->hdr_meta_cur = meta;
++        p->hdr_meta_cur_size = need;
+     }
+ 
+-    meta = (MppFrameHdrDynamicMeta *)mpp_ref_pool_ptr(pool, idx);
+     if (size && data) {
+         switch (hdr_fmt) {
+         case DLBY: {
+@@ -1218,8 +1217,6 @@ void h265d_fill_dynamic_meta(H265dPrs *p, const RK_U8 *data, RK_U32 size, RK_U32
+         meta->size = size;
+         meta->hdr_fmt = hdr_fmt;
+     }
+-    /* Update current active meta index */
+-    p->hdr_meta_current = idx;
+     p->hdr_dynamic = 1;
+     p->is_hdr = 1;
+ 
+@@ -1589,7 +1586,6 @@ RK_S32 h265d_parser_init(H265dParser *s, H265dCtx* ctx)
+     H265dPrs *p = NULL;
+     RK_U8 *buf = NULL;
+     RK_S32 size = SZ_512K;
+-    RK_S32 ret = MPP_OK;
+     RK_U32 i;
+ 
+     if (NULL == s || NULL == ctx) {
+@@ -1660,14 +1656,6 @@ RK_S32 h265d_parser_init(H265dParser *s, H265dCtx* ctx)
+     p->vps_pool = mpp_mem_pool_init_f("h265d_vps", sizeof(H265dVps));
+     p->sps_pool = mpp_mem_pool_init_f("h265d_sps", sizeof(H265dSps));
+ 
+-    /* Initialize HDR metadata pool */
+-    ret = mpp_ref_pool_init(&p->hdr_meta_pool, 4);
+-    if (ret != MPP_OK) {
+-        mpp_loge_f("failed to init hdr meta pool\n");
+-        return ret;
+-    }
+-    p->hdr_meta_current = -1;
+-
+     *s = p;
+ 
+     return MPP_OK;
+@@ -1725,8 +1713,7 @@ RK_S32 h265d_parser_deinit(H265dParser ctx)
+     if (p->sps_pool)
+         mpp_mem_pool_deinit_f(p->sps_pool);
+ 
+-    /* Deinitialize HDR metadata pool */
+-    mpp_ref_pool_deinit(&p->hdr_meta_pool);
++    MPP_FREE(p->hdr_meta_cur);
+ 
+     mpp_free(p);
+ 
+-- 
+2.50.1
+

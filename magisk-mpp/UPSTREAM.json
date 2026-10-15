@@ -4,7 +4,20 @@
   "revision": "c08762ebfadeb4e986d2fed993bc7a54862d3ebe",
   "source": "https://github.com/rockchip-linux/mpp/tree/c08762ebfadeb4e986d2fed993bc7a54862d3ebe",
   "android_api": 32,
-  "abis": ["arm64-v8a", "armeabi-v7a"],
+  "abis": [
+    "arm64-v8a",
+    "armeabi-v7a"
+  ],
   "library_soname": "libmpp.so",
-  "licenses": ["Apache-2.0", "MIT"]
+  "licenses": [
+    "Apache-2.0",
+    "MIT"
+  ],
+  "compatibility_patches": [
+    "mpp-a12-prep-bridge.patch",
+    "mpp-jpeg-partition-stride.patch",
+    "mpp-rk3588-jpeg-route.patch"
+  ],
+  "paired_vpu_wrapper": true,
+  "patch_level": "0.2.0"
 }

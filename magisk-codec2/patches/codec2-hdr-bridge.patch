@@ -1,0 +1,92 @@
+--- a/component/include/C2RKMpiDec.h
++++ b/component/include/C2RKMpiDec.h
+@@ -73,6 +73,7 @@
+         std::shared_ptr<C2GraphicBlock> outblock;
+         uint64_t timestamp;
+         std::shared_ptr<C2StreamHdrStaticInfo::output> hdrInfo;
++        std::shared_ptr<C2StreamHdr10PlusInfo::output> hdr10Plus;
+     } OutWorkEntry;
+ 
+     std::shared_ptr<IntfImpl> mIntf;
+--- a/component/mpi/C2RKMpiDec.cpp
++++ b/component/mpi/C2RKMpiDec.cpp
+@@ -24,6 +24,7 @@
+ #include <ui/GraphicBufferMapper.h>
+ #include <gralloc_priv_omx.h>
+ #include "RKPacked10.h"
++#include "RKHdrBridge.h"
+ 
+ #include "hardware/hardware_rockchip.h"
+ #include "hardware/gralloc_rockchip.h"
+@@ -340,6 +341,12 @@
+                 .withSetter(HdrStaticInfoSetter)
+                 .build());
+ 
++        mHdr10PlusInfo = C2StreamHdr10PlusInfo::output::AllocShared(0, 0u);
++        addParameter(DefineParam(mHdr10PlusInfo, C2_PARAMKEY_OUTPUT_HDR10_PLUS_INFO)
++                .withDefault(mHdr10PlusInfo)
++                .withFields({C2F(mHdr10PlusInfo, m.value).any()})
++                .withSetter(Hdr10PlusInfoSetter).build());
++
+         // vui colorAspects
+         if (mediaType == MEDIA_MIMETYPE_VIDEO_AVC ||
+             mediaType == MEDIA_MIMETYPE_VIDEO_HEVC ||
+@@ -390,6 +397,10 @@
+         }
+     }
+ 
++    static C2R Hdr10PlusInfoSetter(bool, C2P<C2StreamHdr10PlusInfo::output>&) {
++        return C2R::Ok();
++    }
++
+     static C2R HdrStaticInfoSetter(bool mayBlock, C2P<C2StreamHdrStaticInfo::output> &me) {
+         (void)mayBlock;
+         C2R result = C2R::Ok();
+@@ -543,6 +554,7 @@
+     std::shared_ptr<C2StreamBlockSizeInfo::output> mBlockSize;
+     std::shared_ptr<C2StreamPixelFormatInfo::output> mPixelFormat;
+     std::shared_ptr<C2StreamHdrStaticInfo::output> mHdrStaticInfo;
++    std::shared_ptr<C2StreamHdr10PlusInfo::output> mHdr10PlusInfo;
+     std::shared_ptr<C2StreamProfileLevelInfo::input> mProfileLevel;
+     std::shared_ptr<C2StreamMaxBufferSizeInfo::input> mMaxInputSize;
+     std::shared_ptr<C2StreamColorInfo::output> mColorInfo;
+@@ -912,6 +924,9 @@
+         if (entry->hdrInfo) {
+             work->worklets.front()->output.configUpdate.push_back(C2Param::Copy(*entry->hdrInfo));
+         }
++        if (entry->hdr10Plus) {
++            work->worklets.front()->output.configUpdate.push_back(C2Param::Copy(*entry->hdr10Plus));
++        }
+         if (copyMode) {
+             C2StreamPixelFormatInfo::output pixel(0u, copyPixel);
+             work->worklets.front()->output.configUpdate.push_back(C2Param::Copy(pixel));
+@@ -1245,6 +1260,7 @@
+     uint32_t tryCount = 0;
+     std::shared_ptr<C2GraphicBlock> outblock = nullptr;
+     entry->hdrInfo.reset();
++    entry->hdr10Plus.reset();
+ 
+ REDO:
+     err = mMppMpi->decode_get_frame(mMppCtx, &frame);
+@@ -1430,6 +1446,21 @@
+             }
+         }
+ 
++        const bool plusEnabled = mCodingType == MPP_VIDEO_CodingHEVC &&
++                property_get_bool("debug.rkcodec2.hdr10plus", false);
++        if (plusEnabled) {
++            entry->hdr10Plus = rk_hdr::plus(frame);
++            std::vector<std::unique_ptr<C2SettingResult>> failures;
++            mIntf->config({entry->hdr10Plus.get()}, C2_MAY_BLOCK, &failures);
++        }
++        if (plusEnabled || property_get_bool("debug.rkcodec2.hdr_static_buffer", false)) {
++            bool stored = rk_hdr::store(outblock, entry->hdrInfo, entry->hdr10Plus);
++            if (!stored) c2_err("HDR bridge metadata store failed");
++            if (property_get_bool("debug.rkcodec2.hdr_trace", false))
++                c2_info("HDR_BRIDGE pts=%lld static=%d plus=%zu store=%d", (long long)pts,
++                        !!entry->hdrInfo, entry->hdr10Plus ? entry->hdr10Plus->flexCount() : 0, stored);
++        }
++
+         ret = C2_OK;
+     }
+ 

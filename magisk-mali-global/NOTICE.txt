@@ -1,0 +1,5 @@
+Interface definitions and NDK Binder support headers: The Android Open Source Project, Apache-2.0.
+The Vulkan HAL header is Copyright 2015 The Android Open Source Project, Apache-2.0.
+Mali binary drivers are fetched from a pinned public Khadas source at installation.
+No closed Mali driver or original firmware library is redistributed in the public ZIP.
+The source URL and hashes do not relicense the upstream driver.

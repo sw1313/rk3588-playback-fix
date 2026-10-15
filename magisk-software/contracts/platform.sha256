@@ -1,0 +1,13 @@
+a964903330ae708f7bd333a44bbd6a9cbbcc108c42e01e381bf7437eeb76a254  /apex/com.android.media.swcodec/lib64/libbase.so
+ef3e614f3dfddb23bd7d35e2aca50dae3d2f4470e7fddc1866605ec6c06f02fe  /apex/com.android.media.swcodec/lib64/libcodec2.so
+71e1370e420236a768c97fd051870f46c14b2bc6614c9bfd065c0a92267aff55  /apex/com.android.media.swcodec/lib64/libcodec2_vndk.so
+fbc3958c624f5107d0c5e47d9571670f3cce95980eac8465f79db604689402d2  /apex/com.android.media.swcodec/lib64/libutils.so
+258bcb044d845557e4d661d1d7154a139d9ba12395cb5dba53be13c9241fda21  /apex/com.android.media.swcodec/lib64/libcodec2_soft_common.so
+8f9dbacfafb09595524a0c98a2b0361a56aa257c0eee6c702444acf8e7acc246  /apex/com.android.media.swcodec/lib64/libcutils.so
+86b727a9750eec2abb202fc26a37c030d16b44a0ba284c1ff5f3f16b53d3fa91  /apex/com.android.media.swcodec/lib64/libsfplugin_ccodec_utils.so
+5c0995506d8d73a8e0b2e58a320543d070d713717a3f13b30708e267058e182e  /apex/com.android.media.swcodec/lib64/libstagefright_foundation.so
+da8593d5d0794da6a4f4b36a45ef96f43b07e72743a8d5723692c7670a7c8c28  /apex/com.android.media.swcodec/lib64/libc++.so
+b12940d0f87c470d5d644c3bc27efd76e67f891516e1fcb489d3c4a3981a751a  /apex/com.android.media.swcodec/lib64/libvpx.so
+280c8c4deeb64537cc9eabcd17847a93e97e4166803aa7b65e0ef164833928b3  /apex/com.android.media.swcodec/lib64/libcodec2_soft_vp8enc.so
+90aa61ebaa692a0b2a70681a3356d7de1f54a245db49714cd9aaea31b8736d75  /apex/com.android.media.swcodec/lib64/libcodec2_soft_vp9enc.so
+8ea50e446444ec65e13c18536aa2f828ab90ebbbdb0002bfbcdf90193519b7c1  /system/lib64/liblog.so

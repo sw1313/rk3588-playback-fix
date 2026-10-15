@@ -1,0 +1,31 @@
+--- a/mpp/base/mpp_frame.c
++++ b/mpp/base/mpp_frame.c
+@@ -268,6 +268,9 @@
+     if (p->meta)
+         ret->meta = mpp_meta_dup(p->meta);
+ 
++    if (ret->hdr_dynamic_meta)
++        MPP_FETCH_ADD(&HDR_META_REF(ret->hdr_dynamic_meta)->ref, 1);
++
+     return frame;
+ }
+ 
+@@ -279,6 +282,9 @@
+         mpp_err_f("invalid input dst %p src %p\n", dst, src);
+         return MPP_ERR_UNKNOW;
+     }
++
++    if (dst == src)
++        return MPP_OK;
+ 
+     if (p->meta)
+         mpp_meta_put(p->meta);
+@@ -365,6 +371,8 @@
+ 
+     check_is_mpp_frame(p);
+     /* copy the meta into a refcounted wrapper shared by frame copies */
++    if (p->hdr_dynamic_meta == vivi_data)
++        return;
+     hdr_meta_ref_put(p);
+     if (vivi_data) {
+         MppHdrMetaRef *ref = mpp_malloc_size(MppHdrMetaRef,

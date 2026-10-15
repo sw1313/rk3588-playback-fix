@@ -1,0 +1,238 @@
+{
+  "version": "0.1.1",
+  "date": "2026-10-15",
+  "scope": "Exact RK3588 API32 / original 5.10.66, ARM64 opt-in apps only",
+  "stage": "automatic_graphics_namespace_real_surface_runtime_rollback_and_user_legend_clover_confirmation_passed",
+  "preserved": {
+    "boot_kernel_csf_firmware_unchanged": true,
+    "original_vendor_gpu_libraries_unchanged": true,
+    "surfaceflinger_driver": "g13p0",
+    "decode_stack": "0.3.2 unchanged",
+    "yamby_original_components_unchanged": true,
+    "lsposed": "0.3.3 unchanged",
+    "global_all_apps_override_added": false,
+    "panvk_angle_or_kernel_hooks_added": false
+  },
+  "native_probe": [
+    {
+      "candidate": "original",
+      "api": "gl",
+      "returncode": 0,
+      "stdout": "EGL 1.4\nGL_VENDOR ARM\nGL_RENDERER Mali-G610\nGL_VERSION OpenGL ES 3.2 v1.g13p0-01eac0.bce9c6a1f205f86589d60cabb0509764\nPASS GLES3 shader draw and exact RGBA readback\n",
+      "stderr": ""
+    },
+    {
+      "candidate": "original",
+      "api": "vk",
+      "returncode": 0,
+      "stdout": "Vulkan CreateInstance=0\nVK_DEVICE Mali-G610 API 1.1.218 DRIVER 54525952\nVulkan CreateDevice=0\nPASS Vulkan GPU fill and exact 4096-byte readback\n",
+      "stderr": ""
+    },
+    {
+      "candidate": "g15",
+      "api": "gl",
+      "returncode": 0,
+      "stdout": "EGL 1.4\nGL_VENDOR ARM\nGL_RENDERER Mali-G610\nGL_VERSION OpenGL ES 3.2 v1.g15p0-01eac0.a7e257d68dae0f11655cd0b8cc81677f\nPASS GLES3 shader draw and exact RGBA readback\n",
+      "stderr": ""
+    },
+    {
+      "candidate": "g15",
+      "api": "vk",
+      "returncode": 0,
+      "stdout": "Vulkan CreateInstance=0\nVK_DEVICE Mali-G610 API 1.3.231 DRIVER 62914560\nVulkan CreateDevice=0\nPASS Vulkan GPU fill and exact 4096-byte readback\n",
+      "stderr": ""
+    }
+  ],
+  "g18_probe": {
+    "gl": "EGL 1.5\nGL_VENDOR ARM\nGL_RENDERER Mali-G610\nGL_VERSION OpenGL ES 3.2 v1.g18p0-01eac0.2d5e200a1514bdef1a4909db66e37e28\nPASS GLES3 shader draw and exact RGBA readback\n",
+    "vk": "Vulkan CreateInstance=0\nVK_DEVICE Mali-G610 API 1.3.231 DRIVER 75497472\nVulkan CreateDevice=0\nPASS Vulkan GPU fill and exact 4096-byte readback\n"
+  },
+  "framework_namespace": [
+    {
+      "candidate": "g15",
+      "api": "gl",
+      "code": 0,
+      "output": "Framework gfx driver namespace ready\nEGL 1.4\nGL_VENDOR ARM\nGL_RENDERER Mali-G610\nGL_VERSION OpenGL ES 3.2 v1.g15p0-01eac0.a7e257d68dae0f11655cd0b8cc81677f\nPASS GLES3 shader draw and exact RGBA readback\n"
+    },
+    {
+      "candidate": "g15",
+      "api": "vk",
+      "code": 0,
+      "output": "Framework gfx driver namespace ready\nVulkan CreateInstance=0\nVK_DEVICE Mali-G610 API 1.3.231 DRIVER 62914560\nVulkan CreateDevice=0\nPASS Vulkan GPU fill and exact 4096-byte readback\n"
+    },
+    {
+      "candidate": "g18",
+      "api": "gl",
+      "code": 0,
+      "output": "Framework gfx driver namespace ready\nEGL 1.5\nGL_VENDOR ARM\nGL_RENDERER Mali-G610\nGL_VERSION OpenGL ES 3.2 v1.g18p0-01eac0.2d5e200a1514bdef1a4909db66e37e28\nPASS GLES3 shader draw and exact RGBA readback\n"
+    },
+    {
+      "candidate": "g18",
+      "api": "vk",
+      "code": 0,
+      "output": "Framework gfx driver namespace ready\nVulkan CreateInstance=0\nVK_DEVICE Mali-G610 API 1.3.231 DRIVER 75497472\nVulkan CreateDevice=0\nPASS Vulkan GPU fill and exact 4096-byte readback\n"
+    }
+  ],
+  "aligned_apk_namespace": [
+    {
+      "candidate": "g15",
+      "api": "gl",
+      "code": 0,
+      "output": "Framework gfx driver namespace ready\nEGL 1.4\nGL_VENDOR ARM\nGL_RENDERER Mali-G610\nGL_VERSION OpenGL ES 3.2 v1.g15p0-01eac0.a7e257d68dae0f11655cd0b8cc81677f\nPASS GLES3 shader draw and exact RGBA readback\n"
+    },
+    {
+      "candidate": "g15",
+      "api": "vk",
+      "code": 0,
+      "output": "Framework gfx driver namespace ready\nVulkan CreateInstance=0\nVK_DEVICE Mali-G610 API 1.3.231 DRIVER 62914560\nVulkan CreateDevice=0\nPASS Vulkan GPU fill and exact 4096-byte readback\n"
+    },
+    {
+      "candidate": "g18",
+      "api": "gl",
+      "code": 0,
+      "output": "Framework gfx driver namespace ready\nEGL 1.5\nGL_VENDOR ARM\nGL_RENDERER Mali-G610\nGL_VERSION OpenGL ES 3.2 v1.g18p0-01eac0.2d5e200a1514bdef1a4909db66e37e28\nPASS GLES3 shader draw and exact RGBA readback\n"
+    },
+    {
+      "candidate": "g18",
+      "api": "vk",
+      "code": 0,
+      "output": "Framework gfx driver namespace ready\nVulkan CreateInstance=0\nVK_DEVICE Mali-G610 API 1.3.231 DRIVER 75497472\nVulkan CreateDevice=0\nPASS Vulkan GPU fill and exact 4096-byte readback\n"
+    }
+  ],
+  "installed_real_surface_and_rollback": [
+    {
+      "mode": "g18",
+      "initial": {
+        "renderer": "Mali-G610",
+        "version": "OpenGL ES 3.2 v1.g18p0-01eac0.2d5e200a1514bdef1a4909db66e37e28",
+        "frames": 120,
+        "pixelErrors": 0,
+        "vulkanCode": 0,
+        "elapsedSeconds": 2.27484127,
+        "pass": true
+      },
+      "after_home_resume": {
+        "renderer": "Mali-G610",
+        "version": "OpenGL ES 3.2 v1.g18p0-01eac0.2d5e200a1514bdef1a4909db66e37e28",
+        "frames": 180,
+        "pixelErrors": 0,
+        "vulkanCode": 0,
+        "elapsedSeconds": 3.942234729,
+        "pass": true
+      },
+      "private_driver_maps_verified": true,
+      "original_system_graphics_hashes_match": true,
+      "surfaceflinger_uses_original_g13": true,
+      "vulkan_log": "Vulkan CreateInstance=0\nVK_DEVICE Mali-G610 API 1.3.231 DRIVER 75497472\nVulkan CreateDevice=0\nPASS Vulkan GPU fill and exact 4096-byte readback\n"
+    },
+    {
+      "mode": "off",
+      "initial": {
+        "renderer": "Mali-G610",
+        "version": "OpenGL ES 3.2 v1.g13p0-01eac0.bce9c6a1f205f86589d60cabb0509764",
+        "frames": 120,
+        "pixelErrors": 0,
+        "vulkanCode": 0,
+        "elapsedSeconds": 2.088193252,
+        "pass": true
+      },
+      "after_home_resume": {
+        "renderer": "Mali-G610",
+        "version": "OpenGL ES 3.2 v1.g13p0-01eac0.bce9c6a1f205f86589d60cabb0509764",
+        "frames": 180,
+        "pixelErrors": 0,
+        "vulkanCode": 0,
+        "elapsedSeconds": 3.774120379,
+        "pass": true
+      },
+      "private_driver_maps_verified": true,
+      "original_system_graphics_hashes_match": true,
+      "surfaceflinger_uses_original_g13": true,
+      "vulkan_log": "Vulkan CreateInstance=0\nVK_DEVICE Mali-G610 API 1.1.218 DRIVER 54525952\nVulkan CreateDevice=0\nPASS Vulkan GPU fill and exact 4096-byte readback\n"
+    },
+    {
+      "mode": "g15",
+      "initial": {
+        "renderer": "Mali-G610",
+        "version": "OpenGL ES 3.2 v1.g15p0-01eac0.a7e257d68dae0f11655cd0b8cc81677f",
+        "frames": 120,
+        "pixelErrors": 0,
+        "vulkanCode": 0,
+        "elapsedSeconds": 2.233928016,
+        "pass": true
+      },
+      "after_home_resume": {
+        "renderer": "Mali-G610",
+        "version": "OpenGL ES 3.2 v1.g15p0-01eac0.a7e257d68dae0f11655cd0b8cc81677f",
+        "frames": 180,
+        "pixelErrors": 0,
+        "vulkanCode": 0,
+        "elapsedSeconds": 3.888864099,
+        "pass": true
+      },
+      "private_driver_maps_verified": true,
+      "original_system_graphics_hashes_match": true,
+      "surfaceflinger_uses_original_g13": true,
+      "vulkan_log": "Vulkan CreateInstance=0\nVK_DEVICE Mali-G610 API 1.3.231 DRIVER 62914560\nVulkan CreateDevice=0\nPASS Vulkan GPU fill and exact 4096-byte readback\n"
+    },
+    {
+      "mode": "g18",
+      "initial": {
+        "renderer": "Mali-G610",
+        "version": "OpenGL ES 3.2 v1.g18p0-01eac0.2d5e200a1514bdef1a4909db66e37e28",
+        "frames": 120,
+        "pixelErrors": 0,
+        "vulkanCode": 0,
+        "elapsedSeconds": 2.096362544,
+        "pass": true
+      },
+      "after_home_resume": {
+        "renderer": "Mali-G610",
+        "version": "OpenGL ES 3.2 v1.g18p0-01eac0.2d5e200a1514bdef1a4909db66e37e28",
+        "frames": 180,
+        "pixelErrors": 0,
+        "vulkanCode": 0,
+        "elapsedSeconds": 3.765678379,
+        "pass": true
+      },
+      "private_driver_maps_verified": true,
+      "original_system_graphics_hashes_match": true,
+      "surfaceflinger_uses_original_g13": true,
+      "vulkan_log": "Vulkan CreateInstance=0\nVK_DEVICE Mali-G610 API 1.3.231 DRIVER 75497472\nVulkan CreateDevice=0\nPASS Vulkan GPU fill and exact 4096-byte readback\n"
+    }
+  ],
+  "nativehandle_transport_test": "PASS NativeHandle V2 fd/int roundtrip, empty vectors, malformed size rejection",
+  "cold_boot": {
+    "fresh_boot": true,
+    "original_graphics_hashes_match": true,
+    "decode_stack_hashes_match": true,
+    "surfaceflinger_uses_original_g13": true,
+    "selected": "g18",
+    "only_test_app_opted_in": true
+  },
+  "game": {
+    "title": "Legend Clover",
+    "version": "4.0.0",
+    "abi": "arm64-v8a",
+    "native_g18_apk_mapped": true,
+    "stock_mali_not_mapped": true,
+    "native_release_log_verified": true,
+    "app_files_modified": false,
+    "manual_result": "User confirmed normal home screen, battle and exit/reopen; no crash, black screen, corruption or obvious stutter in requested check",
+    "confirmed": true,
+    "confirmed_date": "2026-10-15",
+    "scope": "This game/version with g18p0 only; no measured performance improvement, other-game or full Vulkan conformance claim"
+  },
+  "limits": {
+    "full_vulkan_13_cts": false,
+    "all_new_core_commands_or_extensions": false,
+    "vulkan_graphics_pipeline_or_wsi": false,
+    "long_duration_and_thermal": false,
+    "game_speedup_measured": false,
+    "arm32_candidate": false,
+    "every_game": false,
+    "whole_module_disable_cold_boot_test": false
+  },
+  "controller_isolated_regression": "Refusing an existing global graphics override\nPASS actual controller: original overlapping entry retained, third-party edit retained, managed game removed, original property restored, global override rejected",
+  "source_recipe_clean_build_passed": true
+}

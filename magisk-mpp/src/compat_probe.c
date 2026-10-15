@@ -20,6 +20,11 @@ int main(int argc, char **argv) {
     }
     fclose(symbols);
     if (missing || !count) { dlclose(library); return 5; }
+    if (!strcmp(argv[3], "-")) {
+        printf("Library symbols available: %d\n", count);
+        dlclose(library);
+        return 0;
+    }
     const char *(*version)(void) = (const char *(*)(void)) dlsym(library, "get_mpp_version");
     const char *revision = version ? version() : NULL;
     if (!revision || !strstr(revision, argv[3])) { fprintf(stderr, "unexpected library revision\n"); dlclose(library); return 6; }

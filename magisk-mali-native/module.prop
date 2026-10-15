@@ -1,0 +1,6 @@
+id=rk3588_mali_native
+name=RK3588 Native Mali App Driver (Local Test)
+version=0.1.1
+versionCode=101
+author=sw1313
+description=Hash-gated API32 native Mali g15p0/g18p0 app driver packages. Explicit 64-bit app opt-in only; original system graphics, CSF firmware, kernel and decode stack retained. Experimental local game compatibility test.

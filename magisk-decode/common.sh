@@ -1,0 +1,15 @@
+#!/system/bin/sh
+# Caller sets MODROOT. Configuration is data, never shell code.
+flag() {
+ value=$(sed -n "s/^$1=//p" "$MODROOT/config" 2>/dev/null)
+ case "$value" in 0|1) echo "$value" ;; *) return 1 ;; esac
+}
+resolve() {
+ MPP=$(flag mpp) && RGA=$(flag rga) && C2=$(flag codec2) && YUV=$(flag libyuv) && SOFT=$(flag software) || return 1
+ HDR_STATIC=$(flag hdr_static) && HDR_PLUS=$(flag hdr10plus) || return 1
+ [ "$MPP" = 1 ] && [ "$RGA" = 1 ] || C2=0
+ if [ "$C2" != 1 ]; then SOFT=0; HDR_STATIC=0; HDR_PLUS=0; fi
+}
+selected() {
+ case "$1" in mpp) [ "$MPP" = 1 ] ;; rga) [ "$RGA" = 1 ] ;; codec2) [ "$C2" = 1 ] ;; libyuv) [ "$YUV" = 1 ] ;; software) [ "$SOFT" = 1 ] ;; hdr) [ "$HDR_STATIC" = 1 ] ;; *) return 1 ;; esac
+}

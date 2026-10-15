@@ -11,7 +11,7 @@ recover() {
  exit 1
 }
 : > "$MODDIR/status.txt"
-sha256sum -c "$MODDIR/contracts/runtime.sha256" >> "$MODDIR/status.txt" 2>&1 || recover "MPP/RGA dependency changed"
+sh "$MODDIR/check-runtime.sh" >> "$MODDIR/status.txt" 2>&1 || recover "MPP/RGA dependency changed"
 sha256sum -c "$MODDIR/contracts/platform.sha256" >> "$MODDIR/status.txt" 2>&1 || recover "Codec2/HIDL ABI changed"
 # Early HAL processes may predate Magisk's mounts. Refresh only this codec
 # service and its media list, never hwservicemanager or the graphics stack.

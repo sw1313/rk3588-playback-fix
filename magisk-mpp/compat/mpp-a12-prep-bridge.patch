@@ -1,0 +1,23 @@
+--- a/mpp/mpi.c
++++ b/mpp/mpi.c
+@@ -358,6 +358,8 @@
+     return ret;
+ }
+ 
++#include "mpi_legacy_prep.h"
++
+ static MPP_RET mpi_control(MppCtx ctx, MpiCmd cmd, MppParam param)
+ {
+     MPP_RET ret = MPP_NOK;
+@@ -369,7 +371,10 @@
+         if (ret)
+             break;;
+ 
+-        ret = mpp_control(p->ctx, cmd, param);
++        if (cmd == MPP_ENC_SET_PREP_CFG || cmd == MPP_ENC_GET_PREP_CFG)
++            ret = mpi_a12_prep(p, cmd, param);
++        else
++            ret = mpp_control(p->ctx, cmd, param);
+     } while (0);
+ 
+     mpi_dbg_func("leave ctx %p ret %d\n", ctx, ret);

@@ -1,0 +1,57 @@
+{
+  "date": "2026-10-15",
+  "scope": "Verified RK3588 Android 12 API32 firmware, original 5.10.66 kernel",
+  "active_decode_stack": "0.2.0 unchanged",
+  "display_changes": false,
+  "rebooted": false,
+  "tests": {
+    "mapper_advertised_metadata_types": 22,
+    "rk_private_dynamic_hdr_offset_advertised": false,
+    "rk_private_offset_get_on_valid_scratch_buffer": {
+      "error": 7,
+      "name": "UNSUPPORTED"
+    },
+    "rk_private_offset_set_on_valid_scratch_buffer": {
+      "error": 7,
+      "name": "UNSUPPORTED"
+    },
+    "standard_smpte2086_cta861_3_smpte2094_40_get_on_scratch": "NONE; zero-length metadata on new buffer",
+    "standard_metadata_storage_roundtrip": "not tested",
+    "scratch_buffer_presented": false,
+    "eotf_range": [
+      0,
+      5
+    ],
+    "crtc_legacy_next_hdr_flag": true,
+    "hdr_output_metadata": true,
+    "next_hdr_sink_data": "immutable, blob absent",
+    "absent_properties": [
+      "VSIF_DATA",
+      "HDR_EXT_DATA",
+      "DOVI_INPUT_TYPE",
+      "HDR10_PLUS_VSDB"
+    ],
+    "hwc_support_line": "HWC Support: wideColorGamut=false hdr10plus=false hdr10=true hlg=true dv=false metadata=0"
+  },
+  "feasibility": {
+    "rk_private_codec2_hdr_meta_cap": "do not enable: mapper transport rejected and downstream path absent",
+    "standard_codec2_hdr10plus_bridge": "possible separate implementation; not integrated or validated end to end",
+    "hdr10plus_hdmi": "not available through currently exposed verified interfaces",
+    "dolby_vision_ll_dv": "no verified integration on this device under original kernel and unchanged player",
+    "fel": "upstream software rendering exists; requires demux/decode/render integration and separate quality/performance tests"
+  },
+  "upstream": {
+    "codec2_rk3588_hdrMetaCap": 0,
+    "rockchip_dolby_commit": "a8f0dc0b74e7af0f569190d6b72e11f2ae77f98e",
+    "rockchip_dolby_commit_device_scope": "RK3588*-*V* SOCs, e.g. RK3588S2-DV",
+    "mpv_fel_pr": 17932,
+    "mpv_fel_merged": "2026-07-01",
+    "kernel_research_pin": "95a3ad83f7f90e0e672b9c99b0858b4964318667"
+  },
+  "limitations": [
+    "No HDMI analyzer verification",
+    "A legacy NEXT_HDR feature bit is not evidence of Dolby Vision enablement",
+    "No claim that all RK3588 variants lack HDR hardware",
+    "Successful scratch metadata queries do not prove HDMI output"
+  ]
+}

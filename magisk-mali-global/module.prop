@@ -1,0 +1,6 @@
+id=rk3588_mali_global
+name=RK3588 Native Mali Global Upgrade
+version=0.2.0
+versionCode=200
+author=sw1313
+description=Verified API32 RK3588 system-wide ARM32/ARM64 native Mali g18p0 userspace upgrade. No app lists. Original mapper/allocator, CSF firmware, kernel and boot retained. Action toggles global/original for next reboot.

@@ -1,0 +1,2 @@
+arm 30079696 d27fd799881fe50c7013c667a598f0ad7df41aa50ca3881c6edbf11e6549caa4 https://raw.githubusercontent.com/khadas/android_vendor_rockchip_common/6cf5e034b39c19dfd9e1a15ae5227f61c127d128/gpu/MaliG610/lib/arm/libGLES_mali.so
+arm64 42250760 3dada64de060f83f63dd79d0487f4a4d3352da3c1652aedea3805254301175bb https://raw.githubusercontent.com/khadas/android_vendor_rockchip_common/6cf5e034b39c19dfd9e1a15ae5227f61c127d128/gpu/MaliG610/lib/arm64/libGLES_mali.so

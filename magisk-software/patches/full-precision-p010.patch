@@ -1,0 +1,116 @@
+--- a/C2SoftGav1Dec.cpp
++++ b/C2SoftGav1Dec.cpp
+@@ -17,6 +17,7 @@
+ //#define LOG_NDEBUG 0
+ #define LOG_TAG "C2SoftGav1Dec"
+ #include "C2SoftGav1Dec.h"
++#include "full_precision.h"
+ 
+ #include <C2Debug.h>
+ #include <C2PlatformSupport.h>
+@@ -158,10 +159,14 @@
+ 
+     // TODO: support more formats?
+     addParameter(DefineParam(mPixelFormat, C2_PARAMKEY_PIXEL_FORMAT)
+-                     .withConstValue(new C2StreamPixelFormatInfo::output(
++                     .withDefault(new C2StreamPixelFormatInfo::output(
+                          0u, HAL_PIXEL_FORMAT_YCBCR_420_888))
++                     .withFields({C2F(mPixelFormat, value).oneOf({HAL_PIXEL_FORMAT_YCBCR_420_888, 54})})
++                     .withSetter((Setter<decltype(*mPixelFormat)>::StrictValueWithNoDeps))
+                      .build());
+   }
++
++  uint32_t requestedPixelFormat_l() const { return mPixelFormat->value; }
+ 
+   static C2R SizeSetter(bool mayBlock,
+                         const C2P<C2StreamPictureSizeInfo::output> &oldMe,
+@@ -682,6 +687,14 @@
+       format = HAL_PIXEL_FORMAT_RGBA_1010102;
+     }
+   }
++  {
++    IntfImpl::Lock lock = mIntf->lock();
++    // Keep the original conversion contract for explicit legacy eight-bit
++    // copy clients. Surface and explicit P010 clients retain all ten bits.
++    if (mIntf->requestedPixelFormat_l() == 54 ||
++        (buffer->bitdepth == 10 && pool->getLocalId() > C2BlockPool::PLATFORM_START))
++      format = 54;
++  }
+   C2MemoryUsage usage = {C2MemoryUsage::CPU_READ, C2MemoryUsage::CPU_WRITE};
+ 
+   c2_status_t err = pool->fetchGraphicBlock(align(mWidth, 16), mHeight, format,
+@@ -701,6 +714,16 @@
+     return false;
+   }
+ 
++  if (format == 54) {
++    const uint8_t *planes[3] = {buffer->plane[0], buffer->plane[1], buffer->plane[2]};
++    const int strides[3] = {buffer->stride[0], buffer->stride[1], buffer->stride[2]};
++    if (!storeP010(wView, planes, strides, mWidth, mHeight, isMonochrome, buffer->bitdepth)) {
++      work->result = C2_CORRUPTED;
++      return false;
++    }
++    finishWork(buffer->user_private_data, work, std::move(block));
++    return true;
++  }
+   ALOGV("provided (%dx%d) required (%dx%d), out frameindex %d", block->width(),
+         block->height(), mWidth, mHeight, (int)buffer->user_private_data);
+ 
+--- a/C2SoftVpxDec.cpp
++++ b/C2SoftVpxDec.cpp
+@@ -28,6 +28,7 @@
+ #include <SimpleC2Interface.h>
+ 
+ #include "C2SoftVpxDec.h"
++#include "full_precision.h"
+ 
+ namespace android {
+ constexpr size_t kMinInputBufferSize = 2 * 1024 * 1024;
+@@ -211,10 +212,14 @@
+         // TODO: support more formats?
+         addParameter(
+                 DefineParam(mPixelFormat, C2_PARAMKEY_PIXEL_FORMAT)
+-                .withConstValue(new C2StreamPixelFormatInfo::output(
++                .withDefault(new C2StreamPixelFormatInfo::output(
+                                      0u, HAL_PIXEL_FORMAT_YCBCR_420_888))
+-                .build());
+-    }
++                .withFields({C2F(mPixelFormat, value).oneOf({HAL_PIXEL_FORMAT_YCBCR_420_888, 54})})
++                .withSetter((Setter<decltype(*mPixelFormat)>::StrictValueWithNoDeps))
++                .build());
++    }
++
++    uint32_t requestedPixelFormat_l() const { return mPixelFormat->value; }
+ 
+     static C2R SizeSetter(bool mayBlock, const C2P<C2StreamPictureSizeInfo::output> &oldMe,
+                           C2P<C2StreamPictureSizeInfo::output> &me) {
+@@ -799,6 +804,12 @@
+             format = HAL_PIXEL_FORMAT_RGBA_1010102;
+         }
+     }
++    {
++        IntfImpl::Lock lock = mIntf->lock();
++        if (mIntf->requestedPixelFormat_l() == 54 ||
++            (img->fmt == VPX_IMG_FMT_I42016 && img->bit_depth == 10 &&
++             pool->getLocalId() > C2BlockPool::PLATFORM_START)) format = 54;
++    }
+     C2MemoryUsage usage = { C2MemoryUsage::CPU_READ, C2MemoryUsage::CPU_WRITE };
+     c2_status_t err = pool->fetchGraphicBlock(align(mWidth, 16), mHeight, format, usage, &block);
+     if (err != C2_OK) {
+@@ -814,6 +825,16 @@
+         return UNKNOWN_ERROR;
+     }
+ 
++    if (format == 54) {
++        const uint8_t *planes[3] = {img->planes[0], img->planes[1], img->planes[2]};
++        const int strides[3] = {img->stride[0], img->stride[1], img->stride[2]};
++        if (!storeP010(wView, planes, strides, mWidth, mHeight, false, img->bit_depth)) {
++            work->result = C2_CORRUPTED;
++            return UNKNOWN_ERROR;
++        }
++        finishWork(((c2_cntr64_t *)img->user_priv)->peekull(), work, std::move(block));
++        return OK;
++    }
+     ALOGV("provided (%dx%d) required (%dx%d), out frameindex %lld",
+            block->width(), block->height(), mWidth, mHeight,
+            ((c2_cntr64_t *)img->user_priv)->peekll());

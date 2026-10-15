@@ -1,6 +1,13 @@
 # RK3588 播放兼容修复
 
-[English](README.md) · [下载安装包](https://github.com/sw1313/rk3588-playback-fix/releases/latest)
+[English](README.md) · [当前系统组件安装包](https://github.com/sw1313/rk3588-playback-fix/releases/tag/system-v2026.10.15) · [LSPosed 发布页](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.3.3)
+
+当前系统组件发布页集中提供全局 Mali 0.2.0、统一解码模块 0.3.2，以及保持原版的
+LSPosed 0.3.3 和 Frame Guard 0.1.0。GPU／解码模块只接受各自契约中匹配的固件哈希，
+不通用于所有 RK3588 ROM；统一解码模块替代旧独立解码模块，避免同时覆盖。
+全局 Mali 首次安装需联网下载约 69 MiB 的固定上游库，校验后的设备本地缓存可复用。
+公开包不包含闭源 Mali 库、设备原始日志、连接地址或签名密钥。系统模块以预发布形式提供，
+安装前请阅读对应组件的适用范围、测试记录和回退方法。
 
 LSPosed 模块为所有芯片开放 Yamby 默认 HW+ 设置补全，其他 mpv 应用的强制 HW+ 仅限 RK3588。另有独立 Magisk 模块处理刷新率切换导致的整屏短暂黑屏。实体设备测试为 H96Max V58、RK3588、Android 12（API 32）。
 
@@ -9,6 +16,31 @@ LSPosed 模块为所有芯片开放 Yamby 默认 HW+ 设置补全，其他 mpv �
 独立的 [RGA 1.10.6 用户态升级模块](https://github.com/sw1313/rk3588-playback-fix/releases/tag/rga-v0.1.0) 已按当前 Android 12 的系统 C++ ABI 和 gralloc4 接口编译，提供 32／64 位库。实体设备已通过真实 RGA 图像任务、Codec2 加载，以及停用后重启恢复原库的回退测试。模块包含严格的固件检查，不替换现有 TV 定制 Codec2，也不升级内核；具体适用范围和测试限制见模块说明。
 
 另有独立的 [Codec2 系统兼容模块 0.1.0](https://github.com/sw1313/rk3588-playback-fix/releases/tag/codec2-v0.1.0)：只针对匹配哈希的 API32 固件，保留原厂组件库，改进 Surface、完整 10 位 P010、AV1 色彩范围与 HDR 静态信息。14 组系统播放测试、模式切换和重启回退已通过；不修改 Yamby 或增加 LSPosed 功能。原版 Yamby 的 HEVC Main10 HW 复制路径仍受其 P010 支持限制；最高精度播放继续使用 HW+。测试范围见 [系统升级说明](docs/decoder-upgrade-scope.zh-CN.md)。
+
+## 合并的系统解码模块
+
+[统一解码模块](magisk-decode/README.md)将 MPP／VPU 兼容升级、RGA 1.10.6、
+Codec2 Surface／P010 修正、系统 libyuv 1974 和 libvpx／libgav1 软件解码后端合并为一个面具模块，保留分项开关、
+依赖处理和整包重启回退。使用合并版时保持旧独立模块停用，避免重复覆盖。
+Yamby 原版组件和 LSPosed 0.3.3 不变。完整测试结果及尚未纳入的组件见模块说明。
+0.2.0 增加 MPP 动态 HDR 元数据生命周期修正和保持完整 10 位的系统软件解码升级。
+HDR10／HLG 的实际输出与 HDR10+／杜比视界的能力边界见[专项测试说明](docs/hdr-software-upgrade.zh-CN.md)。
+
+## 原厂 Mali 全局升级
+
+[全局 Mali 模块 0.2.0](magisk-mali-global/README.md)覆盖系统标准图形路径的
+32／64 位原厂 Mali g18p0，包括桌面和 SurfaceFlinger，不设置应用名单。
+保留内核、boot、CSF 固件和原 allocator／mapper，提供全局／原厂开关及重启回退。
+公开安装包从固定上游下载并校验闭源驱动，随包接口库均由 AOSP 冻结源码构建。
+安装、精确固件范围与最终测试记录见组件说明。
+
+原按应用实验现已被全局模块替代：
+
+[独立 Mali 模块源码与测试记录](magisk-mali-native/README.md)支持已校验的 API32／5.10.66
+固件，提供原厂 g15p0／g18p0 与原版切换。采用 Android 按应用驱动命名空间，
+保留系统 GPU 库、CSF 固件、内核、Yamby、LSPosed 和解码模块；仅 ARM64 明确加入的应用生效。
+真实窗口绘制、暂停恢复、Vulkan GPU 缓冲任务及运行时回退已验证，具体游戏验收见
+该组件的 `VALIDATION.json`。固件二进制为用户提供的本地输入，此处不发布通用驱动安装包。
 
 ## LSPosed 模块 0.3.3
 
@@ -72,3 +104,24 @@ APK 构建和 Lint 已通过；默认 HW+ 经应用重启后仍保留，之前�
 模块没有网络权限和遥测。`RKPlaybackFix` 日志只记录解码／渲染选项。仓库和附件不含设备日志、截图、网络地址、本机用户名路径或签名私钥。
 
 第三方组件来源及许可说明见 [英文 README](README.md)。这里不分发 Yamby 或 mpv 的二进制文件。
+
+## HDR metadata integration 0.3.0
+
+The unified decode stack now includes independently switchable HDR10 static
+metadata propagation and a standard Codec2 HEVC HDR10+ metadata bridge. The latter
+is not native HDMI HDR10+ output. Original Yamby and LSPosed remain unchanged.
+See [implementation and measurements](docs/hdr-metadata-030.zh-CN.md)
+and [unified controls/rollback](magisk-decode/README.md).
+
+## HDR 切换修正 0.3.1
+
+已移除独立 Dolby 移植实验、内核探针工具和相应开发报告。统一模块在已验证的
+硬解直出路径修复同一 Surface 中 HDR10／HLG 输出模式残留，沿用 `hdr_static`
+开关和重启回退。其他解码组件、Yamby 原版组件与 LSPosed 保持原状。
+实现、测试与尚未修复的客户端合成限制见[0.3.1 记录](docs/hdr-transition-031.zh-CN.md)。
+
+## 客户端合成修正 0.3.2
+
+原生 SDR 客户端合成路径现在会清理源视频残留的 HDR 输出状态；可直接硬解的视频
+继续保留十位 HDR。修正不新增降位转换，Yamby 和 LSPosed 保持原状。
+见[实现与限制](docs/hdr-client-032.zh-CN.md)及[可升级组件核查](docs/decode-upgrade-audit-032.zh-CN.md)。

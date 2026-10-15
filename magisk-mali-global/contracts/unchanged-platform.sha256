@@ -1,0 +1,12 @@
+267f958f7e63065b8cdb6c2119526f92f0860b2376ad4b00bcc121727d6c4ed5  /vendor/etc/firmware/mali_csffw.bin
+e67a65bee1aad6607025b44f6c742d748445618c941296eb800d428ea4769890  /vendor/lib/hw/vulkan.rk3588.so
+171365e683046f9e6608c9454437a8f920f43f0f67aaac24edc045bf3b1da098  /vendor/lib64/hw/vulkan.rk3588.so
+b18f02b983ad413a15dcadc05f641bcfe7ec8525371a13ae64f246b6aaf2e6df  /vendor/lib/hw/android.hardware.graphics.mapper@4.0-impl-bifrost.so
+492131aea15e8e991d6bd0ea495130bba0c4ae14e23bbb9972ed15b7fbd7b73a  /vendor/lib64/hw/android.hardware.graphics.mapper@4.0-impl-bifrost.so
+50c2266e8d0ae44ae1b8e1b7bcf6f518fe30bb9d6024cba6017649392bbb4ea5  /system/lib/libbinder_ndk.so
+7d8d507344f25419afc56dcc91fc2025277bc15c23f1b4a5764971f554cc277d  /system/lib64/libbinder_ndk.so
+fddde345b957a0898c44cf1c62d23e9736d98d246e46bb3f39244c0e7d6b0d1a  /system/bin/surfaceflinger
+993a810209e2039ead7f15b28f774d3ad981f840ecc7d812a3b9b31f480a6fc6  /system/lib/libEGL.so
+450d978c9787aeb30199e78f41397901bbd8399f2aca773590440379f8751f8b  /system/lib64/libEGL.so
+300e21f161312032319669a99d403490ee5a74f92b8604a7d063891bf28ab0db  /system/lib/libvulkan.so
+3f12bb6b94495259417660f939e15100777089735a05076724f23949ad324ea4  /system/lib64/libvulkan.so
