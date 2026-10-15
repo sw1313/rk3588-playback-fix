@@ -1,8 +1,12 @@
 # RK3588 播放兼容修复
 
+当前解码模块为 [decode-stack 0.4.0](https://github.com/sw1313/rk3588-playback-fix/releases/tag/decode-v0.4.0)，
+回移六项上游 MPP 解码修正并更新 libyuv 缩放实现，替代此前组件合集里的解码模块 0.3.2。
+全局 Mali 和 Yamby／LSPosed 原版组件保留；具体升级范围与测试见[专项说明](docs/decode-upgrade-040.zh-CN.md)。
+
 [English](README.md) · [当前系统组件安装包](https://github.com/sw1313/rk3588-playback-fix/releases/tag/system-v2026.10.15) · [LSPosed 发布页](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.3.3)
 
-当前系统组件发布页集中提供全局 Mali 0.2.0、统一解码模块 0.3.2，以及保持原版的
+此前系统组件合集提供全局 Mali 0.2.0、统一解码模块 0.3.2，以及保持原版的
 LSPosed 0.3.3 和 Frame Guard 0.1.0。GPU／解码模块只接受各自契约中匹配的固件哈希，
 不通用于所有 RK3588 ROM；统一解码模块替代旧独立解码模块，避免同时覆盖。
 全局 Mali 首次安装需联网下载约 69 MiB 的固定上游库，校验后的设备本地缓存可复用。

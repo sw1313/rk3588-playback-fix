@@ -8,7 +8,7 @@ sha256sum -c contracts/platform.sha256 >/dev/null 2>&1 || abort "JPEG dependency
 current=$(sha256sum /system/lib64/libyuv.so) || abort "Original libyuv unavailable."
 current=${current%% *}
 candidate=$(sha256sum "$MODPATH/system/lib64/libyuv.so"); candidate=${candidate%% *}
-[ "$current" = 22358071bb74ad19fbe4b2f5fcba4d4130f680deddf7df02e635674b9824233e ] || [ "$current" = "$candidate" ] || abort "Unknown libyuv baseline."
+[ "$current" = 22358071bb74ad19fbe4b2f5fcba4d4130f680deddf7df02e635674b9824233e ] || [ "$current" = "$candidate" ] || grep -Fx "$current  /system/lib64/libyuv.so" contracts/prior-active.sha256 >/dev/null || abort "Unknown libyuv baseline."
 set_perm_recursive "$MODPATH" 0 0 0755 0644
 set_perm "$MODPATH/bin/quality_probe64" 0 0 0755
 timeout 15 "$MODPATH/bin/quality_probe64" "$MODPATH/system/lib64/libyuv.so" > "$MODPATH/status.txt" 2>&1 || abort "Full precision libyuv preflight failed."

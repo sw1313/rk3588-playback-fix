@@ -5,7 +5,7 @@ The two stock inputs are private link/ABI checks only and never enter the ZIP.
 import argparse,hashlib,json,os,shlex,shutil,subprocess,zipfile
 from pathlib import Path
 ROOT=Path(__file__).resolve().parents[1];MODULE=ROOT/'magisk-libyuv'
-NEW='58d817ed81e8fe8b06a58576d639cd56b19526d3'
+NEW='0b9e5c922deec7c9921ae385f6242a9a27754d6e'
 OLD='715a8b0584d482569ed39ee95291cfa9061c6aaf'
 def run(*args):return subprocess.check_output([str(a) for a in args],text=True)
 def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
@@ -47,7 +47,7 @@ def main():
  if stock-symbols(dest):raise SystemExit('Final symbol contract failed')
  (payload/'bin').mkdir();run(llvm/('clang++'+ext),'--target=aarch64-linux-android32','-O2','-static-libstdc++','-fPIE','-pie','-s','-I'+str(w/'new-source/include'),'-ffile-prefix-map='+ROOT.as_posix()+'=module',MODULE/'src/quality_probe.cpp','-ldl','-o',payload/'bin/quality_probe64')
  (payload/'UPSTREAM.json').write_text(json.dumps(dict(libyuv=NEW,android12_compat=OLD,version=1974,removed_apis_preserved=sorted(missing),all_original_symbols_preserved=True),indent=2))
- package(payload,w/'rk3588-libyuv-upgrade-0.1.0-yuv1974.zip')
+ package(payload,w/'rk3588-libyuv-upgrade-0.1.1-yuv1974.zip')
 def package(payload,output):
  files=sorted(f for f in payload.rglob('*') if f.is_file() and f.name!='checksums.sha256')
  for f in files:

@@ -1,0 +1,157 @@
+From 8f88b50df0af9dc367bf2f9943808e82a8d14482 Mon Sep 17 00:00:00 2001
+From: Hongjin Li <vic.hong@rock-chips.com>
+Date: Tue, 15 Sep 2026 14:49:00 +0800
+Subject: [PATCH] fix[h265d]: Force PS/RPS update for the first sent task
+
+Platform: General
+Spec: h265d
+
+The HAL writes pps_buf/sw_rps_buf only when the parser sets
+ps_update_flag/rps_update_flag. If that update is consumed by frames
+skipped as ref_err, the first task sent to HW reads all-zero tables
+and causes a hardware decode error.
+
+Force both flags until the tables have been written once.
+
+Reported-by: redmine #650924
+Change-Id: I12f61d42d0fc6644236838a3a40a04053c95f9b3
+Signed-off-by: Hongjin Li <vic.hong@rock-chips.com>
+---
+ mpp/hal/rkdec/h265d/hal_h265d_ctx.h      | 1 +
+ mpp/hal/rkdec/h265d/hal_h265d_vdpu34x.c  | 5 +++++
+ mpp/hal/rkdec/h265d/hal_h265d_vdpu382.c  | 5 +++++
+ mpp/hal/rkdec/h265d/hal_h265d_vdpu383.c  | 6 ++++++
+ mpp/hal/rkdec/h265d/hal_h265d_vdpu384a.c | 6 ++++++
+ mpp/hal/rkdec/h265d/hal_h265d_vdpu384b.c | 6 ++++++
+ 6 files changed, 29 insertions(+)
+
+diff --git a/mpp/hal/rkdec/h265d/hal_h265d_ctx.h b/mpp/hal/rkdec/h265d/hal_h265d_ctx.h
+index 525b93085..f4abdf8ec 100644
+--- a/mpp/hal/rkdec/h265d/hal_h265d_ctx.h
++++ b/mpp/hal/rkdec/h265d/hal_h265d_ctx.h
+@@ -86,6 +86,7 @@ typedef struct HalH265dCtx_t {
+     HalBufs         origin_bufs;
+     MppBuffer       missing_ref_buf;
+     RK_U32          missing_ref_buf_size;
++    RK_U32          ps_buf_init;
+ 
+     HalDbgCtx       *dbg_ctx;
+ } HalH265dCtx;
+diff --git a/mpp/hal/rkdec/h265d/hal_h265d_vdpu34x.c b/mpp/hal/rkdec/h265d/hal_h265d_vdpu34x.c
+index c700366eb..7d8ce405a 100644
+--- a/mpp/hal/rkdec/h265d/hal_h265d_vdpu34x.c
++++ b/mpp/hal/rkdec/h265d/hal_h265d_vdpu34x.c
+@@ -989,6 +989,10 @@ static MPP_RET hal_h265d_vdpu34x_gen_regs(void *hal,  HalTaskInfo *syn)
+     if ( dxva_cxt->bitstream == NULL) {
+         dxva_cxt->bitstream = mpp_buffer_get_ptr(streambuf);
+     }
++    if (!reg_ctx->ps_buf_init) {
++        dxva_cxt->pp.ps_update_flag = 1;
++        dxva_cxt->pp.rps_update_flag = 1;
++    }
+     if (reg_ctx->is_v34x) {
+ #ifdef HW_RPS
+         hw_regs->comm_gen.reg012.wait_reset_en = 1;
+@@ -1129,6 +1133,7 @@ static MPP_RET hal_h265d_vdpu34x_gen_regs(void *hal,  HalTaskInfo *syn)
+     } else {
+         hal_h265d_output_pps_packet(hal, syn->dec.syntax.data);
+     }
++    reg_ctx->ps_buf_init = 1;
+ 
+     mpp_dev_set_reg_offset(cfg->dev, 161, reg_ctx->spspps_offset);
+     /* rps */
+diff --git a/mpp/hal/rkdec/h265d/hal_h265d_vdpu382.c b/mpp/hal/rkdec/h265d/hal_h265d_vdpu382.c
+index 2bc227b2d..2fe025447 100644
+--- a/mpp/hal/rkdec/h265d/hal_h265d_vdpu382.c
++++ b/mpp/hal/rkdec/h265d/hal_h265d_vdpu382.c
+@@ -773,6 +773,10 @@ static MPP_RET hal_h265d_vdpu382_gen_regs(void *hal,  HalTaskInfo *syn)
+     if ( dxva_cxt->bitstream == NULL) {
+         dxva_cxt->bitstream = mpp_buffer_get_ptr(streambuf);
+     }
++    if (!reg_ctx->ps_buf_init) {
++        dxva_cxt->pp.ps_update_flag = 1;
++        dxva_cxt->pp.rps_update_flag = 1;
++    }
+ #ifdef HW_RPS
+     hw_regs->comm_paras.reg103.ref_pic_layer_same_with_cur = 0xffff;
+     hal_h265d_slice_hw_rps(syn->dec.syntax.data, rps_ptr, reg_ctx->sw_rps_buf, reg_ctx->fast_mode);
+@@ -900,6 +904,7 @@ static MPP_RET hal_h265d_vdpu382_gen_regs(void *hal,  HalTaskInfo *syn)
+         }
+     }
+     hal_h265d_v382_output_pps_packet(hal, syn->dec.syntax.data);
++    reg_ctx->ps_buf_init = 1;
+ 
+     mpp_dev_set_reg_offset(cfg->dev, 161, reg_ctx->spspps_offset);
+     /* rps */
+diff --git a/mpp/hal/rkdec/h265d/hal_h265d_vdpu383.c b/mpp/hal/rkdec/h265d/hal_h265d_vdpu383.c
+index 304884c3a..121f8603b 100644
+--- a/mpp/hal/rkdec/h265d/hal_h265d_vdpu383.c
++++ b/mpp/hal/rkdec/h265d/hal_h265d_vdpu383.c
+@@ -416,6 +416,11 @@ static MPP_RET hal_h265d_vdpu383_gen_regs(void *hal,  HalTaskInfo *syn)
+     hal_dbg_dumpf_buf(reg_ctx->dbg_ctx, "stream_in_128bit.dat", streambuf, 0,
+                       mpp_buffer_get_size(streambuf), 128, "w+");
+ 
++    if (!reg_ctx->ps_buf_init) {
++        dxva_ctx->pp.ps_update_flag = 1;
++        dxva_ctx->pp.rps_update_flag = 1;
++    }
++
+     hal_h265d_vdpu383_rps(reg_ctx, syn->dec.syntax.data, rps_ptr);
+ 
+     hw_regs->comm_addrs.reg128_strm_base = mpp_buffer_get_fd(streambuf);
+@@ -484,6 +489,7 @@ static MPP_RET hal_h265d_vdpu383_gen_regs(void *hal,  HalTaskInfo *syn)
+ 
+     hal_h265d_vdpu38x_output_pps_packet(hal, syn->dec.syntax.data,
+                                         &hw_regs->comm_addrs.reg132_scanlist_addr);
++    reg_ctx->ps_buf_init = 1;
+ 
+     for (i = 0; i < (RK_S32)MPP_ARRAY_ELEMS(dxva_ctx->pp.RefPicList); i++) {
+ 
+diff --git a/mpp/hal/rkdec/h265d/hal_h265d_vdpu384a.c b/mpp/hal/rkdec/h265d/hal_h265d_vdpu384a.c
+index cf188f376..fa7ec4530 100644
+--- a/mpp/hal/rkdec/h265d/hal_h265d_vdpu384a.c
++++ b/mpp/hal/rkdec/h265d/hal_h265d_vdpu384a.c
+@@ -348,6 +348,11 @@ static MPP_RET hal_h265d_vdpu384a_gen_regs(void *hal,  HalTaskInfo *syn)
+     hal_dbg_dumpf_buf(reg_ctx->dbg_ctx, "stream_in_128bit.dat", streambuf, 0,
+                       mpp_buffer_get_size(streambuf), 128, "w+");
+ 
++    if (!reg_ctx->ps_buf_init) {
++        dxva_ctx->pp.ps_update_flag = 1;
++        dxva_ctx->pp.rps_update_flag = 1;
++    }
++
+     hw_regs->comm_addrs.reg128_strm_base = mpp_buffer_get_fd(streambuf);
+     hw_regs->comm_paras.reg66_stream_len = ((dxva_ctx->bitstream_size + 15) & (~15)) + 64;
+     hw_regs->comm_addrs.reg129_stream_buf_st_base = mpp_buffer_get_fd(streambuf);
+@@ -418,6 +423,7 @@ static MPP_RET hal_h265d_vdpu384a_gen_regs(void *hal,  HalTaskInfo *syn)
+ 
+     hal_h265d_vdpu38x_output_pps_packet(hal, syn->dec.syntax.data,
+                                         &hw_regs->comm_addrs.reg132_scanlist_addr);
++    reg_ctx->ps_buf_init = 1;
+ 
+     for (i = 0; i < (RK_S32)MPP_ARRAY_ELEMS(dxva_ctx->pp.RefPicList); i++) {
+ 
+diff --git a/mpp/hal/rkdec/h265d/hal_h265d_vdpu384b.c b/mpp/hal/rkdec/h265d/hal_h265d_vdpu384b.c
+index 4723a65bf..826aa2a26 100644
+--- a/mpp/hal/rkdec/h265d/hal_h265d_vdpu384b.c
++++ b/mpp/hal/rkdec/h265d/hal_h265d_vdpu384b.c
+@@ -318,6 +318,11 @@ static MPP_RET hal_h265d_vdpu384b_gen_regs(void *hal,  HalTaskInfo *syn)
+     hal_dbg_dumpf_buf(reg_ctx->dbg_ctx, "stream_in_128bit.dat", streambuf, 0,
+                       mpp_buffer_get_size(streambuf), 128, "w+");
+ 
++    if (!reg_ctx->ps_buf_init) {
++        dxva_ctx->pp.ps_update_flag = 1;
++        dxva_ctx->pp.rps_update_flag = 1;
++    }
++
+     hw_regs->comm_addrs.reg128_strm_base = mpp_buffer_get_fd(streambuf);
+     hw_regs->comm_paras.reg66_stream_len = ((dxva_ctx->bitstream_size + 15) & (~15)) + 64;
+     hw_regs->comm_addrs.reg129_stream_buf_st_base = mpp_buffer_get_fd(streambuf);
+@@ -383,6 +388,7 @@ static MPP_RET hal_h265d_vdpu384b_gen_regs(void *hal,  HalTaskInfo *syn)
+ 
+     hal_h265d_vdpu38x_output_pps_packet(hal, syn->dec.syntax.data,
+                                         &hw_regs->comm_addrs.reg132_scanlist_addr);
++    reg_ctx->ps_buf_init = 1;
+ 
+     for (i = 0; i < (RK_S32)MPP_ARRAY_ELEMS(dxva_ctx->pp.RefPicList); i++) {
+ 

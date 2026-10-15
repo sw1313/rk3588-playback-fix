@@ -52,7 +52,7 @@ def main():
     cmake_file = patched / "CMakeLists.txt"
     cmake_text = cmake_file.read_text(encoding='utf-8')
     needle = 'set(VERSION_INFO        "\\\"unknown mpp version for missing VCS info\\\"")'
-    replacement = 'set(VERSION_INFO "\\\"c08762eb MPP 1.1.0 + RK3588 compatibility 0.3.0\\\"")'
+    replacement = 'set(VERSION_INFO "\\\"c08762eb MPP 1.1.0 + RK3588 compatibility 0.4.0\\\"")'
     if cmake_text.count(needle) != 1:
         raise SystemExit("Unexpected upstream revision-generation template")
     cmake_file.write_bytes(cmake_text.replace(needle, replacement).encode())

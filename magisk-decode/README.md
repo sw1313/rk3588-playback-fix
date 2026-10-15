@@ -5,12 +5,18 @@ components. It is restricted to the tested RK3588 firmware hashes and original
 5.10 kernel interfaces. Yamby files, LSPosed 0.3.3, the GPU driver, clocks and
 Frame Guard are retained.
 
+Version 0.4.0 adds six selected upstream MPP decoder fixes and the libyuv
+scaling integer-overflow fix while retaining the existing system ABI. See the
+[upgrade scope, exact commits and tests](../docs/decode-upgrade-040.zh-CN.md).
+It does not replace the kernel VPU/RGA drivers or add unsupported hardware
+formats. The independent global Mali module is retained.
+
 | Component | Included change |
 | --- | --- |
-| MPP + VPU, ARM32/ARM64 | MPP 1.1.0 and its matching VPU wrapper; RK3588 JPEG client-19 selection; Android 12 legacy PREP configuration translation; correct packed-input byte offsets for JPEG partitions |
+| MPP + VPU, ARM32/ARM64 | MPP 1.1.0 plus selected upstream VP9 probability, reset/CSD replay, empty CSD, AV1 metadata capacity/gating and HEVC first-task PS/RPS fixes; retains verified JPEG/PREP/HDR compatibility |
 | RGA, ARM32/ARM64 | Existing validated librga 1.10.6 for this firmware's gralloc4 ABI |
 | Codec2 | Existing full-precision Surface/P010 implementation and six narrowly guarded platform patches; all 21 original codec entries remain available |
-| libyuv, system ARM64 | Upstream version 1974, preserving all 710 original exports; 59 removed APIs use isolated Android 12 source implementations |
+| libyuv, system ARM64 | Version 1974 plus upstream scaling overflow fix `0b9e5c922dee`; all 710 original exports retained; 59 removed APIs use isolated Android 12 source implementations |
 | HDR metadata | Full HDR10 static mastering/light values on the verified direct Surface path; standard per-frame Codec2 HDR10+ metadata bridge, with independent switches; no native HDR10+/Dolby HDMI claim |
 | Software Codec2, ARM64 APEX | libvpx 1.17.0 decoder-only backend and pinned libgav1; API32 wrappers retain CFI and use full-precision P010 for tested ten-bit output; original shared libvpx and VP8/VP9 encoders remain original |
 
@@ -30,7 +36,7 @@ retained.
 
 ## Installation and switches
 
-Install `rk3588-decode-stack-0.3.2.zip` in Magisk and reboot. The installer checks
+Install `rk3588-decode-stack-0.4.0.zip` in Magisk and reboot. The installer checks
 all components before disabling overlapping standalone MPP, RGA, Codec2 and
 libyuv modules. It also works from the original component state: Codec2's
 preflight uses the hash-verified staged dependencies. No vendor partition is
@@ -64,6 +70,17 @@ modified. The shared libvpx encoder ABI is never replaced. A failed temporary
 mount rolls back its mounts before the unified recovery disables the module.
 
 ## Validation
+
+For 0.4.0, both MPP/VPU ABIs retain every previous export and libyuv retains
+all 710 original exports. Four native reset/reference cases, 288 scaling-boundary
+cases, 227 libyuv precision/geometry/JPEG cases, 36 hardware JPEG cases, fourteen
+hardware and four software playback cases, twelve HDR/SDR transitions, and
+AVC/HEVC encoding checks passed. Hardware test frames and P010 output match the
+0.3.2 baseline exactly. Disable/reboot restored 31 original decode files while
+global Mali remained active; re-enabling verified nineteen decode overlay hashes.
+The user confirmed normal Yamby HW+ ten-bit and second-video playback, pause,
+seek, switching and reopening on 2026-10-15, without gray edges or whole-screen
+blackouts. The exact scope and retained limits are recorded under `decoder_040`.
 
 Device results and exact limits are recorded in `VALIDATION.json`. Tests cover
 36 hardware JPEG input/size/quality combinations, both VPU ABIs with H.264 and

@@ -1,5 +1,11 @@
 # RK3588 Playback Fix
 
+The current decoder upgrade is [decode-stack 0.4.0](https://github.com/sw1313/rk3588-playback-fix/releases/tag/decode-v0.4.0),
+with selected upstream MPP decoder fixes and libyuv scaling hardening. It
+supersedes decode-stack 0.3.2 in the earlier system collection. The global GPU
+module and original Yamby/LSPosed components are retained; see the
+[scope and validation](docs/decode-upgrade-040.zh-CN.md).
+
 The [Native Mali Global module 0.2.0](magisk-mali-global/README.md) upgrades both
 ARM32/ARM64 system graphics paths to g18p0 on the hash-verified API32 firmware,
 including SurfaceFlinger. It retains the original mapper/allocator services,
@@ -9,8 +15,9 @@ The older app-scoped experiment is superseded and must stay disabled.
 
 [中文说明](README.zh-CN.md) · [Current system packages](https://github.com/sw1313/rk3588-playback-fix/releases/tag/system-v2026.10.15) · [LSPosed release](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.3.3)
 
-The current system release collects the global GPU module, unified decode stack,
-and unchanged LSPosed/Frame Guard packages. GPU and decode ZIPs accept only the
+The earlier system collection contains the global GPU module, decode-stack 0.3.2,
+and unchanged LSPosed/Frame Guard packages; use decode-stack 0.4.0 linked above
+for the decoder upgrade. GPU and decode ZIPs accept only the
 exact firmware hashes recorded in their contracts, not arbitrary RK3588 ROMs.
 Use the unified decode stack instead of overlapping standalone decode modules.
 
@@ -32,7 +39,7 @@ precision, playback, migration and rollback results and remaining limits.
 | Asset | Version | Purpose |
 | --- | --- | --- |
 | `rk3588-mali-global-0.2.0.zip` | 0.2.0 | System-wide native g18p0, both ABIs; Magisk Action selects global/original for the next reboot |
-| `rk3588-decode-stack-0.3.2.zip` | 0.3.2 | Unified decode updates, metadata fixes and component/whole-stack rollback |
+| `rk3588-decode-stack-0.4.0.zip` | 0.4.0 | Unified decode updates, selected MPP decoder backports, libyuv hardening and component/whole-stack rollback |
 | `RK3588-Mpv-Fix-0.3.3.apk` | 0.3.3 | Yamby HW+ defaults on any chipset; optional RK3588 white-edge correction |
 | `rk3588-frameguard-0.1.0.zip` | 0.1.0 | Magisk module to keep refresh-rate requests at 60Hz |
 

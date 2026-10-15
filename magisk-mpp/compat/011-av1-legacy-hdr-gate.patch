@@ -1,0 +1,24 @@
+From 122235c79b60ad4d1f8c3a179384a841481fbe78 Mon Sep 17 00:00:00 2001
+From: Yanjun Liao <yanjun.liao@rock-chips.com>
+Date: Tue, 15 Sep 2026 15:36:04 +0800
+Subject: [PATCH] fix[av1d]: Fill legacy hdr meta only when enabled
+
+Change-Id: I6fcdb72a1403b1599eaff3c29b0236515433b831
+Signed-off-by: Yanjun Liao <yanjun.liao@rock-chips.com>
+---
+ mpp/codec/dec/av1/av1d_parser.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/mpp/codec/dec/av1/av1d_parser.c b/mpp/codec/dec/av1/av1d_parser.c
+index 59ef36846..7f43b5255 100644
+--- a/mpp/codec/dec/av1/av1d_parser.c
++++ b/mpp/codec/dec/av1/av1d_parser.c
+@@ -547,7 +547,7 @@ static MPP_RET set_output_frame(Av1DecCtx *ctx)
+     if (s->hdr_dynamic_meta && s->hdr_dynamic) {
+         mpp_frame_set_hdr_dynamic_meta(frame, s->hdr_dynamic_meta);
+         s->hdr_dynamic = 0;
+-        if (s->frame_header->show_existing_frame)
++        if (s->frame_header->show_existing_frame && ctx->cfg->base.enable_hdr_meta)
+             fill_hdr_meta_to_frame(frame, MPP_VIDEO_CodingAV1);
+     }
+     mpp_frame_set_pts(frame, s->pts);

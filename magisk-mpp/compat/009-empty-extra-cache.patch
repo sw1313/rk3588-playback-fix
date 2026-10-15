@@ -1,0 +1,38 @@
+From 519ee751897a16a699d626759b2f4126c333c0ec Mon Sep 17 00:00:00 2001
+From: "shine.liu" <shine.liu@rock-chips.com>
+Date: Wed, 9 Sep 2026 09:07:37 +0800
+Subject: [PATCH] fix[mpp]: Skip empty extra packet in cache
+
+An empty extra packet (length == 0) fails the capacity check
+(capacity 0 < length 0 is false), so the cache buffer is never
+allocated and mExtraPacket stays NULL. The memcpy below then
+dereferences the NULL dst_impl and kills the working thread, so
+no work is ever returned and VTS DecodeTestEmptyBuffersInserted
+times out after 8s.
+
+Ignore an incoming extra packet when no cache buffer exists yet
+and it carries nothing to store.
+
+Change-Id: I8a26b57ad26eb4ce20fc617fdb0e8eb9db9a6dbc
+Signed-off-by: shine.liu <shine.liu@rock-chips.com>
+---
+ mpp/mpp.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/mpp/mpp.c b/mpp/mpp.c
+index 272ee0678..f3c306b87 100644
+--- a/mpp/mpp.c
++++ b/mpp/mpp.c
+@@ -54,6 +54,12 @@ static MPP_RET mpp_cache_extra_packet(Mpp *mpp, MppPacket src)
+     size_t capacity = dst_impl ? dst_impl->size : 0;
+     MPP_RET ret;
+ 
++    /* No cache buffer allocated and nothing to store: the incoming extra
++     * packet is empty (length == 0). Just ignore it, otherwise the NULL
++     * dst_impl would be dereferenced below. */
++    if (!dst_impl && !src_length)
++        return MPP_OK;
++
+     if (capacity < length) {
+         void *data;
+ 

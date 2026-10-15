@@ -1,6 +1,6 @@
 id=rk3588_mpp_upgrade
 name=RK3588 MPP & VPU Compatibility (Android 12)
-version=0.3.0-mpp1.1.0
-versionCode=4
+version=0.4.0-mpp1.1.0
+versionCode=5
 author=sw1313
-description=Paired MPP 1.1.0/VPU compatibility with upstream dynamic HDR lifetime/reference fixes, legacy JPEG configuration and partition-stride fixes. Guarded systemless rollback.
+description=Paired MPP/VPU with selected upstream VP9, reset replay, AV1 metadata bounds and HEVC first-task fixes. Retains verified HDR/JPEG compatibility and original kernel ABI. Guarded systemless rollback.

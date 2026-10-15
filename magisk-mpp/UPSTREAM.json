@@ -14,10 +14,57 @@
     "MIT"
   ],
   "compatibility_patches": [
+    "004-hdr-refcount.patch",
+    "005-hdr-parser-lifetime.patch",
+    "006-hdr-copy-alias-safety.patch",
+    "007-vp9-probability.patch",
+    "008-reset-extra-replay.patch",
+    "009-empty-extra-cache.patch",
+    "010-av1-metadata-capacity.patch",
+    "011-av1-legacy-hdr-gate.patch",
+    "012-hevc-first-task-ps-rps.patch",
     "mpp-a12-prep-bridge.patch",
     "mpp-jpeg-partition-stride.patch",
     "mpp-rk3588-jpeg-route.patch"
   ],
   "paired_vpu_wrapper": true,
-  "patch_level": "0.2.0"
+  "patch_level": "0.4.0",
+  "decoder_backports": [
+    {
+      "revision": "9db99ac77505ad745cb1f9cf3402cfe47a09b310",
+      "patch": "007-vp9-probability.patch",
+      "subject": "fix[vp9d]: Correct missing 1+ in vp9d_diff_update_prob",
+      "source": "https://github.com/rockchip-linux/mpp/commit/9db99ac77505ad745cb1f9cf3402cfe47a09b310"
+    },
+    {
+      "revision": "c5b8620973c7e22224fcc78ad5016740979c2e0a",
+      "patch": "008-reset-extra-replay.patch",
+      "subject": "fix[mpp]: Replay extra data after dec reset",
+      "source": "https://github.com/rockchip-linux/mpp/commit/c5b8620973c7e22224fcc78ad5016740979c2e0a"
+    },
+    {
+      "revision": "519ee751897a16a699d626759b2f4126c333c0ec",
+      "patch": "009-empty-extra-cache.patch",
+      "subject": "fix[mpp]: Skip empty extra packet in cache",
+      "source": "https://github.com/rockchip-linux/mpp/commit/519ee751897a16a699d626759b2f4126c333c0ec"
+    },
+    {
+      "revision": "c1ce7e1a612644e6684481afe8045d2bfa680aba",
+      "patch": "010-av1-metadata-capacity.patch",
+      "subject": "fix[av1d]: Fix dlby rpu buffer overflow",
+      "source": "https://github.com/rockchip-linux/mpp/commit/c1ce7e1a612644e6684481afe8045d2bfa680aba"
+    },
+    {
+      "revision": "122235c79b60ad4d1f8c3a179384a841481fbe78",
+      "patch": "011-av1-legacy-hdr-gate.patch",
+      "subject": "fix[av1d]: Fill legacy hdr meta only when enabled",
+      "source": "https://github.com/rockchip-linux/mpp/commit/122235c79b60ad4d1f8c3a179384a841481fbe78"
+    },
+    {
+      "revision": "8f88b50df0af9dc367bf2f9943808e82a8d14482",
+      "patch": "012-hevc-first-task-ps-rps.patch",
+      "subject": "fix[h265d]: Force PS/RPS update for the first sent task",
+      "source": "https://github.com/rockchip-linux/mpp/commit/8f88b50df0af9dc367bf2f9943808e82a8d14482"
+    }
+  ]
 }

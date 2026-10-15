@@ -1,0 +1,31 @@
+From 9db99ac77505ad745cb1f9cf3402cfe47a09b310 Mon Sep 17 00:00:00 2001
+From: Ding Wei <leo.ding@rock-chips.com>
+Date: Mon, 24 Aug 2026 17:35:46 +0800
+Subject: [PATCH] fix[vp9d]: Correct missing 1+ in vp9d_diff_update_prob
+
+vp9d_diff_update_prob() implements the differential probability
+update from the VP9 spec. In the prob <= 128 branch the result
+should be 1 + inv_recenter_nonneg(inv_map_table[delp], prob - 1),
+but the 1+ term was accidentally dropped when writing the function.
+
+Correct the error to match the spec.
+
+Change-Id: I1b8fdb5c9232f60ffa6582b0ee508a6a90ad8149
+Signed-off-by: Ding Wei <leo.ding@rock-chips.com>
+---
+ mpp/codec/dec/vp9/vp9d_codec.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/mpp/codec/dec/vp9/vp9d_codec.c b/mpp/codec/dec/vp9/vp9d_codec.c
+index 64538968d..285c1a2b6 100644
+--- a/mpp/codec/dec/vp9/vp9d_codec.c
++++ b/mpp/codec/dec/vp9/vp9d_codec.c
+@@ -1176,7 +1176,7 @@ RK_S32 vp9d_diff_update_prob(Vp9dReader *r, RK_S32 prob, RK_U8 *delta)
+     }
+     *delta = delp;
+     if (prob <= 128) {
+-        delp = inv_recenter_nonneg(inv_map_table[delp], prob - 1);
++        delp = 1 + inv_recenter_nonneg(inv_map_table[delp], prob - 1);
+     } else {
+         delp = 255 - inv_recenter_nonneg(inv_map_table[delp], 255 - prob);
+     }

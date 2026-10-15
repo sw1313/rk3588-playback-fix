@@ -1,6 +1,6 @@
 id=rk3588_decode_stack
 name=RK3588 Decode Stack
-version=0.3.2
-versionCode=302
+version=0.4.0
+versionCode=400
 author=sw1313
-description=Unified API32 decoder stack with HDR10 static metadata and standard Codec2 HDR10+ info bridges. Original HWC and full pixel precision retained, independent HDR switches and reboot rollback. Does not claim Dolby Vision or HDR10+ HDMI output.
+description=Unified API32 decoder stack with selected upstream MPP/VPU decoder fixes, libyuv overflow hardening and verified Codec2/HDR/software paths. Full precision, component switches and reboot rollback retained. Original kernel ABI; no Dolby/HDR10+ HDMI claim.

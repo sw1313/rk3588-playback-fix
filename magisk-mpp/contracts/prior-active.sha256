@@ -1,4 +1,8 @@
-be1e64863e4b0065b427a718fd87c7279318da4a5d5e8d0bd1f161a2f6d2b10c  /vendor/lib/libmpp.so
-b7336d60f83b90b4e42ef7562b604dfc9c44953b4ac302a021b72fc852932db2  /vendor/lib64/libmpp.so
 0ab5966f27e0dfe1e9a7a305f035b98f0a07575b5e2ab0feb83d590d65dc2a80  /vendor/lib/libvpu.so
+32630fb5eda4bbf4044def893917ac121e8abe5f40f2d9100c33754b567250dc  /vendor/lib64/libvpu.so
+a25b6a8761179eae51c4c9bd89a33661d684873a896b1b2fc711bbd9ce3531e2  /vendor/lib/libmpp.so
+b1b9c1907836ed4db48a94c36a61fafe479267bcfc11bb1f18ad5b2f5ebf64c0  /vendor/lib64/libmpp.so
+b7336d60f83b90b4e42ef7562b604dfc9c44953b4ac302a021b72fc852932db2  /vendor/lib64/libmpp.so
+bd17bfb1c7c547e4a95471c9b2df9ebf8c6b3490b048f4b0b7b6b42507f726e0  /vendor/lib/libvpu.so
+be1e64863e4b0065b427a718fd87c7279318da4a5d5e8d0bd1f161a2f6d2b10c  /vendor/lib/libmpp.so
 ea75ffd3d8bbcef65b39e4df273382872136b032ad14793e286aa42ad5145234  /vendor/lib64/libvpu.so

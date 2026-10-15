@@ -33,3 +33,15 @@ patch level, and compiles both libraries and preflight helpers. Original firmwar
 libraries are never shipped. Upstream uses Apache-2.0 or MIT; both license texts
 are included. Existing standalone GitHub releases are older builds; use the
 unified bundle and its switches for this version.
+
+## Decoder backports in 0.4.0
+
+The verified MPP 1.1.0 base now includes six selected upstream decoder fixes:
+VP9 probability update, reset/CSD replay with the empty-cache companion fix,
+AV1 metadata buffer capacity and legacy-HDR gating, and the first HEVC hardware
+task's PS/RPS initialization. Existing HDR/JPEG compatibility patches remain.
+This is not an upgrade of the kernel VPU driver or a wholesale develop snapshot.
+See [decode-stack 0.4.0](../docs/decode-upgrade-040.zh-CN.md) and `UPSTREAM.json`.
+Use the unified decode package for installation; keep overlapping standalone
+modules disabled. `tests/reset_probe.c` links against the candidate `libmpp`
+and exercises a consumed parameter-header cache through two reset cycles.

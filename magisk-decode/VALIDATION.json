@@ -1,7 +1,7 @@
 {
-  "version": "0.3.2",
+  "version": "0.4.0",
   "date": "2026-10-15",
-  "stage": "automatic_native_client_hdr_state_quality_cold_boot_rollback_and_user_hevc10_confirmation_passed",
+  "stage": "selected_upstream_decoder_upgrades_automatic_precision_playback_rollback_and_user_confirmation_passed",
   "prior_031_evidence": {
     "version": "0.3.1",
     "date": "2026-10-15",
@@ -2656,16 +2656,37 @@
     }
   },
   "upgrade_audit": {
-    "document": "docs/decode-upgrade-audit-032.zh-CN.md",
-    "new_backends_or_upstream_decoder_upgrades_installed_in_this_release": false,
-    "candidates": [
-      "libyuv scaling integer-overflow fix 0b9e5c922dee",
-      "selected MPP post-1.1.0 decoder fixes",
-      "libvpx decoder-only hardening",
-      "optional API32 dav1d Codec2 backend"
+    "document": "docs/decode-upgrade-040.zh-CN.md",
+    "new_backends_or_upstream_decoder_upgrades_installed_in_this_release": true,
+    "installed": [
+      "six selected post-1.1.0 MPP decoder fixes, both ABIs",
+      "libyuv scaling overflow fix 0b9e5c922dee"
+    ],
+    "candidates_not_installed": [
+      "libvpx post-1.17.0 decoder hardening",
+      "optional API32 dav1d backend"
     ]
   },
   "user_playback_confirmation": {
+    "version": "0.4.0",
+    "confirmed": true,
+    "date": "2026-10-15",
+    "application": "original Yamby",
+    "decode_mode": "HW+",
+    "content": "usual HEVC ten-bit and another video",
+    "actions": [
+      "pause",
+      "seek",
+      "switch video",
+      "exit and reopen"
+    ],
+    "picture_normal": true,
+    "sound_normal": true,
+    "top_gray_line_absent": true,
+    "whole_display_blackout_absent": true,
+    "scope": "Requested usual playback check only; no additional manual HDR10, arbitrary-format, other-app or all-renderer coverage inferred"
+  },
+  "prior_032_user_playback_confirmation": {
     "version": "0.3.2",
     "confirmed": true,
     "date": "2026-10-15",
@@ -2683,5 +2704,869 @@
     "top_gray_line_absent": true,
     "whole_display_blackout_absent": true,
     "scope": "Usual playback cases in the requested check only; no additional manual HDR10/HLG client transition, arbitrary-format or both-renderer coverage inferred"
+  },
+  "decoder_040": {
+    "base_mpp": "c08762ebfadeb4e986d2fed993bc7a54862d3ebe",
+    "base_tag": "1.1.0",
+    "mpp_backports": [
+      {
+        "revision": "9db99ac77505ad745cb1f9cf3402cfe47a09b310",
+        "patch": "007-vp9-probability.patch",
+        "subject": "fix[vp9d]: Correct missing 1+ in vp9d_diff_update_prob",
+        "source": "https://github.com/rockchip-linux/mpp/commit/9db99ac77505ad745cb1f9cf3402cfe47a09b310"
+      },
+      {
+        "revision": "c5b8620973c7e22224fcc78ad5016740979c2e0a",
+        "patch": "008-reset-extra-replay.patch",
+        "subject": "fix[mpp]: Replay extra data after dec reset",
+        "source": "https://github.com/rockchip-linux/mpp/commit/c5b8620973c7e22224fcc78ad5016740979c2e0a"
+      },
+      {
+        "revision": "519ee751897a16a699d626759b2f4126c333c0ec",
+        "patch": "009-empty-extra-cache.patch",
+        "subject": "fix[mpp]: Skip empty extra packet in cache",
+        "source": "https://github.com/rockchip-linux/mpp/commit/519ee751897a16a699d626759b2f4126c333c0ec"
+      },
+      {
+        "revision": "c1ce7e1a612644e6684481afe8045d2bfa680aba",
+        "patch": "010-av1-metadata-capacity.patch",
+        "subject": "fix[av1d]: Fix dlby rpu buffer overflow",
+        "source": "https://github.com/rockchip-linux/mpp/commit/c1ce7e1a612644e6684481afe8045d2bfa680aba"
+      },
+      {
+        "revision": "122235c79b60ad4d1f8c3a179384a841481fbe78",
+        "patch": "011-av1-legacy-hdr-gate.patch",
+        "subject": "fix[av1d]: Fill legacy hdr meta only when enabled",
+        "source": "https://github.com/rockchip-linux/mpp/commit/122235c79b60ad4d1f8c3a179384a841481fbe78"
+      },
+      {
+        "revision": "8f88b50df0af9dc367bf2f9943808e82a8d14482",
+        "patch": "012-hevc-first-task-ps-rps.patch",
+        "subject": "fix[h265d]: Force PS/RPS update for the first sent task",
+        "source": "https://github.com/rockchip-linux/mpp/commit/8f88b50df0af9dc367bf2f9943808e82a8d14482"
+      }
+    ],
+    "libyuv": "0b9e5c922deec7c9921ae385f6242a9a27754d6e",
+    "changed_runtime_binaries": [
+      "components/libyuv/system/lib64/libyuv.so",
+      "components/mpp/system/vendor/lib/libmpp.so",
+      "components/mpp/system/vendor/lib/libvpu.so",
+      "components/mpp/system/vendor/lib64/libmpp.so",
+      "components/mpp/system/vendor/lib64/libvpu.so"
+    ],
+    "export_compatibility": [
+      {
+        "component": "libmpp.so",
+        "abi": "lib",
+        "prior_exports": 2500,
+        "removed_exports": 0,
+        "new_exports": 0
+      },
+      {
+        "component": "libvpu.so",
+        "abi": "lib",
+        "prior_exports": 364,
+        "removed_exports": 0,
+        "new_exports": 0
+      },
+      {
+        "component": "libmpp.so",
+        "abi": "lib64",
+        "prior_exports": 2500,
+        "removed_exports": 0,
+        "new_exports": 0
+      },
+      {
+        "component": "libvpu.so",
+        "abi": "lib64",
+        "prior_exports": 362,
+        "removed_exports": 0,
+        "new_exports": 0
+      },
+      {
+        "component": "libyuv.so",
+        "abi": "lib64",
+        "original_exports_retained": 710,
+        "removed_exports": 0,
+        "upstream": "0b9e5c922deec7c9921ae385f6242a9a27754d6e"
+      }
+    ],
+    "isolated_preflight": [
+      {
+        "abi": "32",
+        "clip": "h264",
+        "reset_cycles": 2,
+        "total_frames": 36,
+        "all_samples_exact": true,
+        "empty_csd_safe": true
+      },
+      {
+        "abi": "32",
+        "clip": "hevc10",
+        "reset_cycles": 2,
+        "total_frames": 36,
+        "all_samples_exact": true,
+        "empty_csd_safe": true
+      },
+      {
+        "abi": "64",
+        "clip": "h264",
+        "reset_cycles": 2,
+        "total_frames": 36,
+        "all_samples_exact": true,
+        "empty_csd_safe": true
+      },
+      {
+        "abi": "64",
+        "clip": "hevc10",
+        "reset_cycles": 2,
+        "total_frames": 36,
+        "all_samples_exact": true,
+        "empty_csd_safe": true
+      },
+      {
+        "probe": "scale_boundary_probe64",
+        "pass": true,
+        "cases": 288,
+        "scalar_and_neon": true,
+        "guard_bytes_intact": true
+      },
+      {
+        "probe": "quality_probe64",
+        "pass": true,
+        "output": "CPU flags=303\nPASS cases=227 full_10bit_roundtrip_exact=1 jpeg_stock_equal=1",
+        "jpeg_fixture": "valid 640x368 synthetic reference; invalid/other-size scratch JPEGs excluded"
+      }
+    ],
+    "jpeg_compatibility": [
+      {
+        "abi": "32",
+        "width": 640,
+        "height": 368,
+        "format": 0,
+        "quality": 90,
+        "max_sample_error": 1,
+        "pass": true
+      },
+      {
+        "abi": "32",
+        "width": 640,
+        "height": 368,
+        "format": 0,
+        "quality": 99,
+        "max_sample_error": 1,
+        "pass": true
+      },
+      {
+        "abi": "32",
+        "width": 640,
+        "height": 368,
+        "format": 4,
+        "quality": 90,
+        "max_sample_error": 1,
+        "pass": true
+      },
+      {
+        "abi": "32",
+        "width": 640,
+        "height": 368,
+        "format": 4,
+        "quality": 99,
+        "max_sample_error": 1,
+        "pass": true
+      },
+      {
+        "abi": "32",
+        "width": 640,
+        "height": 368,
+        "format": 8,
+        "quality": 90,
+        "max_sample_error": 1,
+        "pass": true
+      },
+      {
+        "abi": "32",
+        "width": 640,
+        "height": 368,
+        "format": 8,
+        "quality": 99,
+        "max_sample_error": 1,
+        "pass": true
+      },
+      {
+        "abi": "32",
+        "width": 854,
+        "height": 480,
+        "format": 0,
+        "quality": 90,
+        "max_sample_error": 3,
+        "pass": true
+      },
+      {
+        "abi": "32",
+        "width": 854,
+        "height": 480,
+        "format": 0,
+        "quality": 99,
+        "max_sample_error": 1,
+        "pass": true
+      },
+      {
+        "abi": "32",
+        "width": 854,
+        "height": 480,
+        "format": 4,
+        "quality": 90,
+        "max_sample_error": 3,
+        "pass": true
+      },
+      {
+        "abi": "32",
+        "width": 854,
+        "height": 480,
+        "format": 4,
+        "quality": 99,
+        "max_sample_error": 1,
+        "pass": true
+      },
+      {
+        "abi": "32",
+        "width": 854,
+        "height": 480,
+        "format": 8,
+        "quality": 90,
+        "max_sample_error": 3,
+        "pass": true
+      },
+      {
+        "abi": "32",
+        "width": 854,
+        "height": 480,
+        "format": 8,
+        "quality": 99,
+        "max_sample_error": 1,
+        "pass": true
+      },
+      {
+        "abi": "32",
+        "width": 1920,
+        "height": 1080,
+        "format": 0,
+        "quality": 90,
+        "max_sample_error": 1,
+        "pass": true
+      },
+      {
+        "abi": "32",
+        "width": 1920,
+        "height": 1080,
+        "format": 0,
+        "quality": 99,
+        "max_sample_error": 1,
+        "pass": true
+      },
+      {
+        "abi": "32",
+        "width": 1920,
+        "height": 1080,
+        "format": 4,
+        "quality": 90,
+        "max_sample_error": 1,
+        "pass": true
+      },
+      {
+        "abi": "32",
+        "width": 1920,
+        "height": 1080,
+        "format": 4,
+        "quality": 99,
+        "max_sample_error": 1,
+        "pass": true
+      },
+      {
+        "abi": "32",
+        "width": 1920,
+        "height": 1080,
+        "format": 8,
+        "quality": 90,
+        "max_sample_error": 1,
+        "pass": true
+      },
+      {
+        "abi": "32",
+        "width": 1920,
+        "height": 1080,
+        "format": 8,
+        "quality": 99,
+        "max_sample_error": 1,
+        "pass": true
+      },
+      {
+        "abi": "64",
+        "width": 640,
+        "height": 368,
+        "format": 0,
+        "quality": 90,
+        "max_sample_error": 1,
+        "pass": true
+      },
+      {
+        "abi": "64",
+        "width": 640,
+        "height": 368,
+        "format": 0,
+        "quality": 99,
+        "max_sample_error": 1,
+        "pass": true
+      },
+      {
+        "abi": "64",
+        "width": 640,
+        "height": 368,
+        "format": 4,
+        "quality": 90,
+        "max_sample_error": 1,
+        "pass": true
+      },
+      {
+        "abi": "64",
+        "width": 640,
+        "height": 368,
+        "format": 4,
+        "quality": 99,
+        "max_sample_error": 1,
+        "pass": true
+      },
+      {
+        "abi": "64",
+        "width": 640,
+        "height": 368,
+        "format": 8,
+        "quality": 90,
+        "max_sample_error": 1,
+        "pass": true
+      },
+      {
+        "abi": "64",
+        "width": 640,
+        "height": 368,
+        "format": 8,
+        "quality": 99,
+        "max_sample_error": 1,
+        "pass": true
+      },
+      {
+        "abi": "64",
+        "width": 854,
+        "height": 480,
+        "format": 0,
+        "quality": 90,
+        "max_sample_error": 3,
+        "pass": true
+      },
+      {
+        "abi": "64",
+        "width": 854,
+        "height": 480,
+        "format": 0,
+        "quality": 99,
+        "max_sample_error": 1,
+        "pass": true
+      },
+      {
+        "abi": "64",
+        "width": 854,
+        "height": 480,
+        "format": 4,
+        "quality": 90,
+        "max_sample_error": 3,
+        "pass": true
+      },
+      {
+        "abi": "64",
+        "width": 854,
+        "height": 480,
+        "format": 4,
+        "quality": 99,
+        "max_sample_error": 1,
+        "pass": true
+      },
+      {
+        "abi": "64",
+        "width": 854,
+        "height": 480,
+        "format": 8,
+        "quality": 90,
+        "max_sample_error": 3,
+        "pass": true
+      },
+      {
+        "abi": "64",
+        "width": 854,
+        "height": 480,
+        "format": 8,
+        "quality": 99,
+        "max_sample_error": 1,
+        "pass": true
+      },
+      {
+        "abi": "64",
+        "width": 1920,
+        "height": 1080,
+        "format": 0,
+        "quality": 90,
+        "max_sample_error": 1,
+        "pass": true
+      },
+      {
+        "abi": "64",
+        "width": 1920,
+        "height": 1080,
+        "format": 0,
+        "quality": 99,
+        "max_sample_error": 1,
+        "pass": true
+      },
+      {
+        "abi": "64",
+        "width": 1920,
+        "height": 1080,
+        "format": 4,
+        "quality": 90,
+        "max_sample_error": 1,
+        "pass": true
+      },
+      {
+        "abi": "64",
+        "width": 1920,
+        "height": 1080,
+        "format": 4,
+        "quality": 99,
+        "max_sample_error": 1,
+        "pass": true
+      },
+      {
+        "abi": "64",
+        "width": 1920,
+        "height": 1080,
+        "format": 8,
+        "quality": 90,
+        "max_sample_error": 1,
+        "pass": true
+      },
+      {
+        "abi": "64",
+        "width": 1920,
+        "height": 1080,
+        "format": 8,
+        "quality": 99,
+        "max_sample_error": 1,
+        "pass": true
+      }
+    ],
+    "restart_and_rollback": {
+      "initial": {
+        "mode": "initial",
+        "fresh_boot": true,
+        "verified_decode_files": 19,
+        "all_hashes_match": true,
+        "global_mali_still_g18p0": true,
+        "kernel": "5.10.66",
+        "active_config": "mpp=1\nrga=1\ncodec2=1\nlibyuv=1\nsoftware=1\nhdr_static=1\nhdr10plus=1\n"
+      },
+      "off": {
+        "mode": "off",
+        "fresh_boot": true,
+        "verified_decode_files": 31,
+        "all_hashes_match": true,
+        "global_mali_still_g18p0": true,
+        "kernel": "5.10.66",
+        "module_disabled": true,
+        "saved_component_selections_retained": true
+      },
+      "on": {
+        "mode": "on",
+        "fresh_boot": true,
+        "verified_decode_files": 19,
+        "all_hashes_match": true,
+        "global_mali_still_g18p0": true,
+        "kernel": "5.10.66",
+        "active_config": "mpp=1\nrga=1\ncodec2=1\nlibyuv=1\nsoftware=1\nhdr_static=1\nhdr10plus=1\n"
+      }
+    },
+    "hardware_playback": [
+      {
+        "case": "h264-8-720",
+        "codec": "c2.rk.avc.decoder",
+        "pass": true,
+        "frames": 100,
+        "eos": true,
+        "pixelcopy_status": 0
+      },
+      {
+        "case": "hevc10-854",
+        "codec": "c2.rk.hevc.decoder",
+        "pass": true,
+        "frames": 100,
+        "eos": true,
+        "pixelcopy_status": 0
+      },
+      {
+        "case": "hevc10-1080",
+        "codec": "c2.rk.hevc.decoder",
+        "pass": true,
+        "frames": 100,
+        "eos": true,
+        "pixelcopy_status": 0
+      },
+      {
+        "case": "hevc10-hdr-720",
+        "codec": "c2.rk.hevc.decoder",
+        "pass": true,
+        "frames": 100,
+        "eos": true,
+        "pixelcopy_status": 0
+      },
+      {
+        "case": "av1-8-720",
+        "codec": "c2.rk.av1.decoder",
+        "pass": true,
+        "frames": 100,
+        "eos": true,
+        "pixelcopy_status": 0
+      },
+      {
+        "case": "av1-10-720",
+        "codec": "c2.rk.av1.decoder",
+        "pass": true,
+        "frames": 102,
+        "eos": true,
+        "pixelcopy_status": 0
+      },
+      {
+        "case": "vp9-10-720",
+        "codec": "c2.rk.vp9.decoder",
+        "pass": true,
+        "frames": 100,
+        "eos": true,
+        "pixelcopy_status": 0
+      },
+      {
+        "case": "hevc10-4k",
+        "codec": "c2.rk.hevc.decoder",
+        "pass": true,
+        "frames": 100,
+        "eos": true,
+        "pixelcopy_status": 0
+      },
+      {
+        "case": "hevc8-720",
+        "codec": "c2.rk.hevc.decoder",
+        "pass": true,
+        "frames": 100,
+        "eos": true,
+        "pixelcopy_status": 0
+      },
+      {
+        "case": "av1-10-full-720",
+        "codec": "c2.rk.av1.decoder",
+        "pass": true,
+        "frames": 100,
+        "eos": true,
+        "pixelcopy_status": 0
+      },
+      {
+        "case": "vp8-8-720",
+        "codec": "c2.rk.vp8.decoder",
+        "pass": true,
+        "frames": 100,
+        "eos": true,
+        "pixelcopy_status": 0
+      },
+      {
+        "case": "mpeg2-8-720",
+        "codec": "c2.rk.mpeg2.decoder",
+        "pass": true,
+        "frames": 100,
+        "eos": true,
+        "pixelcopy_status": 0
+      },
+      {
+        "case": "m4v-8-720",
+        "codec": "c2.android.mpeg4.decoder",
+        "pass": true,
+        "frames": 100,
+        "eos": true,
+        "pixelcopy_status": 0
+      },
+      {
+        "case": "h263-8-cif",
+        "codec": "c2.rk.h263.decoder",
+        "pass": true,
+        "frames": 100,
+        "eos": true,
+        "pixelcopy_status": 0
+      }
+    ],
+    "software_playback": [
+      {
+        "case": "av1-8-720",
+        "codec": "c2.android.av1.decoder",
+        "pass": true,
+        "frames": 100,
+        "eos": true
+      },
+      {
+        "case": "vp9-10-720",
+        "codec": "c2.android.vp9.decoder",
+        "pass": true,
+        "frames": 100,
+        "eos": true
+      },
+      {
+        "case": "av1-10-pq-720",
+        "codec": "c2.android.av1.decoder",
+        "pass": true,
+        "frames": 100,
+        "eos": true
+      },
+      {
+        "case": "av1-10-hlg-720",
+        "codec": "c2.android.av1.decoder",
+        "pass": true,
+        "frames": 100,
+        "eos": true
+      }
+    ],
+    "frame_comparison": [
+      {
+        "case": "av1-10-720",
+        "max_rgb_difference": 0,
+        "identical": true
+      },
+      {
+        "case": "av1-10-full-720",
+        "max_rgb_difference": 0,
+        "identical": true
+      },
+      {
+        "case": "av1-8-720",
+        "max_rgb_difference": 0,
+        "identical": true
+      },
+      {
+        "case": "h263-8-cif",
+        "max_rgb_difference": 0,
+        "identical": true
+      },
+      {
+        "case": "h264-8-720",
+        "max_rgb_difference": 0,
+        "identical": true
+      },
+      {
+        "case": "hevc10-1080",
+        "max_rgb_difference": 0,
+        "identical": true
+      },
+      {
+        "case": "hevc10-4k",
+        "max_rgb_difference": 0,
+        "identical": true
+      },
+      {
+        "case": "hevc10-854",
+        "max_rgb_difference": 0,
+        "identical": true
+      },
+      {
+        "case": "hevc10-hdr-720",
+        "max_rgb_difference": 0,
+        "identical": true
+      },
+      {
+        "case": "hevc8-720",
+        "max_rgb_difference": 0,
+        "identical": true
+      },
+      {
+        "case": "m4v-8-720",
+        "max_rgb_difference": 0,
+        "identical": true
+      },
+      {
+        "case": "mpeg2-8-720",
+        "max_rgb_difference": 0,
+        "identical": true
+      },
+      {
+        "case": "vp8-8-720",
+        "max_rgb_difference": 0,
+        "identical": true
+      },
+      {
+        "case": "vp9-10-720",
+        "max_rgb_difference": 0,
+        "identical": true
+      }
+    ],
+    "p010": {
+      "bytes": 16588800,
+      "identical_to_decode032_baseline": true,
+      "nonzero_low_two_bits": 1884604,
+      "max_sample_difference": 0,
+      "color_format": 54
+    },
+    "hdr_transitions": [
+      {
+        "clip": "hevc10-hlg-720",
+        "expected_eotf": 3,
+        "actual_eotf": 3,
+        "client_composition": false,
+        "pause_seek_eos": true,
+        "pass": true
+      },
+      {
+        "clip": "hdr4000",
+        "expected_eotf": 0,
+        "actual_eotf": 0,
+        "client_composition": true,
+        "pause_seek_eos": true,
+        "pass": true
+      },
+      {
+        "clip": "hevc10-hdr-720",
+        "expected_eotf": 2,
+        "actual_eotf": 2,
+        "client_composition": false,
+        "pause_seek_eos": true,
+        "pass": true
+      },
+      {
+        "clip": "pq-no-master",
+        "expected_eotf": 0,
+        "actual_eotf": 0,
+        "client_composition": true,
+        "pause_seek_eos": true,
+        "pass": true
+      },
+      {
+        "clip": "hevc10-hlg-720",
+        "expected_eotf": 3,
+        "actual_eotf": 3,
+        "client_composition": false,
+        "pause_seek_eos": true,
+        "pass": true
+      },
+      {
+        "clip": "hevc8-720",
+        "expected_eotf": 0,
+        "actual_eotf": 0,
+        "client_composition": false,
+        "pause_seek_eos": true,
+        "pass": true
+      },
+      {
+        "clip": "hevc10-hlg-360",
+        "expected_eotf": 0,
+        "actual_eotf": 0,
+        "client_composition": true,
+        "pause_seek_eos": true,
+        "pass": true
+      },
+      {
+        "clip": "hevc10-hdr-720",
+        "expected_eotf": 2,
+        "actual_eotf": 2,
+        "client_composition": false,
+        "pause_seek_eos": true,
+        "pass": true
+      },
+      {
+        "clip": "hdr4000",
+        "expected_eotf": 0,
+        "actual_eotf": 0,
+        "client_composition": true,
+        "pause_seek_eos": true,
+        "pass": true
+      },
+      {
+        "clip": "hevc10-hlg-360",
+        "expected_eotf": 0,
+        "actual_eotf": 0,
+        "client_composition": true,
+        "pause_seek_eos": true,
+        "pass": true
+      },
+      {
+        "clip": "hevc10-hlg-720",
+        "expected_eotf": 3,
+        "actual_eotf": 3,
+        "client_composition": false,
+        "pause_seek_eos": true,
+        "pass": true
+      },
+      {
+        "clip": "hevc8-720",
+        "expected_eotf": 0,
+        "actual_eotf": 0,
+        "client_composition": false,
+        "pause_seek_eos": true,
+        "pass": true
+      }
+    ],
+    "avc_hevc_encoding": [
+      {
+        "codec": "avc",
+        "frames": 8,
+        "pixels_identical_to_stock": true,
+        "pass": true
+      },
+      {
+        "codec": "hevc",
+        "frames": 8,
+        "pixels_identical_to_stock": true,
+        "pass": true
+      }
+    ],
+    "preserved": {
+      "yamby_original_libraries": 18,
+      "lsposed": "0.3.3",
+      "global_mali": "0.2.0 g18p0 remains active",
+      "boot_kernel_firmware_unchanged": true,
+      "frame_guard_retained": true,
+      "all_decode_overlay_hashes_match": true
+    },
+    "user_playback_confirmation": {
+      "version": "0.4.0",
+      "confirmed": true,
+      "date": "2026-10-15",
+      "application": "original Yamby",
+      "decode_mode": "HW+",
+      "content": "usual HEVC ten-bit and another video",
+      "actions": [
+        "pause",
+        "seek",
+        "switch video",
+        "exit and reopen"
+      ],
+      "picture_normal": true,
+      "sound_normal": true,
+      "top_gray_line_absent": true,
+      "whole_display_blackout_absent": true,
+      "scope": "Requested usual playback check only; no additional manual HDR10, arbitrary-format, other-app or all-renderer coverage inferred"
+    },
+    "limits": {
+      "kernel_vpu_or_rga_driver_upgraded": false,
+      "all_develop_features_imported": false,
+      "new_hardware_formats_enabled": false,
+      "dolby_or_hdr10plus_hdmi_added": false,
+      "yamby_or_lsposed_modified": false,
+      "dav1d_or_new_vpx_added": false,
+      "complete_fuzzing_of_av1_rpu_and_malformed_streams": false,
+      "new_client_ten_bit_hdr_gpu_composition": false,
+      "all_firmware_or_content_validated": false,
+      "speedup_measured": false
+    }
   }
 }
