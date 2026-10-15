@@ -2,18 +2,20 @@
 
 [**Current downloads / 当前下载**](DOWNLOADS.md) · [Download table](https://github.com/sw1313/rk3588-playback-fix/blob/main/DOWNLOADS.md) · [中文说明](README.zh-CN.md)
 
-This repository contains four independently versioned components. A version
-number belongs to its named component; it is not a shared project version.
-Release tags and titles start with their version number; component suffixes
-distinguish equal version numbers. System modules remain pre-releases, restricted
-to the firmware hashes in their contracts.
+**[Project release v0.5.1 — all four installers](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.5.1)**
+
+Every public Release is a complete project snapshot with Decode Stack, Native
+Mali Global, the Yamby/mpv plugin and Frame Guard attached together. The project
+version identifies the snapshot; each package retains its own component version.
+GitHub **Latest** points to the newest complete project release. System components
+remain experimental and restricted to the firmware hashes in their contracts.
 
 | Component | Current version | Purpose |
 | --- | --- | --- |
-| [Decode Stack](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.5.1) | **0.5.1 — pre-release** | Unified system decode updates; guarded 8-bit AVC/HEVC buffer route repairs the reproduced 4K asynchronous stop/drain crash |
-| [Native Mali Global](magisk-mali-global/README.md) | **0.2.0 — pre-release** | Global ARM32/ARM64 native Mali g18p0 userspace graphics paths |
-| [Yamby/mpv LSPosed plugin](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.3.3-yamby) | **0.3.3** | Default HW+ setting and optional RK3588 edge correction; this is the plugin version, not the LSPosed framework version |
-| [Frame Guard](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.3.3-yamby) | **0.1.0** | Optional fixed-refresh workaround for the reproduced HDMI blackouts |
+| [Decode Stack](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.5.1) | **0.5.1 — experimental** | Unified system decode updates; guarded 8-bit AVC/HEVC buffer route repairs the reproduced 4K asynchronous stop/drain crash |
+| [Native Mali Global](magisk-mali-global/README.md) | **0.2.0 — experimental** | Global ARM32/ARM64 native Mali g18p0 userspace graphics paths |
+| [Yamby/mpv LSPosed plugin](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.5.1) | **0.3.3** | Default HW+ setting and optional RK3588 edge correction; this is the plugin version, not the LSPosed framework version |
+| [Frame Guard](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.5.1) | **0.1.0** | Optional fixed-refresh workaround for the reproduced HDMI blackouts |
 
 ## Choose and install
 

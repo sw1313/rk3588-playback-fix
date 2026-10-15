@@ -1,5 +1,8 @@
 # MPP/VPU compatibility component
 
+> Historical standalone component; its Release is archived. Current installations use the [complete project release](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.5.1) and unified Decode Stack. Do not stack this standalone module on it.
+> 历史独立组件，其 Release 已归档；当前请使用整套项目中的解码合并模块。
+
 Recommended installation is the [unified decode stack](../magisk-decode/README.md).
 This component pairs ARM32/ARM64 MPP **1.1.0** and its matching VPU wrapper,
 based on upstream revision `c08762ebfadeb4e986d2fed993bc7a54862d3ebe`.

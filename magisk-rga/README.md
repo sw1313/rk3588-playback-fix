@@ -1,5 +1,8 @@
 # RK3588 RGA Upgrade
 
+> Historical standalone component; its Release is archived. Current installations use the [complete project release](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.5.1) and unified Decode Stack. Do not stack this standalone module on it.
+> 历史独立组件，其 Release 已归档；当前请使用整套项目中的解码合并模块。
+
 Rebuilds official **librga 1.10.6_[3]** for the verified **AGTV Android 12 / API 32** vendor stack, replacing its **1.9.2_[1]** RGA userspace libraries through a Magisk overlay. Includes ARM64 and ARM32 libraries. RGA performs image copying, scaling and color conversion; this is an image-processing library upgrade, not a replacement VPU decoder or kernel.
 
 The official Android NDK prebuilt cannot directly replace this firmware's library: it lacks Android `RockchipRga`/`Singleton` symbols required by existing consumers and uses a different C++ runtime. This module builds the complete Android gralloc4 configuration from the official source, using Android 12 VNDK C++ headers and the existing system `libc++.so` ABI. Upstream RGA source is unmodified. No vendor link-input binary is redistributed.

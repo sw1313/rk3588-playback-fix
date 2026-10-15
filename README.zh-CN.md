@@ -2,16 +2,18 @@
 
 [**当前下载与版本表**](DOWNLOADS.md) · [GitHub 下载导航](https://github.com/sw1313/rk3588-playback-fix/blob/main/DOWNLOADS.md) · [English](README.md)
 
-项目包含四个独立版本的组件。版本号只属于对应组件，不是整个项目共用的版本。
-Release 的 Tag 和标题统一以版本号开头，同版本组件使用后缀区分。
-系统模块仍为预发布，只能安装到契约匹配的固件。
+**[项目整套版本 v0.5.1 — 四个安装包齐全](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.5.1)**
+
+每个公开 Release 都是完整项目快照，附齐 Decode Stack、全局 Mali、Yamby/mpv 插件
+和 Frame Guard。项目版本标识这次整套发布，包内继续保留各组件真实版本号。
+GitHub **Latest** 指向最近更新的整套版本。系统组件仍为实验性质，只接受契约匹配的固件。
 
 | 组件 | 当前版本 | 用途 |
 | --- | --- | --- |
-| [Decode Stack 解码合并模块](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.5.1) | **0.5.1，预发布** | 合并系统解码升级，修复已复现的 AVC／HEVC 八位缓冲区异步停止／排空崩溃 |
-| [原厂 Mali 全局模块](magisk-mali-global/README.md) | **0.2.0，预发布** | 32／64 位系统标准图形路径使用原厂 g18p0 用户态驱动 |
-| [Yamby／mpv LSPosed 插件](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.3.3-yamby) | **0.3.3** | 默认 HW+ 设置与可选灰白边修正；这是插件版本，不是 LSPosed 框架版本 |
-| [Frame Guard 刷新率模块](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.3.3-yamby) | **0.1.0** | 可选的固定刷新率黑屏规避 |
+| [Decode Stack 解码合并模块](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.5.1) | **0.5.1，实验组件** | 合并系统解码升级，修复已复现的 AVC／HEVC 八位缓冲区异步停止／排空崩溃 |
+| [原厂 Mali 全局模块](magisk-mali-global/README.md) | **0.2.0，实验组件** | 32／64 位系统标准图形路径使用原厂 g18p0 用户态驱动 |
+| [Yamby／mpv LSPosed 插件](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.5.1) | **0.3.3** | 默认 HW+ 设置与可选灰白边修正；这是插件版本，不是 LSPosed 框架版本 |
+| [Frame Guard 刷新率模块](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.5.1) | **0.1.0** | 可选的固定刷新率黑屏规避 |
 
 ## 安装与历史版本
 
