@@ -508,8 +508,40 @@
     "app_optin_not_used": true
   },
   "user_global_playback_confirmation": {
-    "confirmed": false,
-    "status": "pending; scoped 0.1.1 game confirmation is not reused"
+    "confirmed": true,
+    "date": "2026-10-15",
+    "module_version": "0.2.0",
+    "mode": "system-wide native g18p0",
+    "desktop_normal": true,
+    "game": {
+      "title": "Legend Clover",
+      "requested_checks": [
+        "home screen",
+        "battle",
+        "exit and reopen"
+      ],
+      "user_reports_normal": true,
+      "running_process_observed": true,
+      "canonical_global_vendor_mali_mapping_verified": true
+    },
+    "player": {
+      "application": "original Yamby",
+      "decode_mode": "HW+",
+      "content": "usual HEVC ten-bit videos",
+      "requested_checks": [
+        "pause",
+        "seek",
+        "exit and reopen"
+      ],
+      "user_reports_normal": true
+    },
+    "scope": "User confirmed both requested checks normal; no additional games, formats, renderer coverage, long-duration or measured performance improvement inferred",
+    "runtime_after_confirmation": {
+      "global_g18_active": true,
+      "system_compositor_g18": true,
+      "gpu_and_decode_overlay_hashes_match": true
+    },
+    "runtime_binaries_changed": false
   },
   "limits": {
     "complete_graphics_cts": false,

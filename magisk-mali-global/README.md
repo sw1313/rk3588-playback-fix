@@ -82,3 +82,8 @@ HEVC P010 输出与统一解码模块 0.3.2 基线逐字节一致，保留非零
 - [AOSP common V2](https://android.googlesource.com/platform/hardware/interfaces/+/android-13.0.0_r1/common/aidl/aidl_api/android.hardware.common/2/)
 - [AOSP graphics.common V3](https://android.googlesource.com/platform/hardware/interfaces/+/android-13.0.0_r1/graphics/common/aidl/aidl_api/android.hardware.graphics.common/3/)
 - [AOSP allocator V1](https://android.googlesource.com/platform/hardware/interfaces/+/android-13.0.0_r1/graphics/allocator/aidl/aidl_api/android.hardware.graphics.allocator/1/)
+
+2026-10-15 用户已确认全局版桌面、《传奇四叶草》主页／战斗／退出重进，以及原版
+Yamby HW+ 常用十位视频暂停／拖动／重进均正常。确认后再次核对全局驱动、
+系统合成器及 GPU／解码覆盖哈希。补充验收记录见发布页附件与本目录
+`VALIDATION.json`；原安装包与运行库不变，无需重新安装或重启。
