@@ -1,0 +1,14 @@
+{
+  "project": "airockchip/librga",
+  "version": "1.10.6_[3]",
+  "source_share": "https://console.zbox.filez.com/l/fuGojC",
+  "source_sha256": "dae723cfc3cf4d076f21e7f5c609647408f86ac612a94ceb889163959eeb2f0b",
+  "vndk_headers_revision": "e1ba8043f8368220b412c18ee8392850ab009aae",
+  "vndk_headers_content_sha256": "fad8528cbe9f2750622b0058b6f88ac6c68a5b0f4d3dcdc56f33a9bc87c7b9b7",
+  "android_api": 32,
+  "abis": [
+    "arm64-v8a",
+    "armeabi-v7a"
+  ],
+  "source_modifications": "None; rebuilt Android gralloc4 configuration against matching system ABI."
+}

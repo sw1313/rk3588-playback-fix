@@ -1,0 +1,256 @@
+{
+  "date": "2026-10-14",
+  "status": "diagnostic-only; no new module enabled",
+  "player_components": "original; excluded from upgrades",
+  "codec2_native": [
+    {
+      "abi": "arm",
+      "input": "hevc10-854",
+      "bits": 10,
+      "expected_frames": 6,
+      "exit_code": 0,
+      "probe_seconds": 0.657,
+      "samples": 3689280,
+      "expected_samples": 3689280,
+      "max_sample_error": 0,
+      "sample_mismatches": 0,
+      "low_two_bits_nonzero": 2126908
+    },
+    {
+      "abi": "arm",
+      "input": "hevc10-720",
+      "bits": 10,
+      "expected_frames": 6,
+      "exit_code": 0,
+      "probe_seconds": 1.047,
+      "samples": 8294400,
+      "expected_samples": 8294400,
+      "max_sample_error": 0,
+      "sample_mismatches": 0,
+      "low_two_bits_nonzero": 4232699
+    },
+    {
+      "abi": "arm",
+      "input": "hevc10-1080",
+      "bits": 10,
+      "expected_frames": 6,
+      "exit_code": 0,
+      "probe_seconds": 2.11,
+      "samples": 18662400,
+      "expected_samples": 18662400,
+      "max_sample_error": 0,
+      "sample_mismatches": 0,
+      "low_two_bits_nonzero": 9974700
+    },
+    {
+      "abi": "arm",
+      "input": "hevc10-4k",
+      "bits": 10,
+      "expected_frames": 3,
+      "exit_code": 0,
+      "probe_seconds": 3.875,
+      "samples": 37324800,
+      "expected_samples": 37324800,
+      "max_sample_error": 0,
+      "sample_mismatches": 0,
+      "low_two_bits_nonzero": 27384890
+    },
+    {
+      "abi": "arm",
+      "input": "vp9-10-720",
+      "bits": 10,
+      "expected_frames": 6,
+      "exit_code": 0,
+      "probe_seconds": 1.125,
+      "samples": 8294400,
+      "expected_samples": 8294400,
+      "max_sample_error": 0,
+      "sample_mismatches": 0,
+      "low_two_bits_nonzero": 2007129
+    },
+    {
+      "abi": "arm",
+      "input": "av1-10-1080",
+      "bits": 10,
+      "expected_frames": 6,
+      "exit_code": 139,
+      "probe_seconds": 0.344
+    },
+    {
+      "abi": "arm",
+      "input": "h264-1080",
+      "bits": 8,
+      "expected_frames": 6,
+      "exit_code": 0,
+      "probe_seconds": 5.531,
+      "samples": 18662400,
+      "expected_samples": 18662400,
+      "max_sample_error": 0,
+      "sample_mismatches": 0,
+      "low_two_bits_nonzero": 16381972
+    },
+    {
+      "abi": "arm64",
+      "input": "hevc10-854",
+      "bits": 10,
+      "expected_frames": 6,
+      "exit_code": 0,
+      "probe_seconds": 0.656,
+      "samples": 3689280,
+      "expected_samples": 3689280,
+      "max_sample_error": 0,
+      "sample_mismatches": 0,
+      "low_two_bits_nonzero": 2126908
+    },
+    {
+      "abi": "arm64",
+      "input": "hevc10-720",
+      "bits": 10,
+      "expected_frames": 6,
+      "exit_code": 0,
+      "probe_seconds": 0.953,
+      "samples": 8294400,
+      "expected_samples": 8294400,
+      "max_sample_error": 0,
+      "sample_mismatches": 0,
+      "low_two_bits_nonzero": 4232699
+    },
+    {
+      "abi": "arm64",
+      "input": "hevc10-1080",
+      "bits": 10,
+      "expected_frames": 6,
+      "exit_code": 0,
+      "probe_seconds": 1.875,
+      "samples": 18662400,
+      "expected_samples": 18662400,
+      "max_sample_error": 0,
+      "sample_mismatches": 0,
+      "low_two_bits_nonzero": 9974700
+    },
+    {
+      "abi": "arm64",
+      "input": "hevc10-4k",
+      "bits": 10,
+      "expected_frames": 3,
+      "exit_code": 0,
+      "probe_seconds": 3.469,
+      "samples": 37324800,
+      "expected_samples": 37324800,
+      "max_sample_error": 0,
+      "sample_mismatches": 0,
+      "low_two_bits_nonzero": 27384890
+    },
+    {
+      "abi": "arm64",
+      "input": "vp9-10-720",
+      "bits": 10,
+      "expected_frames": 6,
+      "exit_code": 0,
+      "probe_seconds": 0.969,
+      "samples": 8294400,
+      "expected_samples": 8294400,
+      "max_sample_error": 0,
+      "sample_mismatches": 0,
+      "low_two_bits_nonzero": 2007129
+    },
+    {
+      "abi": "arm64",
+      "input": "av1-10-1080",
+      "bits": 10,
+      "expected_frames": 6,
+      "exit_code": 139,
+      "probe_seconds": 0.391
+    },
+    {
+      "abi": "arm64",
+      "input": "h264-1080",
+      "bits": 8,
+      "expected_frames": 6,
+      "exit_code": 0,
+      "probe_seconds": 5.234,
+      "samples": 18662400,
+      "expected_samples": 18662400,
+      "max_sample_error": 0,
+      "sample_mismatches": 0,
+      "low_two_bits_nonzero": 16381972
+    }
+  ],
+  "av1_1080_retest": [
+    {
+      "abi": "arm",
+      "input": "av1-10-1080",
+      "samples": 18662400,
+      "expected_samples": 18662400,
+      "max_sample_error": 0,
+      "sample_mismatches": 0,
+      "frames_eos_pass": true
+    },
+    {
+      "abi": "arm64",
+      "input": "av1-10-1080",
+      "samples": 18662400,
+      "expected_samples": 18662400,
+      "max_sample_error": 0,
+      "sample_mismatches": 0,
+      "frames_eos_pass": true
+    }
+  ],
+  "mediacodec_p010": {
+    "path": "Android MediaCodec P010 copy output",
+    "frames": 12,
+    "eos": true,
+    "samples": 4147200,
+    "reference_samples": 4147200,
+    "max_error": 0,
+    "mismatches": 0,
+    "ten_bit_low_two_bits_preserved": 1884604,
+    "restored_original_component": true
+  },
+  "vpu_native": [
+    {
+      "abi": "32",
+      "input": "h264",
+      "exit_code": 0,
+      "samples": 4147200,
+      "expected_samples": 4147200,
+      "max_error": 0,
+      "mismatches": 0
+    },
+    {
+      "abi": "32",
+      "input": "hevc10",
+      "exit_code": 0,
+      "samples": 4147200,
+      "expected_samples": 4147200,
+      "max_error": 0,
+      "mismatches": 0
+    },
+    {
+      "abi": "64",
+      "input": "h264",
+      "exit_code": 0,
+      "samples": 4147200,
+      "expected_samples": 4147200,
+      "max_error": 0,
+      "mismatches": 0
+    },
+    {
+      "abi": "64",
+      "input": "hevc10",
+      "exit_code": 0,
+      "samples": 4147200,
+      "expected_samples": 4147200,
+      "max_error": 0,
+      "mismatches": 0
+    }
+  ],
+  "limitations": [
+    "Probe elapsed times include pixel dumping; they are not playback FPS measurements.",
+    "Surface rendering, HDR display, seeking and resolution changes are not validated.",
+    "VPU camera/JPEG callers are not validated.",
+    "Additional Codec2 service was rejected by VINTF registration; it is not usable by apps.",
+    "Historical AV1 failures remain recorded; only the separately recorded corrected retest passed."
+  ],
+  "report_scope": "Historical diagnostic snapshot from 2026-10-14; use magisk-codec2/VALIDATION.json for current installed playback and user-confirmed results"
+}

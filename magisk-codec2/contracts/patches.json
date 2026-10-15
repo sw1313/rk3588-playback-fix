@@ -1,0 +1,132 @@
+[
+  {
+    "target": "/vendor/lib/libcodec2_vndk.so",
+    "destination": "system/vendor/lib/libcodec2_vndk.so",
+    "old_sha256": "e7335038a2027f19d2709980e121875023bef10cd6d4b60b4e7a800e642ae8d6",
+    "new_sha256": "aeb3ed7fa7b49348bc4918670c1eac6465f1251810b1d5cbe3d7e2b68fb1bb2a",
+    "patches": [
+      {
+        "plane": "Y",
+        "offset": 211780,
+        "old": "01000000",
+        "new": "00000000"
+      },
+      {
+        "plane": "U",
+        "offset": 211796,
+        "old": "01000000",
+        "new": "00000000"
+      },
+      {
+        "plane": "V",
+        "offset": 211828,
+        "old": "01000000",
+        "new": "00000000"
+      }
+    ]
+  },
+  {
+    "target": "/vendor/lib64/libcodec2_vndk.so",
+    "destination": "system/vendor/lib64/libcodec2_vndk.so",
+    "old_sha256": "36c2248f752b748b1c035c0510031d3eb262a3fc6c7fc2997119ee27c5419fb5",
+    "new_sha256": "a5298a0432f230141bfb90b85c9e0181fff37ccb7a8da6f8ff0fd32da02c3543",
+    "patches": [
+      {
+        "plane": "Y",
+        "offset": 159044,
+        "old": "01000000",
+        "new": "00000000"
+      },
+      {
+        "plane": "U",
+        "offset": 158628,
+        "old": "01000000",
+        "new": "00000000"
+      },
+      {
+        "plane": "V",
+        "offset": 158548,
+        "old": "01000000",
+        "new": "00000000"
+      }
+    ]
+  },
+  {
+    "target": "/system/lib/libcodec2_vndk.so",
+    "destination": "system/lib/libcodec2_vndk.so",
+    "old_sha256": "aeac1b9b5d0f57120511b61a0a5e4e4d0dc230fff3d4e53766adbbea299f95b2",
+    "new_sha256": "ba20eb6f2815c9611f0c6134c13a3189b51a85e8247b743c977b8b67820ff2c0",
+    "patches": [
+      {
+        "plane": "Y",
+        "offset": 211828,
+        "old": "01000000",
+        "new": "00000000"
+      },
+      {
+        "plane": "U",
+        "offset": 211844,
+        "old": "01000000",
+        "new": "00000000"
+      },
+      {
+        "plane": "V",
+        "offset": 211876,
+        "old": "01000000",
+        "new": "00000000"
+      }
+    ]
+  },
+  {
+    "target": "/system/lib64/libcodec2_vndk.so",
+    "destination": "system/lib64/libcodec2_vndk.so",
+    "old_sha256": "f64e385fce0ac4830ce0ac23280021c492e3375f56d7e67caa01d5af447c0a2f",
+    "new_sha256": "3cb22eb3dbb63a3f7a618e497add50c41c44a8c2214da2feb6dc5368517130ae",
+    "patches": [
+      {
+        "plane": "Y",
+        "offset": 158548,
+        "old": "01000000",
+        "new": "00000000"
+      },
+      {
+        "plane": "U",
+        "offset": 158132,
+        "old": "01000000",
+        "new": "00000000"
+      },
+      {
+        "plane": "V",
+        "offset": 158052,
+        "old": "01000000",
+        "new": "00000000"
+      }
+    ]
+  },
+  {
+    "target": "/system/lib64/libsfplugin_ccodec.so",
+    "destination": "system/lib64/libsfplugin_ccodec.so",
+    "old_sha256": "078b33a5296633f720f7616eeca5daa3953387092ad7615178b5ad147cd67b8a",
+    "new_sha256": "88b7f465273698775eea3c505a3b8ea2c5b8f663d342df02cb9454d9c8b0738a",
+    "patches": [
+      {
+        "offset": 551164,
+        "old": "b6090037",
+        "new": "4d000014"
+      }
+    ]
+  },
+  {
+    "target": "/system/lib/libsfplugin_ccodec.so",
+    "destination": "system/lib/libsfplugin_ccodec.so",
+    "old_sha256": "4735bce7fdf3540537b5a1d7b955aa121bf19caf017cf013c6b56baf4741e022",
+    "new_sha256": "5b11df1252f4539321b63374eed0880bb97bb7d6b328a3f01a5d9e0f63d6b07c",
+    "patches": [
+      {
+        "offset": 390048,
+        "old": "40f0a980",
+        "new": "a9e000bf"
+      }
+    ]
+  }
+]

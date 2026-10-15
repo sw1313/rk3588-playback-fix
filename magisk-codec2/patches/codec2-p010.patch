@@ -1,0 +1,427 @@
+--- a/component/mpi/C2RKMpiDec.cpp
++++ b/component/mpi/C2RKMpiDec.cpp
+@@ -23,6 +23,7 @@
+ #include <Codec2Mapper.h>
+ #include <ui/GraphicBufferMapper.h>
+ #include <gralloc_priv_omx.h>
++#include "RKPacked10.h"
+ 
+ #include "hardware/hardware_rockchip.h"
+ #include "hardware/gralloc_rockchip.h"
+@@ -106,8 +107,11 @@
+         // TODO: support more formats?
+         addParameter(
+                 DefineParam(mPixelFormat, C2_PARAMKEY_PIXEL_FORMAT)
+-                .withConstValue(new C2StreamPixelFormatInfo::output(
++                .withDefault(new C2StreamPixelFormatInfo::output(
+                                     0u, HAL_PIXEL_FORMAT_YCBCR_420_888))
++                .withFields({C2F(mPixelFormat, value).oneOf({
++                    HAL_PIXEL_FORMAT_YCBCR_420_888, HAL_PIXEL_FORMAT_YCBCR_P010})})
++                .withSetter((Setter<decltype(*mPixelFormat)>::StrictValueWithNoDeps))
+                 .build());
+ 
+         // profile and level
+@@ -161,7 +165,8 @@
+                     })
+                     .withSetter(ProfileLevelSetter, mSize)
+                     .build());
+-        } else if (mediaType == MEDIA_MIMETYPE_VIDEO_MPEG2) {
++        } else if (mediaType == MEDIA_MIMETYPE_VIDEO_MPEG2 ||
++            mediaType == MEDIA_MIMETYPE_VIDEO_AV1) {
+             addParameter(
+                     DefineParam(mProfileLevel, C2_PARAMKEY_PROFILE_LEVEL)
+                     .withDefault(new C2StreamProfileLevelInfo::input(0u,
+@@ -310,10 +315,36 @@
+                 .withSetter(DefaultColorAspectsSetter)
+                 .build());
+ 
++        helper->addStructDescriptors<C2MasteringDisplayColorVolumeStruct, C2ColorXyStruct>();
++        mHdrStaticInfo = std::make_shared<C2StreamHdrStaticInfo::output>(0u);
++        mHdrStaticInfo->mastering = {{0,0},{0,0},{0,0},{0,0},0,0};
++        mHdrStaticInfo->maxCll = mHdrStaticInfo->maxFall = 0;
++        mHdrStaticInfo->mastering.maxLuminance = -1.0f;
++        addParameter(
++                DefineParam(mHdrStaticInfo, C2_PARAMKEY_HDR_STATIC_INFO)
++                .withDefault(mHdrStaticInfo)
++                .withFields({
++                    C2F(mHdrStaticInfo, mastering.red.x).inRange(0.0f, 1.0f),
++                    C2F(mHdrStaticInfo, mastering.red.y).inRange(0.0f, 1.0f),
++                    C2F(mHdrStaticInfo, mastering.green.x).inRange(0.0f, 1.0f),
++                    C2F(mHdrStaticInfo, mastering.green.y).inRange(0.0f, 1.0f),
++                    C2F(mHdrStaticInfo, mastering.blue.x).inRange(0.0f, 1.0f),
++                    C2F(mHdrStaticInfo, mastering.blue.y).inRange(0.0f, 1.0f),
++                    C2F(mHdrStaticInfo, mastering.white.x).inRange(0.0f, 1.0f),
++                    C2F(mHdrStaticInfo, mastering.white.y).inRange(0.0f, 1.0f),
++                    C2F(mHdrStaticInfo, mastering.maxLuminance).inRange(-1.0f, 100000.0f),
++                    C2F(mHdrStaticInfo, mastering.minLuminance).inRange(0.0f, 100000.0f),
++                    C2F(mHdrStaticInfo, maxCll).inRange(0.0f, 100000.0f),
++                    C2F(mHdrStaticInfo, maxFall).inRange(0.0f, 100000.0f),
++                })
++                .withSetter(HdrStaticInfoSetter)
++                .build());
++
+         // vui colorAspects
+         if (mediaType == MEDIA_MIMETYPE_VIDEO_AVC ||
+             mediaType == MEDIA_MIMETYPE_VIDEO_HEVC ||
+-            mediaType == MEDIA_MIMETYPE_VIDEO_MPEG2) {
++            mediaType == MEDIA_MIMETYPE_VIDEO_MPEG2 ||
++            mediaType == MEDIA_MIMETYPE_VIDEO_AV1) {
+             addParameter(
+                     DefineParam(mCodedColorAspects, C2_PARAMKEY_VUI_COLOR_ASPECTS)
+                     .withDefault(new C2StreamColorAspectsInfo::input(
+@@ -359,6 +390,24 @@
+         }
+     }
+ 
++    static C2R HdrStaticInfoSetter(bool mayBlock, C2P<C2StreamHdrStaticInfo::output> &me) {
++        (void)mayBlock;
++        C2R result = C2R::Ok();
++        result = result.plus(me.F(me.v.mastering.red.x).validatePossible(me.v.mastering.red.x));
++        result = result.plus(me.F(me.v.mastering.red.y).validatePossible(me.v.mastering.red.y));
++        result = result.plus(me.F(me.v.mastering.green.x).validatePossible(me.v.mastering.green.x));
++        result = result.plus(me.F(me.v.mastering.green.y).validatePossible(me.v.mastering.green.y));
++        result = result.plus(me.F(me.v.mastering.blue.x).validatePossible(me.v.mastering.blue.x));
++        result = result.plus(me.F(me.v.mastering.blue.y).validatePossible(me.v.mastering.blue.y));
++        result = result.plus(me.F(me.v.mastering.white.x).validatePossible(me.v.mastering.white.x));
++        result = result.plus(me.F(me.v.mastering.white.y).validatePossible(me.v.mastering.white.y));
++        result = result.plus(me.F(me.v.mastering.maxLuminance).validatePossible(me.v.mastering.maxLuminance));
++        result = result.plus(me.F(me.v.mastering.minLuminance).validatePossible(me.v.mastering.minLuminance));
++        result = result.plus(me.F(me.v.maxCll).validatePossible(me.v.maxCll));
++        result = result.plus(me.F(me.v.maxFall).validatePossible(me.v.maxFall));
++        return result;
++    }
++
+     static C2R SizeSetter(bool mayBlock, const C2P<C2StreamPictureSizeInfo::output> &oldMe,
+                           C2P<C2StreamPictureSizeInfo::output> &me) {
+         (void)mayBlock;
+@@ -493,6 +542,7 @@
+     std::shared_ptr<C2StreamMaxPictureSizeTuning::output> mMaxSize;
+     std::shared_ptr<C2StreamBlockSizeInfo::output> mBlockSize;
+     std::shared_ptr<C2StreamPixelFormatInfo::output> mPixelFormat;
++    std::shared_ptr<C2StreamHdrStaticInfo::output> mHdrStaticInfo;
+     std::shared_ptr<C2StreamProfileLevelInfo::input> mProfileLevel;
+     std::shared_ptr<C2StreamMaxBufferSizeInfo::input> mMaxInputSize;
+     std::shared_ptr<C2StreamColorInfo::output> mColorInfo;
+@@ -721,10 +771,17 @@
+     {
+         MppFrame frame  = nullptr;
+         uint32_t mppFmt = mColorFormat;
++        // AV1's 8-bit output request otherwise truncates 10-bit streams in MPP.
++        // The parser keeps genuinely 8-bit streams in NV12 after info-change.
++        if (mBufferMode && mCodingType == MPP_VIDEO_CodingAV1) {
++            mColorFormat = MPP_FMT_YUV420SP_10BIT;
++            mppFmt = mColorFormat;
++            mMppMpi->control(mMppCtx, MPP_DEC_SET_OUTPUT_FORMAT, &mppFmt);
++        }
+ 
+         /* user can't process fbc output on bufferMode */
+         /* SMPTEST2084 = 6*/
+-        if ((mTransfer == 6) || (!mBufferMode && (mWidth * mHeight > 1920 * 1080))) {
++        if (!mBufferMode) {
+             mFbcCfg.mode = C2RKFbcDef::getFbcOutputMode(mCodingType);
+             if (mFbcCfg.mode) {
+                 c2_info("use mpp fbc output mode");
+@@ -760,6 +817,13 @@
+         c2_info("init: get stride [%d:%d]", mHorStride, mVerStride);
+ 
+         mpp_frame_deinit(&frame);
++        // SET_FRAME_INFO overwrites AV1's output request; apply after it.
++        if (mBufferMode && mCodingType == MPP_VIDEO_CodingAV1) {
++            uint32_t native10 = MPP_FMT_YUV420SP_10BIT;
++            if (mMppMpi->control(mMppCtx, MPP_DEC_SET_OUTPUT_FORMAT, &native10) != MPP_OK) {
++                err = MPP_ERR_UNKNOW; goto error;
++            }
++        }
+     }
+ 
+     /*
+@@ -827,17 +891,31 @@
+                                   C2Rect(mWidth, mHeight).at(left, top));
+ 
+     mOutBlock = nullptr;
++    if (entry->hdrInfo && entry->hdrInfo->mastering.maxLuminance >= 0)
++        buffer->setInfo(entry->hdrInfo);
+ 
+     {
+         if (mCodingType == MPP_VIDEO_CodingAVC ||
+             mCodingType == MPP_VIDEO_CodingHEVC ||
+-            mCodingType == MPP_VIDEO_CodingMPEG2) {
++            mCodingType == MPP_VIDEO_CodingMPEG2 ||
++            mCodingType == MPP_VIDEO_CodingAV1) {
+             IntfImpl::Lock lock = mIntf->lock();
+-            buffer->setInfo(mIntf->getColorAspects_l());
+-        }
+-    }
+-
+-    auto fillWork = [buffer, entry](const std::unique_ptr<C2Work> &work) {
++            auto color = mIntf->getColorAspects_l();
++            if (color) buffer->setInfo(color);
++        }
++    }
++
++    const uint32_t copyPixel = (mColorFormat & MPP_FRAME_FMT_MASK) == MPP_FMT_YUV420SP_10BIT
++        ? HAL_PIXEL_FORMAT_YCBCR_P010 : HAL_PIXEL_FORMAT_YCBCR_420_888;
++    const bool copyMode = mBufferMode;
++    auto fillWork = [buffer, entry, copyMode, copyPixel](const std::unique_ptr<C2Work> &work) {
++        if (entry->hdrInfo) {
++            work->worklets.front()->output.configUpdate.push_back(C2Param::Copy(*entry->hdrInfo));
++        }
++        if (copyMode) {
++            C2StreamPixelFormatInfo::output pixel(0u, copyPixel);
++            work->worklets.front()->output.configUpdate.push_back(C2Param::Copy(pixel));
++        }
+         // now output work is new work, frame index remove by input work,
+         // output work set to incomplete to ignore frame index check
+         work->worklets.front()->output.flags = C2FrameData::FLAG_INCOMPLETE;
+@@ -929,7 +1007,7 @@
+     work->worklets.front()->output.flags = work->input.flags;
+ 
+     mFlushed = false;
+-    mBufferMode = (pool->getLocalId() <= C2BlockPool::PLATFORM_START);
++    mBufferMode = mSurfaceP010Copy || (pool->getLocalId() <= C2BlockPool::PLATFORM_START);
+ 
+     // Initialize decoder if not already initialized
+     if (!mStarted) {
+@@ -1033,6 +1111,17 @@
+         goto outframe;
+     } else if (err == C2_NO_MEMORY) {
+         ensureDecoderState(pool);
++        // Report standard 10-bit output, never silently reduce it to 8-bit.
++        if (mBufferMode) {
++            C2StreamPixelFormatInfo::output pixel(0u,
++                (mColorFormat & MPP_FRAME_FMT_MASK) == MPP_FMT_YUV420SP_10BIT
++                    ? HAL_PIXEL_FORMAT_YCBCR_P010 : HAL_PIXEL_FORMAT_YCBCR_420_888);
++            std::vector<std::unique_ptr<C2SettingResult>> pixelFailures;
++            if (mIntf->config({&pixel}, C2_MAY_BLOCK, &pixelFailures) != C2_OK) {
++                work->result = C2_CORRUPTED; mSignalledError = true; return;
++            }
++            work->worklets.front()->output.configUpdate.push_back(C2Param::Copy(pixel));
++        }
+         // update new config and feekback to framework
+         C2StreamPictureSizeInfo::output size(0u, mWidth, mHeight);
+         std::vector<std::unique_ptr<C2SettingResult>> failures;
+@@ -1155,6 +1244,7 @@
+     uint64_t pts = 0;
+     uint32_t tryCount = 0;
+     std::shared_ptr<C2GraphicBlock> outblock = nullptr;
++    entry->hdrInfo.reset();
+ 
+ REDO:
+     err = mMppMpi->decode_get_frame(mMppCtx, &frame);
+@@ -1180,6 +1270,21 @@
+         c2_info("info-change with new dimensions(%dx%d) stride(%dx%d) fmt %d", \
+                 width, height, hstride, vstride, format);
+ 
++        if (!mBufferMode && !MPP_FRAME_FMT_IS_FBC(format) &&
++                (format & MPP_FRAME_FMT_MASK) == MPP_FMT_YUV420SP_10BIT) {
++            MppBufferGroup internal = nullptr;
++            if (mpp_buffer_group_get_internal(&internal, MPP_BUFFER_TYPE_ION) != MPP_OK ||
++                    mMppMpi->control(mMppCtx, MPP_DEC_SET_EXT_BUF_GROUP, internal) != MPP_OK) {
++                if (internal) mpp_buffer_group_put(internal);
++                ret = C2_CORRUPTED; goto exit;
++            }
++            clearOutBuffers();
++            if (mFrmGrp) mpp_buffer_group_put(mFrmGrp);
++            mFrmGrp = internal;
++            mSurfaceP010Copy = true;
++            mBufferMode = true;
++            c2_info("linear 10-bit Surface uses lossless P010 copy");
++        }
+         if (!mBufferMode) {
+             clearOutBuffers();
+             mpp_buffer_group_clear(mFrmGrp);
+@@ -1225,9 +1330,27 @@
+         }
+ 
+         if (mBufferMode) {
++            const bool packed10 = ((mColorFormat & MPP_FRAME_FMT_MASK) == MPP_FMT_YUV420SP_10BIT);
+             bool useRga = (width * height >= 1280 * 720);
+-
+-            if (useRga) {
++            if (packed10) {
++                if (MPP_FRAME_FMT_IS_FBC(mColorFormat) || !mOutBlock || !mppBuffer) {
++                    ret = C2_CORRUPTED; goto exit;
++                }
++                C2GraphicView view = mOutBlock->map().get();
++                const auto layout = view.layout();
++                const uint8_t *data = (const uint8_t *)mpp_buffer_get_ptr(mppBuffer);
++                if (view.error() != C2_OK || layout.numPlanes != 3 ||
++                    layout.planes[0].allocatedDepth != 16 || layout.planes[0].bitDepth != 10 ||
++                    layout.planes[0].rightShift != 6 || layout.planes[0].colInc != 2 ||
++                    layout.planes[1].allocatedDepth != 16 || layout.planes[1].colInc != 4 ||
++                    layout.planes[0].rowInc <= 0 || layout.planes[1].rowInc <= 0 ||
++                    !rkPacked10ToP010(data, mpp_buffer_get_size(mppBuffer), hstride, vstride,
++                        view.data()[0], view.data()[1], layout.planes[0].rowInc,
++                        layout.planes[1].rowInc, width, height)) {
++                    c2_err("invalid 10-bit copy-back buffer layout");
++                    ret = C2_CORRUPTED; goto exit;
++                }
++            } else if (useRga) {
+                 RgaParam src, dst;
+ 
+                 int32_t srcFd = mpp_buffer_get_fd(mppBuffer);
+@@ -1274,8 +1397,37 @@
+ 
+         if (mCodingType == MPP_VIDEO_CodingAVC ||
+             mCodingType == MPP_VIDEO_CodingHEVC ||
+-            mCodingType == MPP_VIDEO_CodingMPEG2) {
++            mCodingType == MPP_VIDEO_CodingMPEG2 ||
++            mCodingType == MPP_VIDEO_CodingAV1) {
+             getVuiParams(frame);
++        }
++        // Preserve the decoder's HDR10 static metadata without tone mapping.
++        if (mCodingType == MPP_VIDEO_CodingHEVC || mCodingType == MPP_VIDEO_CodingAV1) {
++            auto md = mpp_frame_get_mastering_display(frame);
++            auto cl = mpp_frame_get_content_light(frame);
++            if (md.max_luminance || cl.MaxCLL || cl.MaxFALL) {
++                auto hdr = std::make_shared<C2StreamHdrStaticInfo::output>(0u);
++                const bool av1 = mCodingType == MPP_VIDEO_CodingAV1;
++                const float xyScale = av1 ? 65536.0f : 50000.0f;
++                int red = av1 ? 0 : 2, green = av1 ? 1 : 0, blue = av1 ? 2 : 1;
++                hdr->mastering.red = {md.display_primaries[red][0]/xyScale, md.display_primaries[red][1]/xyScale};
++                hdr->mastering.green = {md.display_primaries[green][0]/xyScale, md.display_primaries[green][1]/xyScale};
++                hdr->mastering.blue = {md.display_primaries[blue][0]/xyScale, md.display_primaries[blue][1]/xyScale};
++                hdr->mastering.white = {md.white_point[0]/xyScale, md.white_point[1]/xyScale};
++                hdr->mastering.maxLuminance = md.max_luminance/(av1?256.0f:10000.0f);
++                hdr->mastering.minLuminance = md.min_luminance/(av1?16384.0f:10000.0f);
++                hdr->maxCll = cl.MaxCLL; hdr->maxFall = cl.MaxFALL;
++                std::vector<std::unique_ptr<C2SettingResult>> hdrFailures;
++                if (mIntf->config({hdr.get()}, C2_MAY_BLOCK, &hdrFailures) == C2_OK)
++                    entry->hdrInfo = hdr;
++            } else {
++                auto absent = std::make_shared<C2StreamHdrStaticInfo::output>(0u);
++                absent->mastering = {{0,0},{0,0},{0,0},{0,0},-1.0f,0};
++                absent->maxCll = absent->maxFall = 0;
++                std::vector<std::unique_ptr<C2SettingResult>> failures;
++                if (mIntf->config({absent.get()}, C2_MAY_BLOCK, &failures) == C2_OK)
++                    entry->hdrInfo = absent;
++            }
+         }
+ 
+         ret = C2_OK;
+@@ -1439,8 +1591,28 @@
+      * dst block(mOutBlock).
+      */
+     if (mBufferMode) {
++        if ((mColorFormat & MPP_FRAME_FMT_MASK) == MPP_FMT_YUV420SP_10BIT) {
++            if (mFbcCfg.mode) return C2_CORRUPTED;
++            format = HAL_PIXEL_FORMAT_YCBCR_P010;
++            blockW = mWidth;
++            blockH = mHeight;
++            usage = GRALLOC_USAGE_SW_READ_OFTEN | GRALLOC_USAGE_SW_WRITE_OFTEN;
++            if (mSurfaceP010Copy) {
++                // Mali's P010 import needs explicit YUV conversion hints; the
++                // window dataspace alone does not set the sampler's range.
++                auto color = mIntf->getColorAspects_l();
++                usage |= color && color->range == C2Color::RANGE_FULL
++                    ? MALI_GRALLOC_USAGE_RANGE_WIDE : MALI_GRALLOC_USAGE_RANGE_NARROW;
++                if (color && color->matrix == C2Color::MATRIX_BT2020)
++                    usage |= MALI_GRALLOC_USAGE_YUV_COLOR_SPACE_BT2020;
++                else if (color && color->matrix == C2Color::MATRIX_BT709)
++                    usage |= MALI_GRALLOC_USAGE_YUV_COLOR_SPACE_BT709;
++                else
++                    usage |= MALI_GRALLOC_USAGE_YUV_COLOR_SPACE_BT601;
++            }
++        }
+         if (mOutBlock &&
+-                (mOutBlock->width() != blockW || mOutBlock->height() != blockH)) {
++                (mOutBlock->width() != blockW || mOutBlock->height() != blockH || mCopyBlockFormat != format)) {
+             mOutBlock.reset();
+         }
+         if (!mOutBlock) {
+@@ -1451,6 +1623,7 @@
+                 c2_err("failed to fetchGraphicBlock, err %d", ret);
+                 return ret;
+             }
++            mCopyBlockFormat = format;
+             c2_trace("required (%dx%d) usage 0x%llx format 0x%x , fetch done",
+                      blockW, blockH, usage, format);
+         }
+--- a/component/include/C2RKMpiDec.h
++++ b/component/include/C2RKMpiDec.h
+@@ -72,6 +72,7 @@
+     typedef struct {
+         std::shared_ptr<C2GraphicBlock> outblock;
+         uint64_t timestamp;
++        std::shared_ptr<C2StreamHdrStaticInfo::output> hdrInfo;
+     } OutWorkEntry;
+ 
+     std::shared_ptr<IntfImpl> mIntf;
+@@ -108,6 +109,7 @@
+        2. SurfaceMode: with surface
+     */
+     bool mBufferMode;
++    bool mSurfaceP010Copy = false;
+     FILE *mOutFile;
+     FILE *mInFile;
+ 
+@@ -119,6 +121,7 @@
+     } mFbcCfg;
+ 
+     std::shared_ptr<C2GraphicBlock> mOutBlock;
++    uint32_t mCopyBlockFormat = 0;
+ 
+     // Color aspects. These are ISO values and are meant to detect changes
+     // in aspects to avoid converting them to C2 values for each frame.
+--- /dev/null
++++ b/component/include/RKPacked10.h
+@@ -0,0 +1,28 @@
++// SPDX-License-Identifier: Apache-2.0
++#pragma once
++#include <stddef.h>
++#include <stdint.h>
++// Rockchip linear NV15: contiguous little-endian 10-bit samples, then UV.
++// Full source and row bounds are validated before any destination write.
++static inline bool rkPacked10ToP010(const uint8_t *src, size_t srcSize,
++        size_t srcStride, size_t srcHeight, uint8_t *dstY, uint8_t *dstUV,
++        size_t yStride, size_t uvStride, size_t width, size_t height) {
++    if (!src || !dstY || !dstUV || !width || !height || (width & 1) || (height & 1) ||
++        width > 8192 || height > 8192 || srcHeight < height ||
++        srcStride < (width * 10 + 7) / 8 || yStride < width * 2 || uvStride < width * 2 ||
++        !srcHeight || srcStride > SIZE_MAX / srcHeight) return false;
++    size_t chromaOffset=srcStride*srcHeight;
++    if (chromaOffset > srcSize || srcStride > (srcSize-chromaOffset)/(height/2)) return false;
++    for (size_t plane=0;plane<2;plane++) {
++        const uint8_t *base=src+(plane?chromaOffset:0);
++        uint8_t *dst=plane?dstUV:dstY;size_t stride=plane?uvStride:yStride;
++        for(size_t y=0;y<(plane?height/2:height);y++)for(size_t x=0;x<width;x++) {
++            size_t bit=x*10, off=bit/8;
++            uint16_t word=uint16_t(base[y*srcStride+off])|
++                (uint16_t(base[y*srcStride+off+1])<<8);
++            uint16_t sample=((word>>(bit%8))&1023)<<6;
++            dst[y*stride+x*2]=uint8_t(sample);dst[y*stride+x*2+1]=uint8_t(sample>>8);
++        }
++    }
++    return true;
++}
+--- a/osal/include/C2RKMediaUtils.h
++++ b/osal/include/C2RKMediaUtils.h
+@@ -44,23 +44,15 @@
+     { "c2.rk.avc.decoder", MPP_VIDEO_CodingAVC, MEDIA_MIMETYPE_VIDEO_AVC, MPP_CTX_DEC },
+     { "c2.rk.vp9.decoder", MPP_VIDEO_CodingVP9, MEDIA_MIMETYPE_VIDEO_VP9, MPP_CTX_DEC },
+     { "c2.rk.hevc.decoder", MPP_VIDEO_CodingHEVC, MEDIA_MIMETYPE_VIDEO_HEVC, MPP_CTX_DEC },
+-    { "c2.rk.vp8.decoder", MPP_VIDEO_CodingVP8, MEDIA_MIMETYPE_VIDEO_VP8, MPP_CTX_DEC },
+-    { "c2.rk.mpeg2.decoder", MPP_VIDEO_CodingMPEG2, MEDIA_MIMETYPE_VIDEO_MPEG2, MPP_CTX_DEC },
+-    { "c2.rk.m4v.decoder", MPP_VIDEO_CodingMPEG4, MEDIA_MIMETYPE_VIDEO_MPEG4, MPP_CTX_DEC },
+-    { "c2.rk.h263.decoder", MPP_VIDEO_CodingH263, MEDIA_MIMETYPE_VIDEO_H263, MPP_CTX_DEC },
+     { "c2.rk.av1.decoder", MPP_VIDEO_CodingAV1, MEDIA_MIMETYPE_VIDEO_AV1, MPP_CTX_DEC },
+-    { "c2.rk.avc.decoder.secure", MPP_VIDEO_CodingAVC, MEDIA_MIMETYPE_VIDEO_AVC, MPP_CTX_DEC },
+-    { "c2.rk.vp9.decoder.secure", MPP_VIDEO_CodingVP9, MEDIA_MIMETYPE_VIDEO_VP9, MPP_CTX_DEC },
+-    { "c2.rk.hevc.decoder.secure", MPP_VIDEO_CodingHEVC, MEDIA_MIMETYPE_VIDEO_HEVC, MPP_CTX_DEC },
+-    { "c2.rk.vp8.decoder.secure", MPP_VIDEO_CodingVP8, MEDIA_MIMETYPE_VIDEO_VP8, MPP_CTX_DEC },
+-    { "c2.rk.mpeg2.decoder.secure", MPP_VIDEO_CodingMPEG2, MEDIA_MIMETYPE_VIDEO_MPEG2, MPP_CTX_DEC },
+-    { "c2.rk.m4v.decoder.secure", MPP_VIDEO_CodingMPEG4, MEDIA_MIMETYPE_VIDEO_MPEG4, MPP_CTX_DEC },
+     { "OMX.c2.rk.avc.decoder", MPP_VIDEO_CodingAVC, MEDIA_MIMETYPE_VIDEO_AVC, MPP_CTX_DEC },
+     { "OMX.c2.rk.vp9.decoder", MPP_VIDEO_CodingVP9, MEDIA_MIMETYPE_VIDEO_VP9, MPP_CTX_DEC },
+     { "OMX.c2.rk.hevc.decoder", MPP_VIDEO_CodingHEVC, MEDIA_MIMETYPE_VIDEO_HEVC, MPP_CTX_DEC },
+-    { "c2.rk.avc.encoder", MPP_VIDEO_CodingAVC, MEDIA_MIMETYPE_VIDEO_AVC, MPP_CTX_ENC },
+-    { "c2.rk.hevc.encoder", MPP_VIDEO_CodingHEVC, MEDIA_MIMETYPE_VIDEO_HEVC, MPP_CTX_ENC },
+-    { "c2.rk.vp8.encoder", MPP_VIDEO_CodingVP8, MEDIA_MIMETYPE_VIDEO_VP8, MPP_CTX_ENC }
++    { "OMX.c2.rk.av1.decoder", MPP_VIDEO_CodingAV1, MEDIA_MIMETYPE_VIDEO_AV1, MPP_CTX_DEC },
++    { "c2.rx.avc.decoder", MPP_VIDEO_CodingAVC, MEDIA_MIMETYPE_VIDEO_AVC, MPP_CTX_DEC },
++    { "c2.rx.vp9.decoder", MPP_VIDEO_CodingVP9, MEDIA_MIMETYPE_VIDEO_VP9, MPP_CTX_DEC },
++    { "c2.rx.hevc.decoder", MPP_VIDEO_CodingHEVC, MEDIA_MIMETYPE_VIDEO_HEVC, MPP_CTX_DEC },
++    { "c2.rx.av1.decoder", MPP_VIDEO_CodingAV1, MEDIA_MIMETYPE_VIDEO_AV1, MPP_CTX_DEC }
+ };
+ 
+ class C2RKMediaUtils {

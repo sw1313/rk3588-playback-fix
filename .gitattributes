@@ -3,3 +3,5 @@
 gradlew text eol=lf
 *.bat text eol=crlf
 *.jar binary
+# Unified diff context lines can contain required single spaces.
+magisk-codec2/patches/*.patch -whitespace

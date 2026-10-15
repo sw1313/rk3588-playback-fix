@@ -1,0 +1,684 @@
+{
+  "version": "0.1.0",
+  "date": "2026-10-15",
+  "stage": "system_playback_precision_encoders_registry_reboot_recovery_and_user_yamby_playback_passed",
+  "surface": [
+    {
+      "codec": "c2.rk.avc.decoder",
+      "clip": "h264-8-720.mp4",
+      "frames": 100,
+      "after_seek_frames": 60,
+      "paused": true,
+      "sought": true,
+      "eos": true,
+      "output": {
+        "width": 1280,
+        "height": 720,
+        "color-format": 2130708361,
+        "color-standard": 1,
+        "color-transfer": 3,
+        "color-range": 2,
+        "hdr-static-info": ""
+      },
+      "capture": {
+        "pixelcopy": 0,
+        "min": 11,
+        "max": 197,
+        "sum": 28902802,
+        "nonzero": 230400,
+        "green_pixels": 40028
+      },
+      "pass": true
+    },
+    {
+      "codec": "c2.rk.hevc.decoder",
+      "clip": "hevc10-854.mp4",
+      "frames": 100,
+      "after_seek_frames": 60,
+      "paused": true,
+      "sought": true,
+      "eos": true,
+      "output": {
+        "width": 854,
+        "height": 480,
+        "color-format": 2130708361,
+        "color-standard": 1,
+        "color-transfer": 3,
+        "color-range": 2,
+        "hdr-static-info": ""
+      },
+      "capture": {
+        "pixelcopy": 0,
+        "min": 29,
+        "max": 190,
+        "sum": 28572697,
+        "nonzero": 230400,
+        "green_pixels": 40547
+      },
+      "pass": true
+    },
+    {
+      "codec": "c2.rk.hevc.decoder",
+      "clip": "hevc10-1080.mp4",
+      "frames": 100,
+      "after_seek_frames": 60,
+      "paused": true,
+      "sought": true,
+      "eos": true,
+      "output": {
+        "width": 1920,
+        "height": 1080,
+        "color-format": 2130708361,
+        "color-standard": 1,
+        "color-transfer": 3,
+        "color-range": 2,
+        "hdr-static-info": ""
+      },
+      "capture": {
+        "pixelcopy": 0,
+        "min": 28,
+        "max": 192,
+        "sum": 28630011,
+        "nonzero": 230400,
+        "green_pixels": 39975
+      },
+      "pass": true
+    },
+    {
+      "codec": "c2.rk.hevc.decoder",
+      "clip": "hevc10-hdr-720.mp4",
+      "frames": 100,
+      "after_seek_frames": 60,
+      "paused": true,
+      "sought": true,
+      "eos": true,
+      "output": {
+        "width": 1280,
+        "height": 720,
+        "color-format": 2130708361,
+        "color-standard": 6,
+        "color-transfer": 6,
+        "color-range": 2,
+        "hdr-static-info": "00d084803ec233c4864c1db80b133d4240e8033200e8039001"
+      },
+      "capture": {
+        "pixelcopy": 0,
+        "min": 34,
+        "max": 191,
+        "sum": 28623098,
+        "nonzero": 230400,
+        "green_pixels": 39388
+      },
+      "pass": true
+    },
+    {
+      "codec": "c2.rk.av1.decoder",
+      "clip": "av1-8-720.mp4",
+      "frames": 100,
+      "after_seek_frames": 60,
+      "paused": true,
+      "sought": true,
+      "eos": true,
+      "output": {
+        "width": 1280,
+        "height": 720,
+        "color-format": 2130708361,
+        "color-standard": 1,
+        "color-transfer": 3,
+        "color-range": 2,
+        "hdr-static-info": ""
+      },
+      "capture": {
+        "pixelcopy": 0,
+        "min": 16,
+        "max": 196,
+        "sum": 28903831,
+        "nonzero": 230400,
+        "green_pixels": 40181
+      },
+      "pass": true
+    },
+    {
+      "codec": "c2.rk.av1.decoder",
+      "clip": "av1-10-720.mp4",
+      "frames": 100,
+      "after_seek_frames": 60,
+      "paused": true,
+      "sought": true,
+      "eos": true,
+      "output": {
+        "width": 1280,
+        "height": 720,
+        "color-format": 2130708361,
+        "color-standard": 1,
+        "color-transfer": 3,
+        "color-range": 2,
+        "hdr-static-info": ""
+      },
+      "capture": {
+        "pixelcopy": 0,
+        "min": 19,
+        "max": 196,
+        "sum": 29057948,
+        "nonzero": 230400,
+        "green_pixels": 40118
+      },
+      "pass": true
+    },
+    {
+      "codec": "c2.rk.vp9.decoder",
+      "clip": "vp9-10-720.mp4",
+      "frames": 100,
+      "after_seek_frames": 60,
+      "paused": true,
+      "sought": true,
+      "eos": true,
+      "output": {
+        "width": 1280,
+        "height": 720,
+        "color-format": 2130708361,
+        "color-standard": 1,
+        "color-transfer": 3,
+        "color-range": 2,
+        "hdr-static-info": ""
+      },
+      "capture": {
+        "pixelcopy": 0,
+        "min": 25,
+        "max": 187,
+        "sum": 28623052,
+        "nonzero": 230400,
+        "green_pixels": 40055
+      },
+      "pass": true
+    },
+    {
+      "codec": "c2.rk.hevc.decoder",
+      "clip": "hevc10-4k.mp4",
+      "frames": 100,
+      "after_seek_frames": 60,
+      "paused": true,
+      "sought": true,
+      "eos": true,
+      "output": {
+        "width": 3840,
+        "height": 2160,
+        "color-format": 2130708361,
+        "color-standard": 77,
+        "color-transfer": 3,
+        "color-range": 2,
+        "hdr-static-info": ""
+      },
+      "capture": {
+        "pixelcopy": 0,
+        "min": 15,
+        "max": 243,
+        "sum": 22564657,
+        "nonzero": 230400,
+        "green_pixels": 22081
+      },
+      "pass": true
+    },
+    {
+      "codec": "c2.rk.hevc.decoder",
+      "clip": "hevc8-720.mp4",
+      "frames": 100,
+      "after_seek_frames": 60,
+      "paused": true,
+      "sought": true,
+      "eos": true,
+      "output": {
+        "width": 1280,
+        "height": 720,
+        "color-format": 2130708361,
+        "color-standard": 1,
+        "color-transfer": 3,
+        "color-range": 2,
+        "hdr-static-info": ""
+      },
+      "capture": {
+        "pixelcopy": 0,
+        "min": 20,
+        "max": 192,
+        "sum": 28898870,
+        "nonzero": 230400,
+        "green_pixels": 40060
+      },
+      "pass": true
+    },
+    {
+      "codec": "c2.rk.av1.decoder",
+      "clip": "av1-10-full-720.mp4",
+      "frames": 102,
+      "after_seek_frames": 62,
+      "paused": true,
+      "sought": true,
+      "eos": true,
+      "output": {
+        "width": 1280,
+        "height": 720,
+        "color-format": 2130708361,
+        "color-standard": 1,
+        "color-transfer": 3,
+        "color-range": 1,
+        "hdr-static-info": ""
+      },
+      "capture": {
+        "pixelcopy": 0,
+        "min": 19,
+        "max": 200,
+        "sum": 29057288,
+        "nonzero": 230400,
+        "green_pixels": 40094
+      },
+      "pass": true
+    },
+    {
+      "codec": "c2.rk.vp8.decoder",
+      "clip": "vp8-8-720.webm",
+      "frames": 100,
+      "after_seek_frames": 60,
+      "paused": true,
+      "sought": true,
+      "eos": true,
+      "output": {
+        "width": 1280,
+        "height": 720,
+        "color-format": 2130708361,
+        "color-standard": 1,
+        "color-transfer": 3,
+        "color-range": 2,
+        "hdr-static-info": ""
+      },
+      "capture": {
+        "pixelcopy": 0,
+        "min": 6,
+        "max": 215,
+        "sum": 29023643,
+        "nonzero": 230400,
+        "green_pixels": 39791
+      },
+      "pass": true
+    },
+    {
+      "codec": "c2.rk.mpeg2.decoder",
+      "clip": "mpeg2-8-720.mp4",
+      "frames": 100,
+      "after_seek_frames": 60,
+      "paused": true,
+      "sought": true,
+      "eos": true,
+      "output": {
+        "width": 1280,
+        "height": 720,
+        "color-format": 2130708361,
+        "color-standard": 1,
+        "color-transfer": 3,
+        "color-range": 2,
+        "hdr-static-info": ""
+      },
+      "capture": {
+        "pixelcopy": 0,
+        "min": 3,
+        "max": 239,
+        "sum": 28917983,
+        "nonzero": 230400,
+        "green_pixels": 40368
+      },
+      "pass": true
+    },
+    {
+      "codec": "c2.android.mpeg4.decoder",
+      "clip": "m4v-8-720.mp4",
+      "frames": 100,
+      "after_seek_frames": 60,
+      "paused": true,
+      "sought": true,
+      "eos": true,
+      "output": {
+        "width": 1280,
+        "height": 720,
+        "color-format": 2130708361,
+        "color-standard": 1,
+        "color-transfer": 3,
+        "color-range": 2,
+        "hdr-static-info": ""
+      },
+      "capture": {
+        "pixelcopy": 0,
+        "min": 9,
+        "max": 233,
+        "sum": 28966040,
+        "nonzero": 230400,
+        "green_pixels": 40277
+      },
+      "pass": true
+    },
+    {
+      "codec": "c2.rk.h263.decoder",
+      "clip": "h263-8-cif.3gp",
+      "frames": 100,
+      "after_seek_frames": 60,
+      "paused": true,
+      "sought": true,
+      "eos": true,
+      "output": {
+        "width": 352,
+        "height": 288,
+        "color-format": 2130708361,
+        "color-standard": 4,
+        "color-transfer": 3,
+        "color-range": 2,
+        "hdr-static-info": ""
+      },
+      "capture": {
+        "pixelcopy": 0,
+        "min": 14,
+        "max": 221,
+        "sum": 28520603,
+        "nonzero": 230400,
+        "green_pixels": 38693
+      },
+      "pass": true
+    }
+  ],
+  "picture_comparison": [
+    {
+      "clip": "av1-10-720",
+      "final15_rgb_psnr_db": 35.60374781853237,
+      "stock-fixed15_rgb_psnr_db": 35.51314104027843
+    },
+    {
+      "clip": "av1-10-full-720",
+      "final15_rgb_psnr_db": 35.99568925542576,
+      "stock-expanded15_rgb_psnr_db": 34.35211220775332
+    },
+    {
+      "clip": "hevc10-4k",
+      "png_identical_to_stock": true
+    },
+    {
+      "clip": "hevc8-720",
+      "png_identical_to_stock": true
+    }
+  ],
+  "legacy_copy": [
+    {
+      "clip": "h264",
+      "stock_and_router_fnv64": "e83881ae90d465bc",
+      "identical": true
+    },
+    {
+      "clip": "av1-8",
+      "stock_and_router_fnv64": "a72e2b0e3423c879",
+      "identical": true
+    },
+    {
+      "clip": "av1-10",
+      "stock_and_router_fnv64": "62f4dcfeedfcdb8b",
+      "identical": true
+    }
+  ],
+  "p010": {
+    "samples": 4147200,
+    "max_error": 0,
+    "mismatches": 0,
+    "low_two_bits_nonzero": 1884604
+  },
+  "adaptive": {
+    "frames": 33,
+    "resolutions": 5,
+    "samples": 72118080,
+    "same_size": true,
+    "byte_identical": true,
+    "maximum_sample_error": 0
+  },
+  "patcher": [
+    {
+      "patch": 0,
+      "sha256": "aeb3ed7fa7b49348bc4918670c1eac6465f1251810b1d5cbe3d7e2b68fb1bb2a",
+      "pass": true
+    },
+    {
+      "patch": 1,
+      "sha256": "a5298a0432f230141bfb90b85c9e0181fff37ccb7a8da6f8ff0fd32da02c3543",
+      "pass": true
+    },
+    {
+      "patch": 2,
+      "sha256": "ba20eb6f2815c9611f0c6134c13a3189b51a85e8247b743c977b8b67820ff2c0",
+      "pass": true
+    },
+    {
+      "patch": 3,
+      "sha256": "3cb22eb3dbb63a3f7a618e497add50c41c44a8c2214da2feb6dc5368517130ae",
+      "pass": true
+    },
+    {
+      "patch": 4,
+      "sha256": "88b7f465273698775eea3c505a3b8ea2c5b8f663d342df02cb9454d9c8b0738a",
+      "pass": true
+    },
+    {
+      "patch": 5,
+      "sha256": "5b11df1252f4539321b63374eed0880bb97bb7d6b328a3f01a5d9e0f63d6b07c",
+      "pass": true
+    },
+    {
+      "negative": "wrong",
+      "result": "RC=10",
+      "pass": true
+    },
+    {
+      "negative": "truncated",
+      "result": "RC=11",
+      "pass": true
+    },
+    {
+      "negative": "bounds",
+      "result": "RC=9",
+      "pass": true
+    },
+    {
+      "xml_sha256": "28aaefc10e5b5c270e2b1c464b8cf7fa5cf8b95417e97392543fe1f56ed0175e",
+      "pass": true
+    }
+  ],
+  "yamby": "Original APK/native components retained; user confirmed normal HW+ playback, picture, sound, gray-line behavior, pause, seek and re-entry with usual rendering configuration on 2026-10-15",
+  "lsposed": "Existing 0.3.3 preserved, no new features",
+  "unverified": [
+    "DRM/secure playback",
+    "camera/recording",
+    "long duration and all applications",
+    "8K",
+    "Dolby Vision/HDR10+",
+    "HDMI output bit depth"
+  ],
+  "module_reboot_off": {
+    "mode": "off",
+    "new_boot_uptime_comparison_verified": true,
+    "boot_completed_verified": true,
+    "files": {
+      "/vendor/lib/libcodec2_vndk.so": "e7335038a2027f19d2709980e121875023bef10cd6d4b60b4e7a800e642ae8d6",
+      "/vendor/lib64/libcodec2_vndk.so": "36c2248f752b748b1c035c0510031d3eb262a3fc6c7fc2997119ee27c5419fb5",
+      "/system/lib/libcodec2_vndk.so": "aeac1b9b5d0f57120511b61a0a5e4e4d0dc230fff3d4e53766adbbea299f95b2",
+      "/system/lib64/libcodec2_vndk.so": "f64e385fce0ac4830ce0ac23280021c492e3375f56d7e67caa01d5af447c0a2f",
+      "/system/lib64/libsfplugin_ccodec.so": "078b33a5296633f720f7616eeca5daa3953387092ad7615178b5ad147cd67b8a",
+      "/system/lib/libsfplugin_ccodec.so": "4735bce7fdf3540537b5a1d7b955aa121bf19caf017cf013c6b56baf4741e022",
+      "/vendor/bin/hw/android.hardware.media.c2@1.1-service": "4c3586e5b54b67f98eb15772ef215380d51f34b52efd8dca80a2f17bad124746",
+      "/vendor/etc/media_codecs_c2_base.xml": "e23172f51e609fc14335f7d6a8d999d29275c967ed06debaad8a5f0aa5f13f67",
+      "/vendor/lib/libcodec2_rk_component.so": "22ce9ddbfc80d72b06ac1d330eed7a11f90575d8b56dc2e0358ed7b75c62a4bb",
+      "/vendor/lib64/libcodec2_rk_component.so": "766023cb1d635a365fd0f10f635bbd2c329e3ecb6d040a0473c6b5f5c67a142b",
+      "/vendor/lib/libcodec2_hidl@1.1.so": "7c1994cb360e9398d5f073fd252a364ad8263ae4ae61355d4782eb053d9da182",
+      "/vendor/lib/libcodec2_hidl@1.0.so": "08387ea2aaa15394bebde2c62a8e6912d273273d01755c6e9539e5180c28cbf1",
+      "/vendor/lib/android.hardware.media.c2@1.1.so": "9939bf4c1ed0c9036be7acb45fe0b4a5b9641709bc81af1a35a943e740f1d3c8",
+      "/vendor/lib/android.hardware.media.c2@1.0.so": "77a6732087626a08fd2d312e58dc4fe909c38f76c47081778416f62cd44ec096",
+      "/vendor/lib/libavservices_minijail.so": "a0c443558d98838838f480a5141b73b433125c00d42e3eb5cab7e4264ea07b10",
+      "/vendor/lib/libgralloc_priv.so": "ff05926207f4d5adb21e0498e1e5d5a271e372e372ce411f52ab822af8b110e0",
+      "/vendor/lib64/libgralloc_priv.so": "aa71d15f6189bab43e91d073f0c01670572e94d9837623f2fa4f905ab297502e",
+      "/system/lib/libc++.so": "749cc4a3f1cb9888f3d2b6e40c0fe8c73ee14eb5d0f277a8ad3e27d545bf0123",
+      "/system/lib64/libc++.so": "c38a57de7b44bccc27bdffd58de033edcc5584c116fc303ec62e80416e9b2d7a"
+    },
+    "codec2_service": "running",
+    "all_hashes_match": true
+  },
+  "module_reboot_on": {
+    "mode": "on",
+    "new_boot_uptime_comparison_verified": true,
+    "boot_completed_verified": true,
+    "files": {
+      "/vendor/lib/libcodec2_vndk.so": "aeb3ed7fa7b49348bc4918670c1eac6465f1251810b1d5cbe3d7e2b68fb1bb2a",
+      "/vendor/lib64/libcodec2_vndk.so": "a5298a0432f230141bfb90b85c9e0181fff37ccb7a8da6f8ff0fd32da02c3543",
+      "/system/lib/libcodec2_vndk.so": "ba20eb6f2815c9611f0c6134c13a3189b51a85e8247b743c977b8b67820ff2c0",
+      "/system/lib64/libcodec2_vndk.so": "3cb22eb3dbb63a3f7a618e497add50c41c44a8c2214da2feb6dc5368517130ae",
+      "/system/lib64/libsfplugin_ccodec.so": "88b7f465273698775eea3c505a3b8ea2c5b8f663d342df02cb9454d9c8b0738a",
+      "/system/lib/libsfplugin_ccodec.so": "5b11df1252f4539321b63374eed0880bb97bb7d6b328a3f01a5d9e0f63d6b07c",
+      "/vendor/bin/hw/android.hardware.media.c2@1.1-service": "f07d9c70d10f2157aaef3db4ca6cf2858bfdeb8f286190467c0a639c4bd07d84",
+      "/vendor/etc/media_codecs_c2_base.xml": "28aaefc10e5b5c270e2b1c464b8cf7fa5cf8b95417e97392543fe1f56ed0175e",
+      "/vendor/lib/libcodec2_rk_component.so": "22ce9ddbfc80d72b06ac1d330eed7a11f90575d8b56dc2e0358ed7b75c62a4bb",
+      "/vendor/lib64/libcodec2_rk_component.so": "766023cb1d635a365fd0f10f635bbd2c329e3ecb6d040a0473c6b5f5c67a142b",
+      "/vendor/lib/libcodec2_hidl@1.1.so": "7c1994cb360e9398d5f073fd252a364ad8263ae4ae61355d4782eb053d9da182",
+      "/vendor/lib/libcodec2_hidl@1.0.so": "08387ea2aaa15394bebde2c62a8e6912d273273d01755c6e9539e5180c28cbf1",
+      "/vendor/lib/android.hardware.media.c2@1.1.so": "9939bf4c1ed0c9036be7acb45fe0b4a5b9641709bc81af1a35a943e740f1d3c8",
+      "/vendor/lib/android.hardware.media.c2@1.0.so": "77a6732087626a08fd2d312e58dc4fe909c38f76c47081778416f62cd44ec096",
+      "/vendor/lib/libavservices_minijail.so": "a0c443558d98838838f480a5141b73b433125c00d42e3eb5cab7e4264ea07b10",
+      "/vendor/lib/libgralloc_priv.so": "ff05926207f4d5adb21e0498e1e5d5a271e372e372ce411f52ab822af8b110e0",
+      "/vendor/lib64/libgralloc_priv.so": "aa71d15f6189bab43e91d073f0c01670572e94d9837623f2fa4f905ab297502e",
+      "/system/lib/libc++.so": "749cc4a3f1cb9888f3d2b6e40c0fe8c73ee14eb5d0f277a8ad3e27d545bf0123",
+      "/system/lib64/libc++.so": "c38a57de7b44bccc27bdffd58de033edcc5584c116fc303ec62e80416e9b2d7a"
+    },
+    "codec2_service": "running",
+    "all_hashes_match": true,
+    "boot_self_check_passed": true
+  },
+  "module_automatic_recovery": {
+    "injection": "wrong checksum in this module only; runtime libraries unchanged",
+    "automatic_disable": true,
+    "stock_service_restored": true,
+    "boot_completed": true,
+    "contract_restored": true,
+    "status": "1\n/vendor/lib/libmpp.so: FAILED\n/vendor/lib64/libmpp.so: OK\n/vendor/lib/librga.so: OK\n/vendor/lib64/librga.so: OK\nsha256sum: WARNING: 1 of 4 computed checksums did NOT match\nFAIL: MPP/RGA dependency changed; module disabled, rebooting once to restore original files."
+  },
+  "yamby_original_verification": [
+    {
+      "library": "libavcodec.so",
+      "sha256": "d5b74992d3fa6b00ea1c7a46c2c9e025c973a2aeb57a571cbf491b9b15fd9854",
+      "original": true
+    },
+    {
+      "library": "libavdevice.so",
+      "sha256": "a037aba990479b608171f6d5af4453a395a15dbdc66d59424d4fe7e61165df92",
+      "original": true
+    },
+    {
+      "library": "libavfilter.so",
+      "sha256": "967d591c8e1f4b8e18708b61a39611e5181c59f00cee7da112cdf4bbef58bf03",
+      "original": true
+    },
+    {
+      "library": "libavformat.so",
+      "sha256": "6ba4e63022a0c817541f8d025184e5fbc6c8bcf94154035a8be04f14c577be43",
+      "original": true
+    },
+    {
+      "library": "libavutil.so",
+      "sha256": "2d4c775fcc8c14aba03dd4a202bea126dc948d9b0f61d57ec2ba740f1ab34cc6",
+      "original": true
+    },
+    {
+      "library": "libc++_shared.so",
+      "sha256": "c4c2fe5cbcb1fba0003a31fc7ab29a9bb12df6cc187ec45a806462540e83d93b",
+      "original": true
+    },
+    {
+      "library": "libmpv.so",
+      "sha256": "85407059a0f23325392db916175ca322bddc501b076ee8e89888ee11c51d187b",
+      "original": true
+    },
+    {
+      "library": "libswresample.so",
+      "sha256": "213baa09e59a69c9bc69f1326114d80f858d92b0ec344afb9ae54dc5e79e95c9",
+      "original": true
+    },
+    {
+      "library": "libswscale.so",
+      "sha256": "88450559ffa9aa5a19a8df6b3943be805bf5dd7614bc7f905e62271314355724",
+      "original": true
+    }
+  ],
+  "installed_after_reboot": {
+    "clips": 14,
+    "playback_passed": 14,
+    "hardware_clips": 13,
+    "original_software_mpeg4_clips": 1,
+    "all_captures_identical_to_validated_baselines": true
+  },
+  "installed_p010": {
+    "frames": 12,
+    "eos": true,
+    "full_buffer_bytes": 16588800,
+    "identical_to_verified_lossless_path": true
+  },
+  "mode_switch": {
+    "quality": "AV1 full range reported 1 and correct picture",
+    "compatibility": "AV1 stock range reported 2 and original picture; all playback operations passed",
+    "policy_frozen_per_component": true
+  },
+  "complete_stock_registry": {
+    "original_components": 21,
+    "additional_candidates": 4,
+    "complete_factory_registry_preserved": true,
+    "installation_and_boot_guard": true,
+    "published_header_matches_original_factory_literals": true
+  },
+  "encoders": [
+    {
+      "encoder": "avc",
+      "frames": 8,
+      "eos": true,
+      "output_decodes_to_8_frames": true,
+      "decoded_pixels_identical_to_stock": true
+    },
+    {
+      "encoder": "hevc",
+      "frames": 8,
+      "eos": true,
+      "output_decodes_to_8_frames": true,
+      "decoded_pixels_identical_to_stock": true
+    }
+  ],
+  "module_registry_recovery": {
+    "injection": "nonexistent required component in this module only; factory libraries unchanged",
+    "automatic_disable": true,
+    "stock_service_restored": true,
+    "boot_completed": true,
+    "contract_restored": true,
+    "status": "1\nCOMPONENT OMX.c2.rk.av1.decoder rank=128\nCOMPONENT OMX.c2.rk.avc.decoder rank=128\nCOMPONENT OMX.c2.rk.hevc.decoder rank=128\nCOMPONENT OMX.c2.rk.vp9.decoder rank=128\nCOMPONENT c2.rk.av1.decoder rank=128\nCOMPONENT c2.rk.avc.decoder rank=128\nCOMPONENT c2.rk.avc.decoder.secure rank=128\nCOMPONENT c2.rk.avc.encoder rank=128\nCOMPONENT c2.rk.h263.decoder rank=128\nCOMPONENT c2.rk.hevc.decoder rank=128\nCOMPONENT c2.rk.hevc.decoder.secure rank=128\nCOMPONENT c2.rk.hevc.encoder rank=128\nCOMPONENT c2.rk.m4v.decoder rank=128\nCOMPONENT c2.rk.m4v.decoder.secure rank=128\nCOMPONENT c2.rk.mpeg2.decoder rank=128\nCOMPONENT c2.rk.mpeg2.decoder.secure rank=128\nCOMPONENT c2.rk.vp8.decoder rank=128\nCOMPONENT c2.rk.vp8.decoder.secure rank=128\nCOMPONENT c2.rk.vp8.encoder rank=128\nCOMPONENT c2.rk.vp9.decoder rank=128\nCOMPONENT c2.rk.vp9.decoder.secure rank=128\nCOMPONENT c2.rx.av1.decoder rank=128\nCOMPONENT c2.rx.avc.decoder rank=128\nCOMPONENT c2.rx.hevc.decoder rank=128\nCOMPONENT c2.rx.vp9.decoder rank=128\nHIDL_INTERFACE android.hardware.media.c2@1.1::IComponentStore\nHIDL_INTERFACE android.hardware.media.c2@1.0::IComponentStore\nHIDL_INTERFACE android.hidl.base@1.0::IBase\nHIDL_CONSTRUCTION_PASS\nFAIL: missing stock component: c2.rk.nonexistent.decoder; module disabled, rebooting once to restore original files."
+  },
+  "history": [
+    {
+      "issue": "Earlier local service enumerated only the candidate-targeted decoder subset",
+      "resolution": "Restore all 21 original factory entries, pin the registry, add installer and boot checks, retest 14 playback cases and AVC/HEVC encoding",
+      "final_retest_passed": true
+    },
+    {
+      "issue": "Original hardware MPEG4 MediaCodec name is not exposed by the stock XML",
+      "resolution": "Preserve the stock software MPEG4 path; no XML expansion for unverified hardware MPEG4",
+      "stock_hardware_mpeg4_creation_failed": true
+    }
+  ],
+  "user_playback_confirmation": {
+    "date": "2026-10-15",
+    "result": "all normal",
+    "application": "Yamby",
+    "decoding": "HW+",
+    "content": "usual HEVC 10-bit and another video, as requested in the confirmation question",
+    "operations": [
+      "pause/resume",
+      "seek",
+      "exit and re-enter"
+    ],
+    "picture_sound_edges_and_controls": "normal",
+    "renderer": "user usual configuration; exact gpu/gpu-next choice not specified"
+  }
+}

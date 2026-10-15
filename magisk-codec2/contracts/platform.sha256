@@ -1,0 +1,11 @@
+22ce9ddbfc80d72b06ac1d330eed7a11f90575d8b56dc2e0358ed7b75c62a4bb  /vendor/lib/libcodec2_rk_component.so
+766023cb1d635a365fd0f10f635bbd2c329e3ecb6d040a0473c6b5f5c67a142b  /vendor/lib64/libcodec2_rk_component.so
+7c1994cb360e9398d5f073fd252a364ad8263ae4ae61355d4782eb053d9da182  /vendor/lib/libcodec2_hidl@1.1.so
+08387ea2aaa15394bebde2c62a8e6912d273273d01755c6e9539e5180c28cbf1  /vendor/lib/libcodec2_hidl@1.0.so
+9939bf4c1ed0c9036be7acb45fe0b4a5b9641709bc81af1a35a943e740f1d3c8  /vendor/lib/android.hardware.media.c2@1.1.so
+77a6732087626a08fd2d312e58dc4fe909c38f76c47081778416f62cd44ec096  /vendor/lib/android.hardware.media.c2@1.0.so
+a0c443558d98838838f480a5141b73b433125c00d42e3eb5cab7e4264ea07b10  /vendor/lib/libavservices_minijail.so
+ff05926207f4d5adb21e0498e1e5d5a271e372e372ce411f52ab822af8b110e0  /vendor/lib/libgralloc_priv.so
+aa71d15f6189bab43e91d073f0c01670572e94d9837623f2fa4f905ab297502e  /vendor/lib64/libgralloc_priv.so
+749cc4a3f1cb9888f3d2b6e40c0fe8c73ee14eb5d0f277a8ad3e27d545bf0123  /system/lib/libc++.so
+c38a57de7b44bccc27bdffd58de033edcc5584c116fc303ec62e80416e9b2d7a  /system/lib64/libc++.so

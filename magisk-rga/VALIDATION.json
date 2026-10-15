@@ -1,0 +1,146 @@
+{
+  "tested_on": "RK3588 AGTV Android12 API32",
+  "kernel": "5.10.66",
+  "rga_kernel": "1.2.15",
+  "baseline_rga": "1.9.2_[1]",
+  "upgraded_rga": "1.10.6_[3]",
+  "tested_abis": [
+    "armeabi-v7a",
+    "arm64-v8a"
+  ],
+  "rga_dimensions": [
+    [
+      320,
+      240,
+      320
+    ],
+    [
+      1280,
+      720,
+      1280
+    ],
+    [
+      1920,
+      1080,
+      1936
+    ],
+    [
+      3840,
+      2160,
+      3840
+    ]
+  ],
+  "nv12_copy_exact": true,
+  "nv12_rgba_max_channel_error": 1,
+  "graphicbuffer_scale_sample_mismatches": 0,
+  "codec2_dynamic_loading_both_abis": true,
+  "active_codec2_service_abi": "armeabi-v7a",
+  "mediacodec_samples": {
+    "resolution": [
+      640,
+      360
+    ],
+    "surface": false,
+    "results": {
+      "h264": {
+        "baseline": {
+          "frames": "12",
+          "expected": "12",
+          "eos": "1",
+          "bytes": "4147200",
+          "nonzero": "4147193",
+          "fnv64": "e83881ae90d465bc"
+        },
+        "upgraded": {
+          "frames": "12",
+          "expected": "12",
+          "eos": "1",
+          "bytes": "4147200",
+          "nonzero": "4147193",
+          "fnv64": "e83881ae90d465bc"
+        },
+        "equal_output_hash": true,
+        "nonempty": true
+      },
+      "hevc10": {
+        "baseline": {
+          "frames": "12",
+          "expected": "12",
+          "eos": "1",
+          "bytes": "2764800",
+          "nonzero": "0",
+          "fnv64": "a04a09c0d4b5e325"
+        },
+        "upgraded": {
+          "frames": "12",
+          "expected": "12",
+          "eos": "1",
+          "bytes": "2764800",
+          "nonzero": "0",
+          "fnv64": "a04a09c0d4b5e325"
+        },
+        "equal_output_hash": true,
+        "nonempty": false
+      },
+      "av1-8": {
+        "baseline": {
+          "frames": "12",
+          "expected": "12",
+          "eos": "1",
+          "bytes": "4147200",
+          "nonzero": "4147199",
+          "fnv64": "a72e2b0e3423c879"
+        },
+        "upgraded": {
+          "frames": "12",
+          "expected": "12",
+          "eos": "1",
+          "bytes": "4147200",
+          "nonzero": "4147199",
+          "fnv64": "a72e2b0e3423c879"
+        },
+        "equal_output_hash": true,
+        "nonempty": true
+      },
+      "av1-10": {
+        "baseline": {
+          "frames": "12",
+          "expected": "12",
+          "eos": "1",
+          "bytes": "4147200",
+          "nonzero": "4147200",
+          "fnv64": "62f4dcfeedfcdb8b"
+        },
+        "upgraded": {
+          "frames": "12",
+          "expected": "12",
+          "eos": "1",
+          "bytes": "4147200",
+          "nonzero": "4147200",
+          "fnv64": "62f4dcfeedfcdb8b"
+        },
+        "equal_output_hash": true,
+        "nonempty": true
+      }
+    }
+  },
+  "actual_disable_reboot_rollback_original_hashes_verified": true,
+  "actual_reenable_reboot_load_checks_passed": true,
+  "other_modules_retained": [
+    "MPP upgrade",
+    "Frame Guard",
+    "LSPosed playback fix"
+  ],
+  "known_limitations": [
+    "HEVC Main10 no-Surface copy-back returns all-zero frames with stock and new RGA.",
+    "FBC disabling did not fix that diagnostic; original property restored.",
+    "Long-form playback, HDR, seek and AFBC validation are not covered by these short tests."
+  ],
+  "private_logs_included": false,
+  "user_playback_confirmation": {
+    "application": "Yamby",
+    "mode": "HW+",
+    "hevc_10bit": "user confirmed normal playback after upgrade",
+    "av1": "real content unavailable; not user-confirmed"
+  }
+}

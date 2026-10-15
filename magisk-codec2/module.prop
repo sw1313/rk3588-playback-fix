@@ -1,0 +1,6 @@
+id=rk3588_codec2_upgrade
+name=RK3588 Codec2 Compatibility & P010
+version=0.1.0
+versionCode=100
+author=RK Playback Fix
+description=API32 firmware-pinned Codec2 service. Full 10-bit Surface/P010 paths, original legacy copy paths, reversible systemless overlays.

@@ -1,0 +1,6 @@
+id=rk3588_rga_upgrade
+name=RK3588 RGA Upgrade (AGTV Android 12)
+version=0.1.0-rga1.10.6
+versionCode=1
+author=sw1313
+description=RGA 1.10.6 userspace upgrade built for the verified Android 12 gralloc4 ABI. ARM32/ARM64, guarded installation, boot checks, and rollback action. No kernel or Codec2 replacement.

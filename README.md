@@ -17,7 +17,15 @@ Yamby's settings adapter has no chipset restriction. The APK requires Android 8.
 
 Install the ZIP using Magisk. Its service runs after boot completes. It requires **RK3588 and Android API 32**. Each module can be used independently.
 
-A separate [experimental MPP userspace upgrade](https://github.com/sw1313/rk3588-playback-fix/releases/tag/mpp-v0.1.1) provides MPP 1.1.0 ARM32/ARM64 libraries for the exact tested Android 12 vendor stack. Version 0.1.1 fixes a false boot-check failure; installation, reboot and active-library checks passed on the physical device. It is independent of Frame Guard and the LSPosed APK. Read its [compatibility, validation and rollback instructions](magisk-mpp/README.md) before installation; full Android Codec2 playback after the system overlay remains unverified.
+A separate [experimental MPP userspace upgrade](https://github.com/sw1313/rk3588-playback-fix/releases/tag/mpp-v0.1.1) provides MPP 1.1.0 ARM32/ARM64 libraries for the exact tested Android 12 vendor stack. Version 0.1.1 fixes a false boot-check failure; installation, reboot and active-library checks passed on the physical device. It is independent of Frame Guard and the LSPosed APK. Read its [compatibility, validation and rollback instructions](magisk-mpp/README.md) before installation. Later short MediaCodec tests passed for H.264 and AV1 8/10-bit; the pre-existing HEVC Main10 copy-back failure remains unresolved. These are limited synthetic tests, not full player validation.
+
+A separate [RGA userspace upgrade](magisk-rga/README.md) rebuilds librga 1.10.6 for the verified Android 12 gralloc4/system ABI. Both ABIs passed actual RGA jobs; installed MediaCodec H.264 and AV1 8/10-bit copy-back samples match their baseline output. The existing HEVC Main10 copy-back failure remains unresolved. The module includes strict firmware guards and a verified disable/reboot rollback. See its validation limits before installation.
+
+## System Codec2 compatibility
+
+The [Codec2 compatibility module 0.1.0](magisk-codec2/README.md) adds verified full-precision Surface/P010 paths, AV1 color-range handling and HDR static metadata on the exact tested API32 firmware. All 21 original component entries are retained. Fourteen playback cases, AVC/HEVC encoding, pixel-precision checks, reboot rollback and automatic recovery passed; the user also confirmed normal Yamby HW+ playback. Yamby components and LSPosed 0.3.3 are unchanged. Original Yamby HEVC Main10 **HW copy-back** remains limited by its lack of P010 support; use **HW+**.
+
+Install the existing [MPP 1.1.0 module](https://github.com/sw1313/rk3588-playback-fix/releases/tag/mpp-v0.1.1) and [RGA 1.10.6 module](https://github.com/sw1313/rk3588-playback-fix/releases/tag/rga-v0.1.0), reboot to activate them, then install [Codec2 0.1.0](https://github.com/sw1313/rk3588-playback-fix/releases/tag/codec2-v0.1.0) and reboot. The installer rejects unverified firmware and SELinux Enforcing configurations; it never changes enforcement. These system modules are published as pre-releases because other firmware and all content are not validated.
 
 ## HW versus HW+
 

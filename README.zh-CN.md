@@ -4,7 +4,11 @@
 
 LSPosed 模块为所有芯片开放 Yamby 默认 HW+ 设置补全，其他 mpv 应用的强制 HW+ 仅限 RK3588。另有独立 Magisk 模块处理刷新率切换导致的整屏短暂黑屏。实体设备测试为 H96Max V58、RK3588、Android 12（API 32）。
 
-另有独立的 [MPP 1.1.0 用户态升级实验版](https://github.com/sw1313/rk3588-playback-fix/releases/tag/mpp-v0.1.1)，提供 32／64 位解码库，只接受当前已验证的 Android 12 厂商组件。0.1.1 修正了启动自检的路径误报，已在实体设备验证安装、重启和实际加载。与 Frame Guard、LSPosed 模块分开使用；安装范围、测试结果和回退方法见 [模块说明](magisk-mpp/README.md)。系统覆盖后的完整 Codec2 播放仍待测试。
+另有独立的 [MPP 1.1.0 用户态升级实验版](https://github.com/sw1313/rk3588-playback-fix/releases/tag/mpp-v0.1.1)，提供 32／64 位解码库，只接受当前已验证的 Android 12 厂商组件。0.1.1 修正了启动自检的路径误报，已在实体设备验证安装、重启和实际加载。与 Frame Guard、LSPosed 模块分开使用；安装范围、测试结果和回退方法见 [模块说明](magisk-mpp/README.md)。后续小样本 MediaCodec 测试中 H.264、AV1 8／10 位正常；原有 HEVC Main10 复制回内存路径问题仍未解决，这不代表完整播放器验证。
+
+独立的 [RGA 1.10.6 用户态升级模块](https://github.com/sw1313/rk3588-playback-fix/releases/tag/rga-v0.1.0) 已按当前 Android 12 的系统 C++ ABI 和 gralloc4 接口编译，提供 32／64 位库。实体设备已通过真实 RGA 图像任务、Codec2 加载，以及停用后重启恢复原库的回退测试。模块包含严格的固件检查，不替换现有 TV 定制 Codec2，也不升级内核；具体适用范围和测试限制见模块说明。
+
+另有独立的 [Codec2 系统兼容模块 0.1.0](https://github.com/sw1313/rk3588-playback-fix/releases/tag/codec2-v0.1.0)：只针对匹配哈希的 API32 固件，保留原厂组件库，改进 Surface、完整 10 位 P010、AV1 色彩范围与 HDR 静态信息。14 组系统播放测试、模式切换和重启回退已通过；不修改 Yamby 或增加 LSPosed 功能。原版 Yamby 的 HEVC Main10 HW 复制路径仍受其 P010 支持限制；最高精度播放继续使用 HW+。测试范围见 [系统升级说明](docs/decoder-upgrade-scope.zh-CN.md)。
 
 ## LSPosed 模块 0.3.3
 

@@ -1,0 +1,9 @@
+{
+  "codec2_repository": "https://github.com/khadas/android_vendor_rockchip_hardware_interfaces_codec2",
+  "codec2_revision": "1e9d80a10b09c9a6e0bf5cc1dbe4b6d3e66dbc2b",
+  "platform": "android-12.1.0_r11",
+  "vndk_revision": "e1ba8043f8368220b412c18ee8392850ab009aae",
+  "service_abi": "ARM32 installed vendor HIDL ComponentStore constructor, exactly 100 bytes; hash-pinned; interface-chain checked",
+  "player_components": "original",
+  "lsposed_changes": "none"
+}
