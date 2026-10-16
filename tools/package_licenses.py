@@ -13,7 +13,7 @@ COMPONENTS = {
     'frameguard': ('magisk', None),
     'yamby-mpv-plugin': ('lsposed', '0.3.5'),
 }
-RELEASE_TAG = 'v0.6.7'
+RELEASE_TAG = 'v0.6.8'
 URL = 'https://github.com/sw1313/rk3588-playback-fix'
 
 
@@ -44,6 +44,8 @@ def stage(destination, component):
     elif component == 'mali-global':
         (destination / 'LICENSES').mkdir(exist_ok=True)
         shutil.copyfile(ROOT / 'third_party/Apache-2.0.txt', destination / 'LICENSES/Apache-2.0.txt')
+        for name in ['GPL-2.0-only.txt','Linux-syscall-note.txt']:
+            shutil.copyfile(ROOT / 'LICENSES' / name, destination / 'LICENSES' / name)
     (destination / 'OPEN_SOURCE.json').write_text(
         json.dumps(metadata(component), indent=2) + '\n', encoding='utf-8', newline='\n')
 

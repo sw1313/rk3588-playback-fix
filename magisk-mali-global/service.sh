@@ -16,6 +16,9 @@ if [ "$(cat "$MODDIR/active-mode")" = off ]; then
  sha256sum -c "$MODDIR/contracts/original-mali.sha256" >> "$MODDIR/status.txt" 2>&1 || recover "original GPU recovery differs"
  resetprop -n vendor.rkmaliglobal.ready stock
  rm -f "$STATE/boot-pending"
+ cat /proc/sys/kernel/random/boot_id > "$MODDIR/active-boot-id"
+ sed -n 's/^version=//p' "$MODDIR/module.prop" > "$MODDIR/active-version"
+ resetprop -n vendor.rkmalikernel.ready stock
  echo "PASS original global GPU restored" >> "$MODDIR/status.txt"
  exit 0
 fi
@@ -56,3 +59,7 @@ done
 rm -f "$STATE/boot-pending"
 resetprop -n vendor.rkmaliglobal.ready active
 echo "PASS global ARM32/ARM64 native Mali and compositor; app/video tests are separate." >> "$MODDIR/status.txt"
+
+cat /proc/sys/kernel/random/boot_id > "$MODDIR/active-boot-id"
+sed -n 's/^version=//p' "$MODDIR/module.prop" > "$MODDIR/active-version"
+sh "$MODDIR/kernel-boot.sh"

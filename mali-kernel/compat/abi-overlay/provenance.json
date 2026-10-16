@@ -1,0 +1,6 @@
+{
+  "source": "https://github.com/rockchip-linux/kernel/blob/120cd00e088a351f930d04898475d4908af86988/include/soc/rockchip/rockchip_opp_select.h",
+  "sha256": "7959f5579f5335c0be054f13cc178d2fed34e26364ff75b17c6f4d9db8fdc638",
+  "reason": "All 17 OPP and 17 system-monitor canonical-source export CRCs match original image with this OPP type graph. No symbol CRC overridden.",
+  "device_tested": false
+}

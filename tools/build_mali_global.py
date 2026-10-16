@@ -7,6 +7,7 @@ Original firmware libraries are link inputs only and are never copied to output.
 import argparse,hashlib,json,os,shutil,subprocess,zipfile
 from pathlib import Path
 from package_licenses import stage as stage_licenses
+from stage_mali_kernel import stage as stage_kernel
 ROOT=Path(__file__).resolve().parents[1];MODULE=ROOT/'magisk-mali-global'
 PACKAGES={'common':('android.hardware.common-V2-ndk.so',2),'graphics-common':('android.hardware.graphics.common-V3-ndk.so',3),'allocator':('android.hardware.graphics.allocator-V1-ndk.so',1)}
 def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
@@ -16,6 +17,8 @@ def run(args):
 def main():
  parser=argparse.ArgumentParser(description=__doc__)
  for name in ['ndk','sdk','headers','binder32','binder64','libcpp32','libcpp64','work']:parser.add_argument('--'+name,type=Path,required=True)
+ parser.add_argument('--kernel-artifacts',type=Path,required=True)
+ parser.add_argument('--kernel-runtime',type=Path,required=True)
  parser.add_argument('--build-tools',default='35.0.0');parser.add_argument('--aidl-build-tools',default='34.0.0')
  a=parser.parse_args();w=a.work.resolve();out=w/'package'
  if out.exists():raise SystemExit('Use a fresh output directory')
@@ -50,6 +53,7 @@ def main():
   abi,size,digest,url=line.split();directory='lib' if abi=='arm' else 'lib64';lines.append(digest+'  payload/'+directory+'/egl/libGLES_mali.so')
  (out/'payload.sha256').write_bytes(('\n'.join(sorted(lines))+'\n').encode())
  stage_licenses(out,'mali-global')
+ stage_kernel(out,a.kernel_artifacts,a.kernel_runtime)
  files=sorted(f for f in out.rglob('*') if f.is_file())
  for f in files:
   if f.suffix in {'.sh','.md','.txt','.json','.sha256','.prop','.java','.c','.cpp','.h','.aidl'}:f.write_bytes(f.read_bytes().replace(b'\r\n',b'\n'))

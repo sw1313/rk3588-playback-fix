@@ -1,0 +1,1 @@
+266240 122f1ecc14d2de0fe93fc025f8c77e4531abd004fa172ffe69e40cd7d15d5c66 https://raw.githubusercontent.com/khadas/android_vendor_rockchip_common/6cf5e034b39c19dfd9e1a15ae5227f61c127d128/gpu/MaliG610/firmware/mali_csffw.bin

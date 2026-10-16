@@ -19,12 +19,22 @@ def verify():
             assert archive.testzip() is None, path.name
             assert all(not PurePosixPath(n).is_absolute() and '..' not in PurePosixPath(n).parts for n in names)
             prefix = 'assets/open-source/' if item['id'] == 'yamby-mpv-plugin' else ''
+            source_tag = item.get('source_release', manifest['release_tag'])
+            carried = source_tag != manifest['release_tag']
             for name in DOCUMENTS:
-                assert archive.read(prefix + name) == (ROOT / name).read_bytes().replace(b'\r\n', b'\n'), (path.name, name)
+                if carried:
+                    assert archive.read(prefix + name), (path.name, name)
+                else:
+                    assert archive.read(prefix + name) == (ROOT / name).read_bytes().replace(b'\r\n', b'\n'), (path.name, name)
             provenance = json.loads(archive.read(prefix + 'OPEN_SOURCE.json'))
-            assert provenance == metadata(item['id'])
+            if carried:
+                assert item.get('carried_from') == source_tag
+                assert provenance['component'] == item['id'] and provenance['third_party_licenses_retained']
+                assert provenance['source'].endswith('/tree/' + source_tag)
+            else:
+                assert provenance == metadata(item['id'])
             assert provenance['component_version'] == item['version']
-            assert provenance['project_release'] == manifest['release_tag']
+            assert provenance['project_release'] == source_tag
             checksum_count = 0
             for name in names:
                 if PurePosixPath(name).name != 'checksums.sha256':
@@ -37,15 +47,20 @@ def verify():
                     checksum_count += 1
             license_count = 1
             if item['id'] == 'decode-stack':
-                for source in (ROOT / 'LICENSES').rglob('*'):
-                    if source.is_file():
-                        assert archive.read(source.relative_to(ROOT).as_posix()) == source.read_bytes().replace(b'\r\n', b'\n')
+                for name in names:
+                    source = ROOT / name
+                    if name.startswith('LICENSES/') and not name.endswith('/') and source.is_file():
+                        assert archive.read(name) == source.read_bytes().replace(b'\r\n', b'\n')
                         license_count += 1
                 checked = {line.split(None, 1)[1] for line in archive.read('checksums.sha256').decode().splitlines()}
                 assert set(DOCUMENTS) | {'OPEN_SOURCE.json'} <= checked
             if item['id'] == 'mali-global':
                 assert not any(n.endswith('/libGLES_mali.so') for n in names)
                 assert archive.read('LICENSES/Apache-2.0.txt') == (ROOT / 'third_party/Apache-2.0.txt').read_bytes().replace(b'\r\n', b'\n')
+                if not carried:
+                    assert archive.read('LICENSES/GPL-2.0-only.txt') == (ROOT / 'LICENSES/GPL-2.0-only.txt').read_bytes().replace(b'\r\n', b'\n')
+                    assert not any(n.endswith(('mali_csffw.bin','rk_next_csffw.bin')) for n in names)
+                    assert {'kernel/rk_mali_next.ko','kernel/rk_mali_resource_guard.ko'} <= set(names)
             if prefix:
                 assert not any(n.startswith('lib/') for n in names), 'Unexpected player/framework native library'
             results.append({'component': item['id'], 'version': item['version'],

@@ -30,9 +30,18 @@ while read -r abi bytes expected url; do
  mkdir -p "$MODPATH/payload/$dir/egl"
  cp "$cache" "$MODPATH/payload/$dir/egl/libGLES_mali.so" || abort "Cannot stage native Mali"
 done < contracts/driver-sources.txt
+read -r bytes expected url < contracts/csf-source.txt
+cache="$STATE/cache/$expected.bin"
+if [ ! -f "$cache" ] || [ "$(sha "$cache")" != "$expected" ]; then
+ ui_print "Downloading pinned CSF firmware; kernel upgrade remains off by default."
+ CLASSPATH="$MODPATH/bin/fetch-driver.jar" timeout 150 /system/bin/app_process /system/bin FetchDriver "$url" "$cache" "$expected" "$bytes" || abort "Pinned CSF download failed"
+fi
+[ "$(sha "$cache")" = "$expected" ] || abort "CSF hash differs"
+sha256sum -c kernel.sha256 >/dev/null 2>&1 || abort "Kernel upgrade payload differs"
+[ -f "$STATE/kernel-mode" ] || printf 'stock\n' > "$STATE/kernel-mode"
 sha256sum -c payload.sha256 >/dev/null 2>&1 || abort "Complete GPU payload differs"
 set_perm_recursive "$MODPATH" 0 0 0755 0644
-for f in mode-control.sh action.sh assemble.sh post-fs-data.sh service.sh uninstall.sh bin/graphics_probe32 bin/graphics_probe64; do set_perm "$MODPATH/$f" 0 0 0755; done
+for f in mode-control.sh action.sh assemble.sh post-fs-data.sh service.sh uninstall.sh webui.sh kernel-state.sh kernel-boot.sh kernel-transition.sh kernel-verify.sh bin/graphics_probe32 bin/graphics_probe64 bin/kernel_controller bin/kernel_health bin/kernel_scan; do set_perm "$MODPATH/$f" 0 0 0755; done
 for abi in 32 64; do
  [ "$abi" = 64 ] && dir=lib64 || dir=lib
  prefix="$MODPATH/payload/$dir:/vendor/$dir:/system/$dir:/apex/com.android.vndk.v32/$dir"
@@ -53,4 +62,4 @@ fi
 sh "$MODPATH/assemble.sh" || abort "Cannot assemble global GPU overlay"
 # Installation is not a boot attempt; the first real boot sets this marker.
 rm -f "$STATE/boot-pending"
-ui_print "ARM32/ARM64 global g18p0 prepared. Original allocator/mapper, firmware and kernel retained. Reboot to apply; Action selects original/global for next reboot."
+ui_print "Global g18p0 prepared. Optional kernel + CSF pair is controlled in WebUI. Default: original kernel/CSF. Reboot applies settings; no boot flashing."

@@ -1,8 +1,17 @@
 # RK3588 播放兼容修复
 
+**v0.6.8 / Mali Global 0.3.0** adds a paired g18p0 kernel/CSF option and a separate
+English / 中文 WebUI. The kernel upgrade defaults off, applies after reboot, and
+falls back after an incomplete startup. Boot is never flashed. Original user-space,
+kernel and CSF rollback remain. [Mali controls, scope and source](magisk-mali-global/README.md).
+
+新增配套 Mali 内核／CSF 与中英文 WebUI，默认关闭内核升级。保存后重启生效，
+失败启动自动选择原内核；不刷 boot。其余三个安装包和 Yamby 保持原样。
+
+
 [**当前下载与版本表**](DOWNLOADS.md) · [GitHub 下载导航](https://github.com/sw1313/rk3588-playback-fix/blob/main/DOWNLOADS.md) · [English](README.md)
 
-**[项目整套版本 v0.6.7 — 四个安装包齐全](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.7)**
+**[项目整套版本 v0.6.8 — 四个安装包齐全](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.8)**
 
 每个公开 Release 都是完整项目快照，附齐 Decode Stack、全局 Mali、Yamby/mpv 插件
 和 Frame Guard。项目版本标识这次整套发布，包内继续保留各组件真实版本号。
@@ -10,10 +19,10 @@ GitHub **Latest** 指向最近更新的整套版本。系统组件仍为实验�
 
 | 组件 | 当前版本 | 用途 |
 | --- | --- | --- |
-| [Decode Stack 解码合并模块](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.7) | **0.6.7，实验组件** | 中英切换并记忆语言；版本单选、依赖联动与回退保持 |
-| [原厂 Mali 全局模块](magisk-mali-global/README.md) | **0.2.1，实验组件** | 32／64 位系统标准图形路径使用原厂 g18p0 用户态驱动 |
-| [Yamby／mpv LSPosed 插件](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.7) | **0.3.5** | 默认 HW+ 设置与可选灰白边修正；这是插件版本，不是 LSPosed 框架版本 |
-| [Frame Guard 刷新率模块](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.7) | **0.1.1** | 可选的固定刷新率黑屏规避 |
+| [Decode Stack 解码合并模块](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.8) | **0.6.7，实验组件** | 中英切换并记忆语言；版本单选、依赖联动与回退保持 |
+| [原厂 Mali 全局模块](magisk-mali-global/README.md) | **0.3.0，实验组件** | 全局 g18p0 用户态；可选配套内核／CSF、重启开关与回退 |
+| [Yamby／mpv LSPosed 插件](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.8) | **0.3.5** | 默认 HW+ 设置与可选灰白边修正；这是插件版本，不是 LSPosed 框架版本 |
+| [Frame Guard 刷新率模块](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.8) | **0.1.1** | 可选的固定刷新率黑屏规避 |
 
 ## 开源许可与构建说明 · v0.6.7
 
@@ -44,7 +53,7 @@ HDR 和胶片颗粒，保留分项开关和整包回退。最终二进制在同�
 ## 安装与历史版本
 
 安装包文件名、直接下载链接和校验值统一见 [DOWNLOADS.md](DOWNLOADS.md)。
-本次四包补充许可和构建说明，运行行为不变，包内版本随文档更新递增。
+本次更新 Mali Global；另外三个安装包沿用原版本与原字节，继续附齐四包。
 旧系统合集包含的解码模块是 **0.3.2**，已不是当前版本。
 旧版保留用于回退和核对历史，不再作为当前安装入口。
 
@@ -54,7 +63,7 @@ MPP／RGA／Codec2／libyuv 模块停用，避免重复覆盖。安装器先检�
 选择在重启后生效。
 
 解码和全局 Mali 模块只接受契约匹配的固件哈希。实测设备为 H96Max V58、
-RK3588、Android 12／API32、原 5.10.66 内核。不刷 boot，不替换内核，不改 Yamby 文件，
+RK3588、Android 12／API32、原 5.10.66 内核。不刷 boot、不替换内核镜像；可选在内存接管 GPU，不改 Yamby 文件，
 LSPosed 仅增加设置语言切换，不增加播放钩子。全局 Mali 首次安装联网下载约 69 MiB 的固定上游库并校验 SHA256；
 公开 ZIP 不包含闭源 Mali 库。原按应用 Mali 实验已被全局模块替代，使用全局模块时保持旧实验停用。
 
@@ -76,7 +85,7 @@ Surface、P010、完整十位样本、分辨率和码率保持原样。未知／
 
 0.6.3 本地播放、精度、生命周期和重启回退测试已通过。本次没有新增 0.6.3 的手动 Yamby
 验收；原版组件和 LSPosed 保持不动，历史版本确认不重复计入。有限样本不等于通用兼容性。
-HDR10+ 指标准 Codec2 元数据桥，不代表原生 HDMI HDR10+ 输出；不包含杜比视界／LLDV／FEL 或内核驱动升级。
+HDR10+ 指标准 Codec2 元数据桥，不代表原生 HDMI HDR10+ 输出；解码模块不包含杜比视界／LLDV／FEL；可选 GPU 内核升级属于独立 Mali 模块。
 
 ## 组件说明
 

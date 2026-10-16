@@ -1,8 +1,17 @@
 # RK3588 Playback Fix
 
+**v0.6.8 / Mali Global 0.3.0** adds a paired g18p0 kernel/CSF option and a separate
+English / 中文 WebUI. The kernel upgrade defaults off, applies after reboot, and
+falls back after an incomplete startup. Boot is never flashed. Original user-space,
+kernel and CSF rollback remain. [Mali controls, scope and source](magisk-mali-global/README.md).
+
+新增配套 Mali 内核／CSF 与中英文 WebUI，默认关闭内核升级。保存后重启生效，
+失败启动自动选择原内核；不刷 boot。其余三个安装包和 Yamby 保持原样。
+
+
 [**Current downloads / 当前下载**](DOWNLOADS.md) · [Download table](https://github.com/sw1313/rk3588-playback-fix/blob/main/DOWNLOADS.md) · [中文说明](README.zh-CN.md)
 
-**[Project release v0.6.7 — all four installers](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.7)**
+**[Project release v0.6.8 — all four installers](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.8)**
 
 Every public Release is a complete project snapshot with Decode Stack, Native
 Mali Global, the Yamby/mpv plugin and Frame Guard attached together. The project
@@ -12,10 +21,10 @@ remain experimental and restricted to the firmware hashes in their contracts.
 
 | Component | Current version | Purpose |
 | --- | --- | --- |
-| [Decode Stack](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.7) | **0.6.7 — experimental** | English/Chinese WebUI with remembered language choice; backend selector, dependencies and rollback retained |
-| [Native Mali Global](magisk-mali-global/README.md) | **0.2.1 — experimental** | Global ARM32/ARM64 native Mali g18p0 userspace graphics paths |
-| [Yamby/mpv LSPosed plugin](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.7) | **0.3.5** | Default HW+ setting and optional RK3588 edge correction; this is the plugin version, not the LSPosed framework version |
-| [Frame Guard](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.7) | **0.1.1** | Optional fixed-refresh workaround for the reproduced HDMI blackouts |
+| [Decode Stack](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.8) | **0.6.7 — experimental** | English/Chinese WebUI with remembered language choice; backend selector, dependencies and rollback retained |
+| [Native Mali Global](magisk-mali-global/README.md) | **0.3.0 — experimental** | Global g18p0 userspace; optional matched kernel/CSF, reboot controls and rollback |
+| [Yamby/mpv LSPosed plugin](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.8) | **0.3.5** | Default HW+ setting and optional RK3588 edge correction; this is the plugin version, not the LSPosed framework version |
+| [Frame Guard](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.8) | **0.1.1** | Optional fixed-refresh workaround for the reproduced HDMI blackouts |
 
 ## Licensing and source · v0.6.7
 
@@ -52,9 +61,8 @@ See [actual playback, exact pixels and limits](docs/decode-av1-063.zh-CN.md).
 
 ## Choose and install
 
-Use the exact filenames and links in [DOWNLOADS.md](DOWNLOADS.md). This snapshot
-repackages all four components to include licensing documents; runtime behavior
-is unchanged. Old releases remain available for rollback
+Use the exact filenames and links in [DOWNLOADS.md](DOWNLOADS.md). This snapshot upgrades Mali Global; the other three installers retain their
+previous versions and exact bytes. Old releases remain available for rollback
 and source history. The old system collection contains Decode Stack **0.3.2**,
 not the current decoder package.
 
@@ -66,7 +74,7 @@ remain available; changes take effect after reboot.
 
 Decode Stack and global Mali accept only the firmware hashes in their
 contracts. Testing targets an H96Max V58 with RK3588, Android 12/API32 and the
-original 5.10.66 kernel. These packages do not flash boot, replace the kernel,
+original 5.10.66 kernel. These packages do not flash boot or replace the kernel image,
 modify Yamby files or add playback hooks. LSPosed 0.3.4 only adds settings localization. Global Mali's installer downloads
 about 69 MiB of SHA256-pinned upstream libraries; closed Mali binaries are not
 included in the public ZIP. The retired app-scoped Mali experiment must remain
@@ -98,7 +106,7 @@ See the [exit-path evidence](docs/antutu-image-effects.zh-CN.md).
 No new manual Yamby acceptance is recorded for 0.6.3; its original libraries and
 the LSPosed plugin remain unchanged. Earlier confirmations are historical. Finite sample coverage does not establish universal compatibility.
 HDR10+ refers to the standard Codec2 metadata bridge, not native HDMI HDR10+
-output. Dolby Vision/LLDV/FEL and kernel-driver upgrades are not included.
+output. Decode Stack does not add Dolby Vision/LLDV/FEL or a VPU kernel upgrade. The separate Mali module offers the optional GPU kernel/CSF pair described above.
 
 ## Component documentation
 

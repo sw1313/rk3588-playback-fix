@@ -1,3 +1,43 @@
+# v0.6.8 Mali kernel / CSF integration
+
+Mali Global is now 0.3.0. Decode Stack 0.6.7, plugin 0.3.5 and Frame Guard 0.1.1
+are carried with unchanged bytes and v0.6.7 source metadata. Use v0.6.8 for the new
+Mali sources; the older sections below document the unchanged component inputs.
+本次新增 Mali 内核／CSF 与中英文 WebUI；其余三包沿用原版本、字节和源码标签。
+
+## Rebuilding the GPL kernel option
+
+`mali-kernel/` contains the complete frozen driver subtree and compatibility changes,
+all helper source, exact object list, linker export namespace CRCs, image-derived ABI
+contract, matching configuration and generated headers. Original kernel/boot images
+are not inputs to this release build. Obtain pristine Linux 5.10.66 source headers
+from kernel.org and build its host `scripts/mod/modpost` (GNU host build tools/MSYS2
+on Windows; normal host compiler on Linux). The frozen configuration/generated
+headers are used by the standalone builder. Do not configure against arbitrary
+installed distribution headers or replace the pinned import versions.
+
+```sh
+python tools/build_mali_kernel.py --ndk /inputs/ndk --kernel-source /inputs/linux-5.10.66 --modpost /inputs/kernel-host/scripts/mod/modpost --work /work/kernel
+python tools/build_mali_kernel_runtime.py --ndk /inputs/ndk --work /work/kernel-runtime
+```
+
+On Windows `--host-tools /inputs/msys/usr/bin` supplies modpost's host runtime.
+The build checks 394 KMD and 34 handover-helper import versions against the original
+ABI contract and maps compiler paths. The module loader additionally verifies the
+live original code/layout before installing any handover callbacks. Build success
+alone does not establish compatibility with a different firmware.
+
+Then add `--kernel-artifacts /work/kernel --kernel-runtime /work/kernel-runtime`
+to the existing `tools/build_mali_global.py` command below. Both native helpers and
+GPL modules are compiled from the published files. Proprietary userspace libraries
+and CSF are downloaded at installation using the pinned URL/size/SHA256 contracts.
+Do not copy those blobs into source archives or public installer ZIPs.
+
+原内核版本仍为 5.10.66；新版可加载模块在内存接管 GPU，不编译或刷写 boot。构建需要
+上述 Linux 头、NDK 和主机 modpost 工具，不需要私人内核镜像。运行前仍严格校验当前固件。
+
+---
+
 # 源码与构建说明
 
 本次版本 **v0.6.7**：Decode Stack 0.6.7、Mali Global 0.2.1、LSPosed 插件

@@ -1,19 +1,238 @@
 {
   "component": "mali-global",
-  "version": "0.2.1",
-  "project_release": "v0.6.7",
-  "scope": "license, source/build documentation and version metadata only",
-  "runtime_rebuilt": false,
-  "previous_release": "v0.6.6",
-  "previous_asset": {
-    "id": "mali-global",
-    "version": "0.2.0",
-    "filename": "rk3588-mali-global-0.2.0.zip",
-    "status": "experimental",
-    "sha256": "9d6959f68ba4fe54591d4ccac1e91a677272668a6d20bf61eb0bb64087cbec03",
-    "url": "https://github.com/sw1313/rk3588-playback-fix/releases/download/v0.6.6/rk3588-mali-global-0.2.0.zip"
+  "version": "0.3.0",
+  "project_release": "v0.6.8",
+  "validation_date": "2026-10-17",
+  "scope": "Exact-firmware optional paired g18p0 kernel/CSF and bilingual WebUI",
+  "tested_platform": {
+    "soc": "RK3588",
+    "model": "H96 Max V58",
+    "android_api": 32,
+    "kernel": "5.10.66",
+    "original_kmd": "g12p0-01eac0 (UK version 1.11)",
+    "candidate_kmd": "g18p0-01eac0 (UK version 1.18)"
   },
-  "previous_validation": "Historical runtime tests remain with v0.6.6 and its cited records; no fresh playback claim.",
-  "licenses": "Original project MIT; upstream permissions, patent grants and notices retained.",
-  "preservation": "Executable payload and control scripts must match previous installer exactly; see release validation."
+  "source_built_kernel_modules": true,
+  "proprietary_userspace_or_csf_included": false,
+  "kernel_defaults_to_original": true,
+  "boot_flashed": false,
+  "offline_and_state_checks": {
+    "android_shell_state_cases": 20,
+    "webui_interaction_checks": 17,
+    "controller_policy_cases": 35,
+    "health_policy_cases": 13,
+    "health_output_capture_cases": 2,
+    "kernel_import_versions": 394,
+    "guard_import_versions": 34
+  },
+  "installed_boot_matrix": [
+    {
+      "phase": "installed-default",
+      "passed": true,
+      "expected": "stock",
+      "last_state": {
+        "schema": 1,
+        "version": "0.3.0",
+        "activeVersion": "0.3.0",
+        "requested": "on",
+        "effective": "on",
+        "active": "on",
+        "activeKnown": true,
+        "moduleEnabled": true,
+        "staged": false,
+        "removing": false,
+        "supported": true,
+        "kernelRequested": "stock",
+        "kernelEffective": "stock",
+        "kernelActive": "stock",
+        "kernelHealth": "stock",
+        "recovery": "none",
+        "pendingReboot": false
+      },
+      "boot_written": false,
+      "online": true
+    },
+    {
+      "phase": "whole-original",
+      "passed": true,
+      "expected": "off",
+      "last_state": {
+        "schema": 1,
+        "version": "0.3.0",
+        "activeVersion": "0.3.0",
+        "requested": "off",
+        "effective": "off",
+        "active": "off",
+        "activeKnown": true,
+        "moduleEnabled": true,
+        "staged": false,
+        "removing": false,
+        "supported": true,
+        "kernelRequested": "next",
+        "kernelEffective": "stock",
+        "kernelActive": "stock",
+        "kernelHealth": "stock",
+        "recovery": "none",
+        "pendingReboot": false
+      },
+      "boot_written": false,
+      "online": true
+    },
+    {
+      "phase": "paired-upgrade",
+      "passed": true,
+      "expected": "next",
+      "last_state": {
+        "schema": 1,
+        "version": "0.3.0",
+        "activeVersion": "0.3.0",
+        "requested": "on",
+        "effective": "on",
+        "active": "on",
+        "activeKnown": true,
+        "moduleEnabled": true,
+        "staged": false,
+        "removing": false,
+        "supported": true,
+        "kernelRequested": "next",
+        "kernelEffective": "next",
+        "kernelActive": "next",
+        "kernelHealth": "active",
+        "recovery": "none",
+        "pendingReboot": false
+      },
+      "boot_written": false,
+      "online": true
+    },
+    {
+      "phase": "kernel-original",
+      "passed": true,
+      "expected": "stock",
+      "last_state": {
+        "schema": 1,
+        "version": "0.3.0",
+        "activeVersion": "0.3.0",
+        "requested": "on",
+        "effective": "on",
+        "active": "on",
+        "activeKnown": true,
+        "moduleEnabled": true,
+        "staged": false,
+        "removing": false,
+        "supported": true,
+        "kernelRequested": "stock",
+        "kernelEffective": "stock",
+        "kernelActive": "stock",
+        "kernelHealth": "stock",
+        "recovery": "none",
+        "pendingReboot": false
+      },
+      "boot_written": false,
+      "online": true
+    },
+    {
+      "phase": "interrupted-startup",
+      "passed": true,
+      "expected": "stock",
+      "last_state": {
+        "schema": 1,
+        "version": "0.3.0",
+        "activeVersion": "0.3.0",
+        "requested": "on",
+        "effective": "on",
+        "active": "on",
+        "activeKnown": true,
+        "moduleEnabled": true,
+        "staged": false,
+        "removing": false,
+        "supported": true,
+        "kernelRequested": "stock",
+        "kernelEffective": "stock",
+        "kernelActive": "stock",
+        "kernelHealth": "stock",
+        "recovery": "interrupted_previous_boot",
+        "pendingReboot": false
+      },
+      "boot_written": false,
+      "online": true
+    },
+    {
+      "phase": "final-paired",
+      "passed": true,
+      "expected": "next",
+      "last_state": {
+        "schema": 1,
+        "version": "0.3.0",
+        "activeVersion": "0.3.0",
+        "requested": "on",
+        "effective": "on",
+        "active": "on",
+        "activeKnown": true,
+        "moduleEnabled": true,
+        "staged": false,
+        "removing": false,
+        "supported": true,
+        "kernelRequested": "next",
+        "kernelEffective": "next",
+        "kernelActive": "next",
+        "kernelHealth": "active",
+        "recovery": "none",
+        "pendingReboot": false
+      },
+      "boot_written": false,
+      "online": true
+    }
+  ],
+  "graphics_verification": {
+    "gles_shader_and_exact_rgba_readback": [
+      "arm32",
+      "arm64"
+    ],
+    "vulkan_gpu_fill_exact_4096_byte_readback": [
+      "arm32",
+      "arm64"
+    ],
+    "desktop_actual_userspace": "g18p0",
+    "actual_kernel_binding": "rk_next_mali",
+    "csf_size_and_digest_checked": true,
+    "audio_pids_preserved_during_takeover": true,
+    "local_health_stability_ms": 30000,
+    "pc_or_network_required_for_health": false,
+    "supply_bridge_released": true,
+    "handover_callbacks_restored": true,
+    "firmware_search_path_restored": true
+  },
+  "protected_state": {
+    "files_compared": 30,
+    "only_expected_module_metadata_changed": true,
+    "boot_unchanged": true,
+    "original_csf_unchanged": true,
+    "decode_stack_unchanged": true,
+    "yamby_native_libraries_unchanged": true,
+    "lsposed_module_unchanged": true
+  },
+  "manual_playback_scope": "Earlier controlled takeover of the same kernel/CSF source baseline: user confirmed game and HEVC 10-bit playback normal. This installed-module boot matrix adds automated checks; it does not claim new exhaustive app acceptance.",
+  "limitations": [
+    "Exact pinned firmware only; unknown builds refused",
+    "Experimental; no full CTS or long-term power validation",
+    "Kernel hard hangs may require a power cycle; the next boot skips an incomplete attempt",
+    "No claim of arbitrary application coverage or proof of draining every hidden reference",
+    "Does not address existing AnTuTu application exit or editing completion limitations"
+  ],
+  "kernel_build": {
+    "candidate": {
+      "sha256": "748e34ddc7897f733725772a1be6fd9cdcd7e503526a7779ec27c17af9eddea1",
+      "canonical_import_versions": 394
+    },
+    "guard": {
+      "sha256": "14d047bba8011ac40d7b403ee0da684418261914945b42a07252d574ceb88a55",
+      "canonical_import_versions": 34
+    }
+  },
+  "runtime_build": {
+    "kernel_controller": "045699586bcfe4819df2d664aed1e872bb07d0a9bd006d7464e6da3acd8da8db",
+    "kernel_health": "165d7aed573a3f049216b6515a0da46b501718f7935e96bc94c251a1b8829d3c",
+    "kernel_scan": "6ae9a13b202eca949a4cd072850851233f951816825c93536f91b5cc0e0e9f20"
+  },
+  "final_package_method": "Installed candidate runtime payload passed the six-phase boot matrix. Final package updates only notices, validation and the WebUI checking-state message; deployed files are synchronized and verified against the final checksum manifest."
 }

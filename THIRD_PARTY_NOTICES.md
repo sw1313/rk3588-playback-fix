@@ -50,3 +50,21 @@ For component upgrades, retain the license/patent/author files from the exact
 new source revision, update this table and source provenance, then regenerate
 package checksums. Do not replace third-party copyright notices with the
 project author's name. / 升级组件时同步更新许可、专利、作者、来源及校验值。
+
+
+## Mali kernel option / Mali 内核选项 · v0.6.8
+
+Mali Global 0.3.0 additionally distributes GPL source-built g18p0 kernel and
+resource-handover modules. Their corresponding frozen source, API compatibility
+headers, generated kernel configuration, guards and build scripts are in
+`mali-kernel/`. The driver baseline is rockchip-linux/kernel commit
+`7a76350c1e0df810d8c11eb0d18285da4e79e6ed`; original file-level GPL terms remain.
+`LICENSES/GPL-2.0-only.txt` and `LICENSES/Linux-syscall-note.txt` accompany the ZIP.
+The installer, offline bilingual WebUI and userspace controller are project MIT.
+Closed userspace libraries and CSF firmware are separately downloaded, never
+relicensed or redistributed here. The boot image and original firmware are not bundled.
+内核组件保留 GPL 许可，自写安装器、WebUI 和用户态控制程序采用 MIT；不将第三方
+内核代码重新授权为 MIT。公开包不含闭源 Mali 库或 CSF 固件。
+
+Unchanged installers in the complete v0.6.8 snapshot retain their v0.6.7 source
+metadata and exact bytes. Their historical licenses/build notices remain inside.

@@ -12,3 +12,9 @@ magisk-mpp/compat/*.patch -whitespace
 magisk-software/patches/*.patch -whitespace
 # Preserve verbatim upstream license/notice formatting.
 LICENSES/** -whitespace
+
+# Retain verbatim formatting in frozen corresponding upstream kernel sources.
+mali-kernel/driver/** -whitespace
+mali-kernel/compat/drivers-base/** -whitespace
+mali-kernel/prepared/** -whitespace
+mali-kernel/image.Module.symvers -whitespace

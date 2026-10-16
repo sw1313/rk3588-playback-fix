@@ -1,0 +1,20 @@
+{
+  "driver_repository": "https://github.com/rockchip-linux/kernel",
+  "driver_revision": "7a76350c1e0df810d8c11eb0d18285da4e79e6ed",
+  "driver_subtree": "drivers/gpu/arm/bifrost",
+  "release": "g18p0-01eac0",
+  "original_kernel_headers": "Linux 5.10.66",
+  "kernel_header_source": "https://cdn.kernel.org/pub/linux/kernel/v5.x/linux-5.10.66.tar.xz",
+  "frozen_driver_modified": true,
+  "modifications": [
+    "API/layout-compatible Rockchip OPP types",
+    "isolated exported symbols and trace events",
+    "private rk_next_mali platform driver with standard mali0 misc endpoint",
+    "explicit opt-in initialization and fixed CSF filename",
+    "firmware cache digest telemetry",
+    "guarded device-specific old-driver resource handover"
+  ],
+  "closed_firmware_redistributed": false,
+  "kernel_config_and_generated_headers_included": true,
+  "license": "File-level GPL-2.0 terms and Linux syscall exception retained; Rockchip overlay GPL-2.0-or-later"
+}
