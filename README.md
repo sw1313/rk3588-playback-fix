@@ -2,7 +2,7 @@
 
 [**Current downloads / 当前下载**](DOWNLOADS.md) · [Download table](https://github.com/sw1313/rk3588-playback-fix/blob/main/DOWNLOADS.md) · [中文说明](README.zh-CN.md)
 
-**[Project release v0.6.5 — all four installers](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.5)**
+**[Project release v0.6.6 — all four installers](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.6)**
 
 Every public Release is a complete project snapshot with Decode Stack, Native
 Mali Global, the Yamby/mpv plugin and Frame Guard attached together. The project
@@ -12,20 +12,23 @@ remain experimental and restricted to the firmware hashes in their contracts.
 
 | Component | Current version | Purpose |
 | --- | --- | --- |
-| [Decode Stack](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.5) | **0.6.5 — experimental** | One Codec2 version selector, nested dependency controls and retained gray inactive choices; lossless decode stack retained |
+| [Decode Stack](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.6) | **0.6.6 — experimental** | English/Chinese WebUI with remembered language choice; backend selector, dependencies and rollback retained |
 | [Native Mali Global](magisk-mali-global/README.md) | **0.2.0 — experimental** | Global ARM32/ARM64 native Mali g18p0 userspace graphics paths |
-| [Yamby/mpv LSPosed plugin](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.5) | **0.3.3** | Default HW+ setting and optional RK3588 edge correction; this is the plugin version, not the LSPosed framework version |
-| [Frame Guard](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.5) | **0.1.0** | Optional fixed-refresh workaround for the reproduced HDMI blackouts |
+| [Yamby/mpv LSPosed plugin](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.6) | **0.3.4** | Default HW+ setting and optional RK3588 edge correction; this is the plugin version, not the LSPosed framework version |
+| [Frame Guard](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.6) | **0.1.0** | Optional fixed-refresh workaround for the reproduced HDMI blackouts |
 
-## Decode Stack 0.6.5 WebUI
+## English / Chinese · v0.6.6
 
-Open **RK3588 Decode Stack** in standalone **KsuWebUI** on Magisk. Codec2
-versions share one selector: legacy, 1.14.3 SIMD or 1.14.16. Dependent controls
-are nested below prerequisites. Parent-off grays retained child choices;
-parent-on restores them. Enabling a child links required dependencies and
-backend selection in one configuration commit. Reboot to apply. Decoder
-binaries, Yamby and LSPosed are unchanged.
-[Operation and validation](docs/decode-webui-065.zh-CN.md).
+All four components support English. Decode Stack **0.6.6** adds an **English / 中文**
+button throughout its offline WebUI. LSPosed plugin **0.3.4** adds the same choice
+to its native settings, with localized app name and module description. Both
+remember your choice; playback settings remain unchanged. Mali and Frame Guard
+already have English metadata and console messages and retain their original
+packages. [Coverage and language controls](docs/localization-066.md).
+
+The existing Codec2 version selector, nested dependency controls, retained gray
+inactive choices and reboot rollback remain. Decoder binaries and hook logic
+are unchanged; Yamby itself is untouched.
 
 ## Decode Stack 0.6.3
 
@@ -38,8 +41,8 @@ See [actual playback, exact pixels and limits](docs/decode-av1-063.zh-CN.md).
 
 ## Choose and install
 
-Use the exact filenames and links in [DOWNLOADS.md](DOWNLOADS.md). The Mali,
-LSPosed and Frame Guard packages are unchanged; they do not need a new version
+Use the exact filenames and links in [DOWNLOADS.md](DOWNLOADS.md). The Mali and
+Frame Guard packages are unchanged; they do not need a new version
 number when Decode Stack changes. Old releases remain available for rollback
 and source history. The old system collection contains Decode Stack **0.3.2**,
 not the current decoder package.
@@ -53,7 +56,7 @@ remain available; changes take effect after reboot.
 Decode Stack and global Mali accept only the firmware hashes in their
 contracts. Testing targets an H96Max V58 with RK3588, Android 12/API32 and the
 original 5.10.66 kernel. These packages do not flash boot, replace the kernel,
-modify Yamby files or add LSPosed features. Global Mali's installer downloads
+modify Yamby files or add playback hooks. LSPosed 0.3.4 only adds settings localization. Global Mali's installer downloads
 about 69 MiB of SHA256-pinned upstream libraries; closed Mali binaries are not
 included in the public ZIP. The retired app-scoped Mali experiment must remain
 disabled when using the global module.

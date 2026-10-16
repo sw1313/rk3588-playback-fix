@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">Yamby HW+ / RK3588 mpv 修复</string>
+    <string name="xposed_description">Yamby 默认 HW+ 设置不限芯片；其他 mpv 应用的非 copy 硬解仅限 RK3588，保留 SW</string>
+    <string name="settings_title">Yamby HW+ / RK3588 mpv 兼容修复 · %1$s</string>
+    <string name="language_button">English</string>
+    <string name="language_description">Switch settings to English</string>
+    <string name="settings_description">在 LSPosed 中勾选需要修复的 mpv 播放器，然后重新启动对应应用。\nYamby 在自己的“默认解码方式”中选择 HW+、HW 或 SW，播放时仍可手动切换。\n%1$s</string>
+    <string name="shared_available">LSPosed 共享设置可用。</string>
+    <string name="shared_unavailable">LSPosed 尚未接管设置：启用模块后重新打开本页。</string>
+    <string name="yamby_menu_label">Yamby 默认解码补上 HW+（不限芯片）</string>
+    <string name="noncopy_label">其他 mpv 播放器：硬解优先使用 HW+（仅 RK3588，保留 SW）</string>
+    <string name="cropfix_label">Yamby HW+ 灰白边自动裁剪修正（仅 RK3588）</string>
+    <string name="settings_limits">Yamby 设置补全不限芯片，目前适配 2.1.0.11；HW+ 解码能力由设备决定。\n作用域由你选择，默认仅推荐已验证的 Yamby。其他 mpv 应用仅在 RK3588 上识别常见 JNI 接口；\n没有匹配接口时仅记录诊断信息。纯 native 调用或完全混淆的封装可能需要另行适配。\n灰白边选项默认关闭，根据每段视频报告的裁剪和纹理尺寸修正；未获得匹配信息时跳过。更改后请重启播放器。\ngpu-next 设置由原播放器控制。HDR 色彩、字幕和拖动仍需实测。日志标签：RKPlaybackFix。</string>
+</resources>

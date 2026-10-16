@@ -1,27 +1,33 @@
 "use strict";
 (() => {
   // KernelSU's documented exec callback contract, implemented without remote dependencies.
+  const catalogs = window.DecodeI18n;
+  const languageKey = "rk3588.decode.language";
+  let language = (navigator.language || "en").toLowerCase().startsWith("zh") ? "zh" : "en";
+  try { const saved = localStorage.getItem(languageKey); if (saved === "zh" || saved === "en") language = saved; } catch {}
+  const t = (key, args = {}) => (catalogs[language][key] || catalogs.en[key] || key).replace(/\{(\w+)\}/g, (match, name) => args[name] ?? match);
+  function uiError(key, args = {}) { const error = new Error(key); error.translation = "error." + key; error.args = args; return error; }
   const bridge = "sh /data/adb/modules/rk3588_decode_stack/webui.sh";
   const definitions = [
-    ["rga", "硬件与解码", "RGA", "图像转换、缩放与缓冲区处理。", []],
-    ["mpp", "硬件与解码", "MPP / VPU", "硬件视频解码与 VPU 兼容库，32 / 64 位作为一组切换。", []],
-    ["av1_grain", "硬件与解码", "AV1 胶片颗粒修正", "恢复片源携带的颗粒参数，不是额外添加滤镜。", ["mpp"]],
-    ["codec2", "Codec2 与软件解码", "Codec2 兼容层", "保留原系统接口的解码组件与平台适配。", ["mpp", "rga"]],
-    ["codec2_backend", "Codec2 与软件解码", "Codec2 后端版本", "单选一个后端，修改后重启生效。", ["codec2"]],
-    ["codec2_buffer", "Codec2 与软件解码", "八位缓冲区兼容修正", "AVC / HEVC 停止与排空路径修正；关闭会恢复旧路径。", ["codec2_sdk"]],
-    ["av1_native", "十位与 AV1", "AV1 原生输出", "按实际消费者选择显示 / P010 路径；关闭后恢复完整精度复制。", ["codec2_sdk_next"]],
-    ["av1_afbc", "十位与 AV1", "AV1 无损 AFBC", "符合条件的显示 Surface 与 64 对齐宽度启用无损压缩；其他路径保留原选择。", ["av1_native"]],
-    ["software", "Codec2 与软件解码", "系统软件解码器", "libvpx / libgav1 与完整精度 P010 输出适配。", ["codec2"]],
-    ["p010_fast", "十位与 AV1", "十位 SIMD 转换", "关闭后使用标量转换，保留相同十位样本。", ["codec2"]],
-    ["hdr_static", "HDR 元数据", "HDR10 静态元数据", "包含既有 HDR / SDR 状态切换适配。", ["codec2"]],
-    ["hdr10plus", "HDR 元数据", "Codec2 HDR10+ 元数据桥", "传递标准逐帧元数据，不代表 HDMI HDR10+ 或杜比输出。", ["codec2"]],
-    ["libyuv", "像素转换", "libyuv", "系统像素转换与缩放库。", []]
+    ["rga", "group.hardware", t("name.rga"), t("desc.rga"), []],
+    ["mpp", "group.hardware", t("name.mpp"), t("desc.mpp"), []],
+    ["av1_grain", "group.hardware", t("name.av1_grain"), t("desc.av1_grain"), ["mpp"]],
+    ["codec2", "group.hardware", t("name.codec2"), t("desc.codec2"), ["mpp", "rga"]],
+    ["codec2_backend", "group.hardware", t("name.codec2_backend"), t("desc.codec2_backend"), ["codec2"]],
+    ["codec2_buffer", "group.hardware", t("name.codec2_buffer"), t("desc.codec2_buffer"), ["codec2_sdk"]],
+    ["av1_native", "group.hardware", t("name.av1_native"), t("desc.av1_native"), ["codec2_sdk_next"]],
+    ["av1_afbc", "group.hardware", t("name.av1_afbc"), t("desc.av1_afbc"), ["av1_native"]],
+    ["software", "group.hardware", t("name.software"), t("desc.software"), ["codec2"]],
+    ["p010_fast", "group.hardware", t("name.p010_fast"), t("desc.p010_fast"), ["codec2"]],
+    ["hdr_static", "group.hardware", t("name.hdr_static"), t("desc.hdr_static"), ["codec2"]],
+    ["hdr10plus", "group.hardware", t("name.hdr10plus"), t("desc.hdr10plus"), ["codec2"]],
+    ["libyuv", "group.pixels", t("name.libyuv"), t("desc.libyuv"), []]
   ];
   const parents = { av1_grain: "mpp", codec2: "mpp", codec2_backend: "codec2", codec2_buffer: "codec2_backend", av1_native: "codec2_backend", av1_afbc: "av1_native", software: "codec2", p010_fast: "codec2", hdr_static: "codec2", hdr10plus: "codec2" };
   const names = Object.fromEntries(definitions.map(([key, , title]) => [key, title]));
-  names.codec2_sdk = "后端版本：1.14.3 SIMD 或 1.14.16";
-  names.codec2_sdk_next = "后端版本：1.14.16";
-  const backendNames = { legacy: "旧后端（0.4.0 路径）", simd: "1.14.3 SIMD", latest: "1.14.16" };
+  names.codec2_sdk = t("name.codec2_sdk");
+  names.codec2_sdk_next = t("name.codec2_sdk_next");
+  const backendNames = { legacy: t("backend.legacy"), simd: t("backend.simd"), latest: t("backend.latest") };
   function backend(components, field) {
     const sdk = components.codec2_sdk[field], latest = components.codec2_sdk_next[field];
     if (sdk === null || latest === null) return "unknown";
@@ -29,10 +35,12 @@
   }
   const rows = new Map();
   let state = null;
+  let lastError = null;
+  let lastChange = null;
   let busy = false;
   let counter = 0;
   const $ = id => document.getElementById(id);
-  const bitLabel = value => value === 1 ? "开启" : value === 0 ? "关闭" : "未知";
+  const bitLabel = value => t(value === 1 ? "on" : value === 0 ? "off" : "unknown");
   const element = (tag, text, cls) => { const node = document.createElement(tag); if (text) node.textContent = text; if (cls) node.className = cls; return node; };
   function notice(text, kind) { $("notice").textContent = text; $("notice").className = "notice " + kind; }
   function controls() {
@@ -43,55 +51,54 @@
   }
   function exec(command) {
     return new Promise((resolve, reject) => {
-      if (!window.ksu || typeof window.ksu.exec !== "function") { reject(new Error("请在 KSU WebUI / 独立版 KsuWebUI 中打开此面板，并授予 root 权限。")); return; }
+      if (!window.ksu || typeof window.ksu.exec !== "function") { reject(uiError("host")); return; }
       const callback = "rkDecode_" + Date.now() + "_" + counter++;
       const cleanup = () => { clearTimeout(timer); delete window[callback]; };
-      const timer = setTimeout(() => { cleanup(); reject(new Error("读取超时。请刷新确认实际保存状态。")); }, 15000);
+      const timer = setTimeout(() => { cleanup(); reject(uiError("timeout")); }, 15000);
       window[callback] = (errno, stdout) => {
         cleanup();
-        if (Number(errno) !== 0) { reject(new Error("模块操作失败（" + errno + "），请刷新检查配置和 root 权限。")); return; }
-        try { resolve(JSON.parse(stdout)); } catch { reject(new Error("模块返回了无效状态，请检查安装是否完整。")); }
+        if (Number(errno) !== 0) { reject(uiError("operation", { errno })); return; }
+        try { resolve(JSON.parse(stdout)); } catch { reject(uiError("json")); }
       };
-      try { window.ksu.exec(command, "{}", callback); } catch { cleanup(); reject(new Error("无法调用 root 接口，请确认 WebUI 已获授权。")); }
+      try { window.ksu.exec(command, "{}", callback); } catch { cleanup(); reject(uiError("permission")); }
     });
   }
   function render(next) {
-    if (next.schema !== 1 || !next.components || definitions.some(([k]) => k !== "codec2_backend" && !next.components[k]) || !next.components.codec2_sdk || !next.components.codec2_sdk_next) throw new Error("模块状态版本不匹配，请重新安装完整 ZIP。");
+    if (next.schema !== 1 || !next.components || definitions.some(([k]) => k !== "codec2_backend" && !next.components[k]) || !next.components.codec2_sdk || !next.components.codec2_sdk_next) throw uiError("schema");
     state = next;
-    $("version").textContent = "模块 " + next.version + " · 当前启动 " + (next.activeKnown ? next.activeEnabled ? next.activeVersion : "原厂组件" : "尚未确认");
+    $("version").textContent = t("version", { version: next.version, active: next.activeKnown ? next.activeEnabled ? next.activeVersion : t("originals") : t("unconfirmed") });
     $("whole").setAttribute("aria-checked", String(next.enabled));
-    $("whole-state").textContent = "当前：" + (next.activeKnown ? next.activeEnabled ? "启用" : "停用" : "未知") + " · 重启后：" + (next.enabled && !next.removing ? "启用" : "停用");
+    $("whole-state").textContent = t("wholeState", { current: t(next.activeKnown ? next.activeEnabled ? "enabled" : "disabled" : "unknown"), next: t(next.enabled && !next.removing ? "enabled" : "disabled") });
     for (const [key, , , , deps] of definitions) {
       if (key === "codec2_backend") {
         const row = rows.get(key);
         row.section.classList.toggle("inactive", next.components.codec2.effective === 0);
         row.toggle.value = backend(next.components, "requested");
-        row.current.textContent = "当前：" + (next.components.codec2.active === null ? "未知" : next.components.codec2.active === 0 ? "未启用" : backendNames[backend(next.components, "active")]);
-        row.effective.textContent = "重启后：" + (next.components.codec2.effective === null ? "未知" : next.components.codec2.effective === 0 ? "未启用" : backendNames[backend(next.components, "effective")]);
-        row.reason.textContent = next.components.codec2.effective === 0 ? "版本选择已保留；Codec2 兼容层或整包关闭时暂不生效。" : "";
+        row.current.textContent = t("current", { value: next.components.codec2.active === null ? t("unknown") : next.components.codec2.active === 0 ? t("inactive") : backendNames[backend(next.components, "active")] });
+        row.effective.textContent = t("next", { value: next.components.codec2.effective === null ? t("unknown") : next.components.codec2.effective === 0 ? t("inactive") : backendNames[backend(next.components, "effective")] });
+        row.reason.textContent = next.components.codec2.effective === 0 ? t("backendRetained") : "";
         row.reason.hidden = !row.reason.textContent;
         continue;
       }
       const info = next.components[key], row = rows.get(key);
       row.section.classList.toggle("inactive", info.effective === 0);
       row.toggle.setAttribute("aria-checked", String(info.requested === 1));
-      row.current.textContent = "当前：" + bitLabel(info.active);
-      row.effective.textContent = "重启后：" + bitLabel(info.effective);
+      row.current.textContent = t("current", { value: bitLabel(info.active) });
+      row.effective.textContent = t("next", { value: bitLabel(info.effective) });
       let reason = "";
       if (info.requested === 1 && info.effective === 0) {
         const missing = deps.filter(k => next.components[k].effective !== 1).map(k => names[k]);
-        reason = !next.enabled || next.removing ? "选择已保留；整包停用时暂不生效。" : "选择已保留；需要先启用：" + missing.join("、") + "。";
+        reason = !next.enabled || next.removing ? t("wholeRetained") : t("dependenciesRetained", { items: missing.join(t("separator")) });
       }
       row.reason.textContent = reason;
       row.reason.hidden = !reason;
     }
-    if (next.removing) notice("模块已标记卸载，重启后恢复原厂组件。当前禁止修改选择。", "pending");
-    else if (!next.valid) notice("配置或组件载荷不完整，已禁止修改分项。仍可关闭整包并重启回退，或重新安装完整 ZIP。", "error");
-    else if (next.health === "failed") notice("本次启动检查失败，模块已请求回退。请检查整包状态并重启。", "error");
-    else if (next.pendingReboot) notice((next.staged ? "模块更新已暂存。" : "") + (!next.activeKnown ? "尚无本次启动记录。" : "") + "待重启：已保存的选择将在重启后应用。依赖未启用的分项会保留选择。", "pending");
-    else notice("配置已应用，无需重启。依赖未满足的分项仍保留原选择。", "ready");
-    const health = { passed: "通过", checking: "检查中", failed: "失败，等待回退", unknown: "无本次记录" };
-    $("health").textContent = "启动检查：" + (health[next.health] || "未知") + "。此状态不等于所有视频均已通过播放测试。";
+    if (next.removing) notice(t("removing"), "pending");
+    else if (!next.valid) notice(t("invalid"), "error");
+    else if (next.health === "failed") notice(t("failed"), "error");
+    else if (next.pendingReboot) notice((next.staged ? t("staged") : "") + (!next.activeKnown ? t("noReceipt") : "") + t("pending"), "pending");
+    else notice(t("ready"), "ready");
+    $("health").textContent = t("health", { value: t("health." + (["passed", "checking", "failed"].includes(next.health) ? next.health : "unknown")) });
   }
   async function update(key, value) {
     if (busy) return;
@@ -100,23 +107,27 @@
     busy = true; controls();
     try {
       const command = key === "codec2_backend" ? bridge + " backend " + value : key ? bridge + " set " + key + " " + (value ? "on" : "off") : bridge + " status";
+      lastError = null;
       const before = state;
       const result = await exec(command);
       render(result);
-      const linked = before && key ? definitions.filter(([k]) => k !== key && k !== "codec2_backend" && before.components[k].requested === 0 && result.components[k].requested === 1).map(([, , title]) => title) : [];
-      if (before && key !== "codec2_backend" && backend(before.components, "requested") !== backend(result.components, "requested")) linked.push("后端版本 " + backendNames[backend(result.components, "requested")]);
-      $("changes").textContent = key ? "已保存。" + (linked.length ? "已联动开启：" + linked.join("、") + "。" : "") + "重启后应用。" : "";
+      const linked = before && key ? definitions.filter(([k]) => k !== key && k !== "codec2_backend" && before.components[k].requested === 0 && result.components[k].requested === 1).map(([k]) => k) : [];
+      const changedBackend = before && key !== "codec2_backend" && backend(before.components, "requested") !== backend(result.components, "requested") ? backend(result.components, "requested") : null;
+      lastChange = key ? { linked, backend: changedBackend } : null;
+      paintChanges();
     } catch (error) {
-      state = null; notice(error.message, "error");
+      state = null; lastChange = null;
+      lastError = { key: error.translation || "error.generic", args: error.args || {} };
+      applyLanguage();
     } finally { busy = false; controls(); }
   }
   let group = "";
   for (const [key, category, title, description, deps] of definitions) {
-    if (!parents[key] && category !== group) { $("components").append(element("h2", category, "group-title")); group = category; }
+    if (!parents[key] && category !== group) { const heading = element("h2", category, "group-title"); heading.dataset.i18n = key === "libyuv" ? "group.pixels" : "group.hardware"; $("components").append(heading); group = category; }
     const section = element("section", "", "component"), content = element("div");
-    content.append(element("h3", title), element("p", description, "detail"));
-    content.append(element("p", "依赖：" + (deps.length ? deps.map(k => names[k]).join("、") : "无其他分项依赖"), "depends"));
-    const badges = element("div", "", "states"), current = element("span", "当前：未知", "badge"), effective = element("span", "重启后：未知", "badge");
+    const heading = element("h3"), descriptionNode = element("p", "", "detail"), dependency = element("p", "", "depends");
+    content.append(heading, descriptionNode, dependency);
+    const badges = element("div", "", "states"), current = element("span", t("current", { value: t("unknown") }), "badge"), effective = element("span", t("next", { value: t("unknown") }), "badge");
     badges.append(current, effective); content.append(badges);
     const reason = element("p", "", "blocked"); reason.hidden = true; content.append(reason);
     const toggle = element(key === "codec2_backend" ? "select" : "button"); toggle.id = "toggle-" + key; toggle.disabled = true;
@@ -133,8 +144,45 @@
     const wrapper = element("div", "", "tree-node"), children = element("div", "", "children");
     wrapper.dataset.component = key; wrapper.append(section, children);
     (parents[key] ? rows.get(parents[key]).children : $("components")).append(wrapper);
-    rows.set(key, { toggle, current, effective, reason, section, children });
+    rows.set(key, { toggle, current, effective, reason, section, children, heading, description: descriptionNode, dependency, deps });
   }
+  function paintChanges() {
+    const items = lastChange ? lastChange.linked.map(k => names[k]) : [];
+    if (lastChange && lastChange.backend) items.push(t("backendChanged", { value: backendNames[lastChange.backend] }));
+    $("changes").textContent = lastChange ? t("saved") + (items.length ? t("linked", { items: items.join(t("separator")) }) : "") + t("applyReboot") : "";
+  }
+  function applyLanguage() {
+    document.documentElement.lang = language === "zh" ? "zh-CN" : "en";
+    document.title = t("pageTitle");
+    for (const node of document.querySelectorAll("[data-i18n]")) node.textContent = t(node.dataset.i18n);
+    for (const node of document.querySelectorAll("[data-i18n-aria]")) node.setAttribute("aria-label", t(node.dataset.i18nAria));
+    $("language").textContent = language === "zh" ? "English" : "中文";
+    $("language").setAttribute("aria-label", t("languageAction"));
+    $("whole").setAttribute("aria-label", t("wholeLabel"));
+    for (const key of Object.keys(names)) names[key] = t("name." + key);
+    for (const key of Object.keys(backendNames)) backendNames[key] = t("backend." + key);
+    for (const [key, row] of rows) {
+      row.heading.textContent = names[key]; row.description.textContent = t("desc." + key);
+      row.dependency.textContent = t("dependency", { items: row.deps.length ? row.deps.map(k => names[k]).join(t("separator")) : t("noDependencies") });
+      row.toggle.setAttribute("aria-label", names[key]);
+      if (key === "codec2_backend") for (const option of row.toggle.options) option.textContent = backendNames[option.value];
+      if (!state) { row.current.textContent = t("current", { value: t("unknown") }); row.effective.textContent = t("next", { value: t("unknown") }); row.reason.hidden = true; }
+    }
+    if (state) render(state);
+    else {
+      $("version").textContent = t(lastError ? "unavailable" : "loading");
+      $("whole-state").textContent = t("wholeState", { current: t("unknown"), next: t("unknown") });
+      $("health").textContent = t("healthLoading");
+      notice(lastError ? t(lastError.key, lastError.args) : t("connecting"), lastError ? "error" : "");
+    }
+    paintChanges(); controls();
+  }
+  $("language").addEventListener("click", () => {
+    language = language === "zh" ? "en" : "zh";
+    try { localStorage.setItem(languageKey, language); } catch {}
+    applyLanguage();
+  });
+  applyLanguage();
   $("whole").addEventListener("click", () => update("all", !state.enabled));
   $("refresh").addEventListener("click", () => update());
   document.addEventListener("visibilitychange", () => { if (!document.hidden) update(); });

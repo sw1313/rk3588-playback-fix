@@ -1,26 +1,29 @@
-# 完整项目下载 / Complete project downloads
+# Complete project downloads / 完整项目下载
 
-**[v0.6.5 — RK3588 Playback Fix：全部四个组件](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.5)**
+**[v0.6.6 — RK3588 Playback Fix: all four components / 全部四个组件](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.6)**
 
-每个公开 Release 附齐四个安装包；未更新组件保留原版本与原始字节。GitHub Latest 指向最新整套版本。
+Every public release includes all four installers. Unchanged components retain their original versions and bytes. Latest identifies the newest complete suite.
+每个公开 Release 附齐四个安装包；未更新组件保持原版本与原字节。
 
-| 组件 | 包内版本 | 安装包 |
+| Component / 组件 | Version / 包内版本 | Download / 安装包 |
 | --- | --- | --- |
-| Decode Stack 解码合并模块 | 0.6.5 | [rk3588-decode-stack-0.6.5.zip](https://github.com/sw1313/rk3588-playback-fix/releases/download/v0.6.5/rk3588-decode-stack-0.6.5.zip) |
-| Native Mali Global 全局图形驱动 | 0.2.0 | [rk3588-mali-global-0.2.0.zip](https://github.com/sw1313/rk3588-playback-fix/releases/download/v0.6.5/rk3588-mali-global-0.2.0.zip) |
-| Yamby/mpv LSPosed 插件 | 0.3.3 | [RK3588-Mpv-Fix-0.3.3.apk](https://github.com/sw1313/rk3588-playback-fix/releases/download/v0.6.5/RK3588-Mpv-Fix-0.3.3.apk) |
-| Frame Guard 刷新率模块 | 0.1.0 | [rk3588-frameguard-0.1.0.zip](https://github.com/sw1313/rk3588-playback-fix/releases/download/v0.6.5/rk3588-frameguard-0.1.0.zip) |
+| Decode Stack / 解码合并模块 | 0.6.6 | [rk3588-decode-stack-0.6.6.zip](https://github.com/sw1313/rk3588-playback-fix/releases/download/v0.6.6/rk3588-decode-stack-0.6.6.zip) |
+| Native Mali Global / 全局图形驱动 | 0.2.0 | [rk3588-mali-global-0.2.0.zip](https://github.com/sw1313/rk3588-playback-fix/releases/download/v0.6.6/rk3588-mali-global-0.2.0.zip) |
+| Yamby/mpv LSPosed plugin / 插件 | 0.3.4 | [RK3588-Mpv-Fix-0.3.4.apk](https://github.com/sw1313/rk3588-playback-fix/releases/download/v0.6.6/RK3588-Mpv-Fix-0.3.4.apk) |
+| Frame Guard / 刷新率模块 | 0.1.0 | [rk3588-frameguard-0.1.0.zip](https://github.com/sw1313/rk3588-playback-fix/releases/download/v0.6.6/rk3588-frameguard-0.1.0.zip) |
 
-[SHA256 校验值](https://github.com/sw1313/rk3588-playback-fix/releases/download/v0.6.5/SHA256SUMS.txt) · [组件清单](https://github.com/sw1313/rk3588-playback-fix/releases/download/v0.6.5/release-manifest.json)
+[SHA256](https://github.com/sw1313/rk3588-playback-fix/releases/download/v0.6.6/SHA256SUMS.txt) · [Manifest / 组件清单](https://github.com/sw1313/rk3588-playback-fix/releases/download/v0.6.6/release-manifest.json)
 
-本次更新版本单选与依赖联动面板；解码二进制及 Mali、Yamby 插件、Frame Guard 原包不变。系统组件仍为匹配固件的实验组件。
+This update adds language controls to Decode Stack and LSPosed settings. Mali and Frame Guard already have English messages and are unchanged. No decoder or hook behavior changes.
+本次补齐四组件英文覆盖，两个设置界面新增语言按钮；不修改解码或钩子行为。
 
-[WebUI 操作与验证](docs/decode-webui-065.zh-CN.md) · [解码能力与限制](docs/decode-av1-063.zh-CN.md) · [开关与回退](magisk-decode/README.md)
+[Languages / 语言入口](docs/localization-066.md) · [Decoder limits / 解码边界](docs/decode-av1-063.zh-CN.md) · [Rollback / 回退](magisk-decode/README.md)
 
 ## 整套版本历史 / Complete release history
 
 | 项目版本 | 首次发布时间（Asia/Shanghai） | 解码 | Mali | Yamby 插件 | Frame Guard |
 | --- | --- | --- | --- | --- | --- |
+| [v0.6.6](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.6) | 2026-10-16 | 0.6.6 | 0.2.0 | 0.3.4 | 0.1.0 |
 | [v0.6.5](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.5) | 2026-10-16 | 0.6.5 | 0.2.0 | 0.3.3 | 0.1.0 |
 | [v0.6.4](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.4) | 2026-10-16 | 0.6.4 | 0.2.0 | 0.3.3 | 0.1.0 |
 | [v0.6.3](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.3) | 2026-10-16 | 0.6.3 | 0.2.0 | 0.3.3 | 0.1.0 |

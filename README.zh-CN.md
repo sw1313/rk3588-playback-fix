@@ -2,7 +2,7 @@
 
 [**当前下载与版本表**](DOWNLOADS.md) · [GitHub 下载导航](https://github.com/sw1313/rk3588-playback-fix/blob/main/DOWNLOADS.md) · [English](README.md)
 
-**[项目整套版本 v0.6.5 — 四个安装包齐全](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.5)**
+**[项目整套版本 v0.6.6 — 四个安装包齐全](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.6)**
 
 每个公开 Release 都是完整项目快照，附齐 Decode Stack、全局 Mali、Yamby/mpv 插件
 和 Frame Guard。项目版本标识这次整套发布，包内继续保留各组件真实版本号。
@@ -10,17 +10,19 @@ GitHub **Latest** 指向最近更新的整套版本。系统组件仍为实验�
 
 | 组件 | 当前版本 | 用途 |
 | --- | --- | --- |
-| [Decode Stack 解码合并模块](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.5) | **0.6.5，实验组件** | Codec2 版本单选、依赖层级联动与灰色保留选择，保留无损解码与回退 |
+| [Decode Stack 解码合并模块](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.6) | **0.6.6，实验组件** | 中英切换并记忆语言；版本单选、依赖联动与回退保持 |
 | [原厂 Mali 全局模块](magisk-mali-global/README.md) | **0.2.0，实验组件** | 32／64 位系统标准图形路径使用原厂 g18p0 用户态驱动 |
-| [Yamby／mpv LSPosed 插件](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.5) | **0.3.3** | 默认 HW+ 设置与可选灰白边修正；这是插件版本，不是 LSPosed 框架版本 |
-| [Frame Guard 刷新率模块](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.5) | **0.1.0** | 可选的固定刷新率黑屏规避 |
+| [Yamby／mpv LSPosed 插件](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.6) | **0.3.4** | 默认 HW+ 设置与可选灰白边修正；这是插件版本，不是 LSPosed 框架版本 |
+| [Frame Guard 刷新率模块](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.6) | **0.1.0** | 可选的固定刷新率黑屏规避 |
 
-## Decode Stack 0.6.5 图形面板
+## 四组件英文支持 · v0.6.6
 
-打开 **KsuWebUI → RK3588 Decode Stack**。Codec2 多版本合并为一个下拉框：
-旧后端／1.14.3 SIMD／1.14.16。下级放在依赖项下面；关闭上级时保留选择并变灰，
-重新开启后恢复。开启子项时联动补齐依赖与所需后端版本，修改后重启。
-解码二进制、Yamby 和 LSPosed 不变。详见[操作与验证](docs/decode-webui-065.zh-CN.md)。
+Decode Stack **0.6.6** WebUI 与 LSPosed 插件 **0.3.4** 设置页新增 **English／中文**
+按钮，均可记忆语言，切换不改变播放配置。Mali 与 Frame Guard 原有模块信息、安装、
+Action／命令行提示已是英文，保留原包。[四组件覆盖与切换入口](docs/localization-066.md)。
+
+Codec2 版本下拉单选、依赖层级、灰色保留选择和重启回退保持。解码二进制、钩子逻辑
+和 Yamby 原版组件不动，LSPosed 仅改设置显示语言。
 
 ## Decode Stack 0.6.3
 
@@ -33,7 +35,7 @@ HDR 和胶片颗粒，保留分项开关和整包回退。最终二进制在同�
 ## 安装与历史版本
 
 安装包文件名、直接下载链接和校验值统一见 [DOWNLOADS.md](DOWNLOADS.md)。
-本次只有 Decode Stack 更新；Mali、Yamby 插件与 Frame Guard 使用已发布的原包，
+本次更新 Decode Stack 与 LSPosed 插件的语言显示；Mali 与 Frame Guard 使用已发布的原包，
 不跟随解码模块更改版本号。旧系统合集包含的解码模块是 **0.3.2**，已不是当前版本。
 旧版保留用于回退和核对历史，不再作为当前安装入口。
 
@@ -44,7 +46,7 @@ MPP／RGA／Codec2／libyuv 模块停用，避免重复覆盖。安装器先检�
 
 解码和全局 Mali 模块只接受契约匹配的固件哈希。实测设备为 H96Max V58、
 RK3588、Android 12／API32、原 5.10.66 内核。不刷 boot，不替换内核，不改 Yamby 文件，
-不增加 LSPosed 功能。全局 Mali 首次安装联网下载约 69 MiB 的固定上游库并校验 SHA256；
+LSPosed 仅增加设置语言切换，不增加播放钩子。全局 Mali 首次安装联网下载约 69 MiB 的固定上游库并校验 SHA256；
 公开 ZIP 不包含闭源 Mali 库。原按应用 Mali 实验已被全局模块替代，使用全局模块时保持旧实验停用。
 
 ## 0.5.1 更新与已知限制
@@ -77,9 +79,9 @@ HDR10+ 指标准 Codec2 元数据桥，不代表原生 HDMI HDR10+ 输出；不�
 旧独立模块源码和测试记录保留在 `magisk-mpp`、`magisk-rga`、`magisk-codec2`，
 用于历史核查；不与当前解码合并模块叠加安装。
 
-## LSPosed 模块 0.3.3
+## LSPosed 模块 0.3.4
 
-下载安装 `RK3588-Mpv-Fix-0.3.3.apk`，在 LSPosed 启用模块并勾选 Yamby，打开一次模块设置，再强行停止并重开 Yamby。进入 **设置 → MPV 播放器 → 默认解码方式 → HW+**。
+下载安装 `RK3588-Mpv-Fix-0.3.4.apk`，在 LSPosed 启用模块并勾选 Yamby，打开一次模块设置，再强行停止并重开 Yamby。进入 **设置 → MPV 播放器 → 默认解码方式 → HW+**。
 
 已适配 Yamby **2.1.0.11（20010012）**，测试框架为 LSPosed **2.2.1**。Yamby 更新后可能需要重新适配。
 

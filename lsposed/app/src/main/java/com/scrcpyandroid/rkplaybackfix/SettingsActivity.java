@@ -3,13 +3,25 @@ package com.scrcpyandroid.rkplaybackfix;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.Bundle;
+import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import java.util.Locale;
 
 public final class SettingsActivity extends Activity {
+    @Override protected void attachBaseContext(Context base) {
+        String language = base.getSharedPreferences("interface", Context.MODE_PRIVATE).getString("language", "");
+        if ("zh".equals(language) || "en".equals(language)) {
+            Configuration configuration = new Configuration(base.getResources().getConfiguration());
+            configuration.setLocale(Locale.forLanguageTag(language));
+            base = base.createConfigurationContext(configuration);
+        }
+        super.attachBaseContext(base);
+    }
     @Override @SuppressWarnings("deprecation") public void onCreate(Bundle saved) {
         super.onCreate(saved);
         SharedPreferences preferences;
@@ -32,21 +44,24 @@ public final class SettingsActivity extends Activity {
         int pad = (int) (32 * getResources().getDisplayMetrics().density);
         column.setPadding(pad, pad, pad, pad);
         TextView title = new TextView(this);
-        title.setText("Yamby HW+ / RK3588 mpv 兼容修复 · 0.3.3"); title.setTextSize(24); column.addView(title);
+        title.setText(getString(R.string.settings_title, BuildConfig.VERSION_NAME)); title.setTextSize(24); column.addView(title);
+        Button language = new Button(this);
+        language.setText(R.string.language_button);
+        language.setContentDescription(getString(R.string.language_description));
+        language.setOnClickListener(button -> {
+            boolean chinese = getResources().getConfiguration().getLocales().get(0).getLanguage().equals("zh");
+            getSharedPreferences("interface", Context.MODE_PRIVATE).edit().putString("language", chinese ? "en" : "zh").commit();
+            recreate();
+        });
+        column.addView(language);
         TextView description = new TextView(this);
-        description.setText("在 LSPosed 中勾选需要修复的 mpv 播放器，然后重新启动对应应用。\n"
-            + "Yamby 在自己的“默认解码方式”中选择 HW+、HW 或 SW，播放时仍可手动切换。\n"
-            + (shared ? "LSPosed 共享设置可用。" : "LSPosed 尚未接管设置：启用模块后重新打开本页。"));
+        description.setText(getString(R.string.settings_description, getString(shared ? R.string.shared_available : R.string.shared_unavailable)));
         description.setTextSize(18); column.addView(description);
-        addSwitch(column, preferences, "yamby_menu", "Yamby 默认解码补上 HW+（不限芯片）");
-        addSwitch(column, preferences, "noncopy", "其他 mpv 播放器：硬解优先使用 HW+（仅 RK3588，保留 SW）");
-        addSwitch(column, preferences, "cropfix", "Yamby HW+ 灰白边自动裁剪修正（仅 RK3588）");
+        addSwitch(column, preferences, "yamby_menu", getString(R.string.yamby_menu_label));
+        addSwitch(column, preferences, "noncopy", getString(R.string.noncopy_label));
+        addSwitch(column, preferences, "cropfix", getString(R.string.cropfix_label));
         TextView limits = new TextView(this);
-        limits.setText("Yamby 设置补全不限芯片，目前适配 2.1.0.11；HW+ 解码能力由设备决定。\n"
-            + "作用域由你选择，默认仅推荐已验证的 Yamby。其他 mpv 应用仅在 RK3588 上识别常见 JNI 接口；\n"
-            + "没有匹配接口时仅记录诊断信息。纯 native 调用或完全混淆的封装可能需要另行适配。\n"
-            + "灰白边选项默认关闭，根据每段视频报告的裁剪和纹理尺寸修正；未获得匹配信息时跳过。更改后请重启播放器。\n"
-            + "gpu-next 设置由原播放器控制。HDR 色彩、字幕和拖动仍需实测。日志标签：RKPlaybackFix。");
+        limits.setText(R.string.settings_limits);
         limits.setTextSize(16); column.addView(limits);
         ScrollView scroll = new ScrollView(this); scroll.addView(column); setContentView(scroll);
     }

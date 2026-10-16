@@ -1,0 +1,14 @@
+<resources>
+    <string name="app_name">Yamby HW+ / RK3588 mpv Fix</string>
+    <string name="xposed_description">Yamby HW+ defaults on any chipset; non-copy hardware decoding for other mpv apps is limited to RK3588. Explicit software decoding is retained.</string>
+    <string name="settings_title">Yamby HW+ / RK3588 mpv Fix · %1$s</string>
+    <string name="language_button">中文</string>
+    <string name="language_description">Switch settings to Chinese</string>
+    <string name="settings_description">Select the mpv players to patch in LSPosed, then restart those apps.\nIn Yamby, choose HW+, HW or SW in its own default decoder setting. You can still switch during playback.\n%1$s</string>
+    <string name="shared_available">LSPosed shared preferences are available.</string>
+    <string name="shared_unavailable">LSPosed has not enabled shared preferences yet. Enable the module and reopen this page.</string>
+    <string name="yamby_menu_label">Add HW+ to Yamby default decoding (any chipset)</string>
+    <string name="noncopy_label">Other mpv players: prefer HW+ hardware decoding (RK3588 only; keep explicit SW)</string>
+    <string name="cropfix_label">Yamby HW+ automatic gray/white edge crop fix (RK3588 only)</string>
+    <string name="settings_limits">Yamby setting support is not chipset-restricted; currently adapted for 2.1.0.11. Actual HW+ decoding support depends on the device.\nYou choose the scope. Only the tested Yamby app is recommended by default. Other mpv apps use detection of common JNI interfaces on RK3588 only.\nWhen no matching interface is found, only diagnostics are logged. Pure native calls or fully obfuscated wrappers may need additional adaptation.\nThe edge fix defaults to off and uses each video\'s reported crop and texture dimensions. It skips unmatched inputs. Restart the player after changing settings.\ngpu-next remains controlled by the original player. HDR colors, subtitles and seeking still require playback testing. Log tag: RKPlaybackFix.</string>
+</resources>

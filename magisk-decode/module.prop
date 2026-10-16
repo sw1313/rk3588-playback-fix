@@ -1,6 +1,6 @@
 id=rk3588_decode_stack
 name=RK3588 Decode Stack
-version=0.6.5
-versionCode=605
+version=0.6.6
+versionCode=606
 author=sw1313
 description=Firmware-specific RK3588 API32 decode stack with offline KSU WebUI, dependency-aware switches and reboot status. Lossless AV1 AFBC and existing rollback retained.

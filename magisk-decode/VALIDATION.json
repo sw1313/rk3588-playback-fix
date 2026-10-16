@@ -1,61 +1,72 @@
 {
-  "version": "0.6.5",
+  "version": "0.6.6",
   "publication": {
-    "tag": "v0.6.5",
+    "tag": "v0.6.6",
     "kind": "complete_project_release"
   },
-  "scope": "single Codec2 backend selector, nested dependency controls, retained gray inactive choices and atomic linked selection writes",
+  "scope": "English coverage for all four components; bilingual Decode Stack WebUI and LSPosed settings, presentation only",
   "tests": {
-    "android_shell_isolated": {
-      "passed": true,
-      "assertions": 100,
-      "live_module_modified": false,
-      "covers": [
-        "three backend flag pairs",
-        "recursive enable",
-        "retained child selection",
-        "whole/Action rollback controls",
-        "pending update synchronization",
-        "invalid arguments and uninstall marker"
-      ]
-    },
     "browser_mock_bridge": {
+      "assertions": 48,
       "passed": true,
-      "assertions": 28,
       "covers": [
-        "one selector replacing two toggles",
-        "dependency DOM hierarchy",
-        "gray retained selections",
-        "automatic backend dependency",
-        "keyboard and mobile layout",
-        "failure handling"
+        "full catalog parity and placeholders",
+        "no root command on language switch",
+        "language persistence",
+        "translated ready/pending/errors",
+        "English layout and accessibility",
+        "unavailable storage",
+        "existing backend/dependency controls"
       ]
     },
-    "actual_android_webview": {
-      "host": "standalone KsuWebUI 1.0 / versionCode 34 on Magisk",
-      "three_native_dropdown_choices_saved": true,
-      "gray_checked_child_when_parent_off": true,
-      "parent_on_restores_child": true,
-      "child_enable_selects_required_1_14_16": true,
-      "no_pending_reboot_after_restoring_original_choices": true,
-      "legacy_and_simd_choices_saved_without_rebooting_into_them": true
+    "native_resource_pairs": 12,
+    "existing_english_module_message_lines": 104,
+    "lsposed_geometry_unit_tests": {
+      "tests": 4,
+      "failures": 0,
+      "errors": 0
     },
-    "boot": {
-      "candidate_0_6_5_healthy": true,
-      "active_latest_core_hash_verified": true
+    "actual_webui": {
+      "both_languages_visually_verified": true,
+      "manual_toggle_and_reopen_persistence": true,
+      "all_component_choices_unchanged": true,
+      "original_chinese_display_restored": true
+    },
+    "actual_lsposed_settings": {
+      "both_languages_displayed": true,
+      "manual_toggle_and_reopen_persistence": true,
+      "existing_hook_choices_preserved": true,
+      "original_display_language_restored": true
+    },
+    "candidate_boot": {
+      "health": "passed",
+      "saved_choices_retained": true,
+      "pending_reboot": false
     }
   },
   "preservation": {
-    "preserved_component_boot_and_rollback_files": 188,
+    "preserved_component_and_all_shell_files": 192,
     "identical_elf_files": 26,
-    "passed": true
+    "passed": true,
+    "unchanged_hook_geometry_class_files": 16,
+    "byte_identical": true,
+    "yamby_native_libraries_exact": 18,
+    "boot_kernel_exact": true,
+    "existing_fixes_preferences_exact": true,
+    "apk_signer_unchanged": true
   },
-  "quality": "All 26 ELF files are byte-identical to 0.6.4; no decoder setting, bit-depth, resolution, bitrate or frame-rate reduction.",
-  "previous_validation": "https://github.com/sw1313/rk3588-playback-fix/blob/main/docs/validation/decode-0.6.4.json",
+  "components": {
+    "decode_stack": "0.6.6",
+    "lsposed_plugin": "0.3.4",
+    "mali_global": "0.2.0 unchanged: existing English UI/CLI messages",
+    "frame_guard": "0.1.0 unchanged: existing English UI/CLI messages"
+  },
   "limits": [
-    "No new full playback/precision matrix; decoder payload unchanged.",
-    "Three backend choices were tested for configuration and dependency updates, not a new playback run on each backend.",
-    "The 31-file original-stack reboot rollback and 3597-frame AV1 playback evidence belong to 0.6.4; not recounted as new 0.6.5 measurements.",
-    "Firmware contracts, existing AnTuTu limitations and KernelSU mounting scope unchanged."
-  ]
+    "UI/localization-only update; no new complete playback or precision matrix.",
+    "Mali and Frame Guard have no separate graphical settings page; their existing English module and console messages were audited.",
+    "Manual LSPosed language choice affects settings; launcher label and manager description follow the system locale.",
+    "Clearing WebUI host data clears its local language preference.",
+    "Existing firmware, playback and benchmark limitations remain."
+  ],
+  "previous_validation": "https://github.com/sw1313/rk3588-playback-fix/blob/main/docs/validation/decode-0.6.5.json"
 }

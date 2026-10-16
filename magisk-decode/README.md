@@ -1,5 +1,18 @@
 # Unified RK3588 decode stack
 
+## 0.6.6 English / Chinese display
+
+The WebUI has an **English / 中文** button for the complete interface, including
+dependencies, inactive choices, backend names, reboot/health state and errors.
+The first visit follows the browser language (Chinese or English fallback).
+The button saves a preference in this WebUI host; switching display language
+never sends a root command or changes a component choice. Reopening retains the
+choice unless host storage is cleared. The page remains offline.
+
+Module metadata, installer, CLI and Action messages already support English.
+No root control, decoder binary, dependency or rollback logic changed here.
+For all four components, see [language coverage](../docs/localization-066.md).
+
 ## 0.6.5 backend selector and dependency tree
 
 Codec2 versions now share one selector: legacy 0.4.0 backend, 1.14.3 SIMD or
@@ -120,7 +133,7 @@ retained.
 
 ## Installation and switches
 
-Install `rk3588-decode-stack-0.6.5.zip` in Magisk and reboot. The installer checks
+Install `rk3588-decode-stack-0.6.6.zip` in Magisk and reboot. The installer checks
 all components before disabling overlapping standalone MPP, RGA, Codec2 and
 libyuv modules. It also works from the original component state: Codec2's
 preflight uses the hash-verified staged dependencies. No vendor partition is
