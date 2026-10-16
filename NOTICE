@@ -1,0 +1,31 @@
+RK3588 Playback Fix
+Copyright 2026 sw1313 and project contributors.
+
+Original project code and documentation are licensed under Apache-2.0.
+This statement does not replace existing third-party copyright notices,
+licenses, patent grants, or separately licensed files. LICENSE contains the
+project license. THIRD_PARTY_NOTICES.md identifies the applicable components.
+
+Rockchip MPP, librga and Codec2 code: Rockchip Electronics Co. LTD and
+their respective contributors. MPP contains Apache-2.0 and MIT files;
+librga and Codec2 contain Apache-2.0 code. See original source file notices.
+Android platform code, headers and interface definitions: The Android Open
+Source Project and contributors, with original Apache/BSD notices retained.
+libyuv: Copyright 2011 The LibYuv Project Authors. All rights reserved.
+libvpx: Copyright (c) 2010, The WebM Project authors. All rights reserved.
+libgav1: Google LLC and other authors listed in LICENSES/software/libgav1-AUTHORS.
+LLVM/libc++ and Android NDK runtime/header portions retain their own notices;
+see LICENSES/rga/LLVM-libcxx.txt and LICENSES/ndk/.
+
+Local modifications include API32 compatibility, component routing, packed
+ten-bit conversion, HDR metadata bridging, buffer ownership/lifecycle fixes,
+AV1 native/AFBC output and grain handling. These are project modifications,
+not upstream endorsement. Exact patches, upstream pins and build recipes are
+identified in SOURCE_CODE.md and each component's provenance files.
+
+Closed Mali drivers, original firmware, Android, Magisk, KernelSU, KsuWebUI,
+LSPosed, Yamby and mpv are not relicensed by this project. Closed Mali binaries
+are downloaded separately by the installer; they are not in these releases.
+No permission to redistribute those binaries is asserted. Trademarks remain
+with their respective owners. This NOTICE is attribution, not an additional
+restriction on rights granted by the applicable licenses.

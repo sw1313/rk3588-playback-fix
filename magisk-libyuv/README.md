@@ -1,7 +1,7 @@
 # System libyuv compatibility build
 
 This component is included in [the unified decode stack](../magisk-decode/README.md).
-It builds libyuv 1974 at revision `58d817ed81e8fe8b06a58576d639cd56b19526d3`
+It builds libyuv 1974 at revision `0b9e5c922deec7c9921ae385f6242a9a27754d6e`
 for the verified system ARM64 API32 ABI. All 710 original exports remain;
 59 removed APIs use isolated Android 12 public-source objects. Existing JPEG
 support is retained through the hash-pinned original libjpeg dependency.

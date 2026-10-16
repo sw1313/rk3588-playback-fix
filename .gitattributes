@@ -10,3 +10,5 @@ magisk-codec2-sdk-next/patches/*.patch -whitespace
 
 magisk-mpp/compat/*.patch -whitespace
 magisk-software/patches/*.patch -whitespace
+# Preserve verbatim upstream license/notice formatting.
+LICENSES/** -whitespace

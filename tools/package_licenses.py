@@ -1,0 +1,56 @@
+"""Stage public notices before package integrity manifests are generated."""
+from pathlib import Path
+import argparse
+import json
+import shutil
+
+ROOT = Path(__file__).resolve().parents[1]
+DOCUMENTS = ('LICENSE', 'NOTICE', 'OPEN_SOURCE.md', 'THIRD_PARTY_NOTICES.md',
+             'SOURCE_CODE.md', 'SOURCE_CODE.zh-CN.md')
+COMPONENTS = {
+    'decode-stack': ('magisk-decode', None),
+    'mali-global': ('magisk-mali-global', None),
+    'frameguard': ('magisk', None),
+    'yamby-mpv-plugin': ('lsposed', '0.3.5'),
+}
+RELEASE_TAG = 'v0.6.7'
+URL = 'https://github.com/sw1313/rk3588-playback-fix'
+
+
+def metadata(component):
+    folder, version = COMPONENTS[component]
+    if version is None:
+        fields = dict(line.split('=', 1) for line in
+                      (ROOT / folder / 'module.prop').read_text(encoding='utf-8').splitlines()
+                      if '=' in line)
+        version = fields['version']
+    return {
+        'component': component, 'component_version': version,
+        'project_release': RELEASE_TAG, 'original_project_license': 'Apache-2.0',
+        'source': URL + '/tree/' + RELEASE_TAG,
+        'build_guide': URL + '/blob/' + RELEASE_TAG + '/SOURCE_CODE.md',
+        'third_party_licenses_retained': True,
+        'proprietary_driver_or_firmware_included': False,
+    }
+
+
+def stage(destination, component):
+    destination = Path(destination)
+    destination.mkdir(parents=True, exist_ok=True)
+    for name in DOCUMENTS:
+        (destination / name).write_bytes((ROOT / name).read_bytes().replace(b'\r\n', b'\n'))
+    if component == 'decode-stack':
+        shutil.copytree(ROOT / 'LICENSES', destination / 'LICENSES', dirs_exist_ok=True)
+    elif component == 'mali-global':
+        (destination / 'LICENSES').mkdir(exist_ok=True)
+        shutil.copyfile(ROOT / 'LICENSE', destination / 'LICENSES/Apache-2.0.txt')
+    (destination / 'OPEN_SOURCE.json').write_text(
+        json.dumps(metadata(component), indent=2) + '\n', encoding='utf-8', newline='\n')
+
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('component', choices=COMPONENTS)
+    parser.add_argument('destination', type=Path)
+    args = parser.parse_args()
+    stage(args.destination, args.component)

@@ -1,72 +1,19 @@
 {
-  "version": "0.6.6",
-  "publication": {
-    "tag": "v0.6.6",
-    "kind": "complete_project_release"
+  "component": "decode-stack",
+  "version": "0.6.7",
+  "project_release": "v0.6.7",
+  "scope": "license, source/build documentation and version metadata only",
+  "runtime_rebuilt": false,
+  "previous_release": "v0.6.6",
+  "previous_asset": {
+    "id": "decode-stack",
+    "version": "0.6.6",
+    "filename": "rk3588-decode-stack-0.6.6.zip",
+    "status": "experimental",
+    "sha256": "164b5f754db7560ef79a3473b4dcd55432ca7dd31ba305612322a4a086736012",
+    "url": "https://github.com/sw1313/rk3588-playback-fix/releases/download/v0.6.6/rk3588-decode-stack-0.6.6.zip"
   },
-  "scope": "English coverage for all four components; bilingual Decode Stack WebUI and LSPosed settings, presentation only",
-  "tests": {
-    "browser_mock_bridge": {
-      "assertions": 48,
-      "passed": true,
-      "covers": [
-        "full catalog parity and placeholders",
-        "no root command on language switch",
-        "language persistence",
-        "translated ready/pending/errors",
-        "English layout and accessibility",
-        "unavailable storage",
-        "existing backend/dependency controls"
-      ]
-    },
-    "native_resource_pairs": 12,
-    "existing_english_module_message_lines": 104,
-    "lsposed_geometry_unit_tests": {
-      "tests": 4,
-      "failures": 0,
-      "errors": 0
-    },
-    "actual_webui": {
-      "both_languages_visually_verified": true,
-      "manual_toggle_and_reopen_persistence": true,
-      "all_component_choices_unchanged": true,
-      "original_chinese_display_restored": true
-    },
-    "actual_lsposed_settings": {
-      "both_languages_displayed": true,
-      "manual_toggle_and_reopen_persistence": true,
-      "existing_hook_choices_preserved": true,
-      "original_display_language_restored": true
-    },
-    "candidate_boot": {
-      "health": "passed",
-      "saved_choices_retained": true,
-      "pending_reboot": false
-    }
-  },
-  "preservation": {
-    "preserved_component_and_all_shell_files": 192,
-    "identical_elf_files": 26,
-    "passed": true,
-    "unchanged_hook_geometry_class_files": 16,
-    "byte_identical": true,
-    "yamby_native_libraries_exact": 18,
-    "boot_kernel_exact": true,
-    "existing_fixes_preferences_exact": true,
-    "apk_signer_unchanged": true
-  },
-  "components": {
-    "decode_stack": "0.6.6",
-    "lsposed_plugin": "0.3.4",
-    "mali_global": "0.2.0 unchanged: existing English UI/CLI messages",
-    "frame_guard": "0.1.0 unchanged: existing English UI/CLI messages"
-  },
-  "limits": [
-    "UI/localization-only update; no new complete playback or precision matrix.",
-    "Mali and Frame Guard have no separate graphical settings page; their existing English module and console messages were audited.",
-    "Manual LSPosed language choice affects settings; launcher label and manager description follow the system locale.",
-    "Clearing WebUI host data clears its local language preference.",
-    "Existing firmware, playback and benchmark limitations remain."
-  ],
-  "previous_validation": "https://github.com/sw1313/rk3588-playback-fix/blob/main/docs/validation/decode-0.6.5.json"
+  "previous_validation": "Historical runtime tests remain with v0.6.6 and its cited records; no fresh playback claim.",
+  "licenses": "Original project Apache-2.0; upstream permissions, patent grants and notices retained.",
+  "preservation": "Executable payload and control scripts must match previous installer exactly; see release validation."
 }

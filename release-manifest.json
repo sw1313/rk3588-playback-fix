@@ -1,42 +1,48 @@
 {
   "kind": "complete_project_release",
-  "project_version": "0.6.6",
-  "release_tag": "v0.6.6",
+  "project_version": "0.6.7",
+  "release_tag": "v0.6.7",
   "release_date": "2026-10-16",
   "system_modules_firmware_pinned": true,
   "system_components_experimental": true,
   "components": [
     {
       "id": "decode-stack",
-      "version": "0.6.6",
-      "filename": "rk3588-decode-stack-0.6.6.zip",
+      "version": "0.6.7",
+      "filename": "rk3588-decode-stack-0.6.7.zip",
       "status": "experimental",
-      "sha256": "164b5f754db7560ef79a3473b4dcd55432ca7dd31ba305612322a4a086736012",
-      "url": "https://github.com/sw1313/rk3588-playback-fix/releases/download/v0.6.6/rk3588-decode-stack-0.6.6.zip"
+      "sha256": "505ed6f97b8d2ca73fd55f72f0fa5c9414760e4e4d1704ded2538e021e5ab8aa",
+      "url": "https://github.com/sw1313/rk3588-playback-fix/releases/download/v0.6.7/rk3588-decode-stack-0.6.7.zip"
     },
     {
       "id": "mali-global",
-      "version": "0.2.0",
-      "filename": "rk3588-mali-global-0.2.0.zip",
+      "version": "0.2.1",
+      "filename": "rk3588-mali-global-0.2.1.zip",
       "status": "experimental",
-      "sha256": "9d6959f68ba4fe54591d4ccac1e91a677272668a6d20bf61eb0bb64087cbec03",
-      "url": "https://github.com/sw1313/rk3588-playback-fix/releases/download/v0.6.6/rk3588-mali-global-0.2.0.zip"
+      "sha256": "6f74f65c64dfaf5436d067fe4aa2cef6aa5ff4f4202c693dade4109a6ab0de3b",
+      "url": "https://github.com/sw1313/rk3588-playback-fix/releases/download/v0.6.7/rk3588-mali-global-0.2.1.zip"
     },
     {
       "id": "yamby-mpv-plugin",
-      "version": "0.3.4",
-      "filename": "RK3588-Mpv-Fix-0.3.4.apk",
+      "version": "0.3.5",
+      "filename": "RK3588-Mpv-Fix-0.3.5.apk",
       "status": "released",
-      "sha256": "e7a9f3bc36039df4abb78f5b525889b499b89c349244c2b607990061023d9365",
-      "url": "https://github.com/sw1313/rk3588-playback-fix/releases/download/v0.6.6/RK3588-Mpv-Fix-0.3.4.apk"
+      "sha256": "f8f1d0b25ff9f267d92d9ab77e8aed366d5b6b23a8a2fd9f73a7b691b475e39b",
+      "url": "https://github.com/sw1313/rk3588-playback-fix/releases/download/v0.6.7/RK3588-Mpv-Fix-0.3.5.apk"
     },
     {
       "id": "frameguard",
-      "version": "0.1.0",
-      "filename": "rk3588-frameguard-0.1.0.zip",
+      "version": "0.1.1",
+      "filename": "rk3588-frameguard-0.1.1.zip",
       "status": "released",
-      "sha256": "30d816e2a704cfb8004184c5be879e45ca1858ae42887f20e29c8150a8d07480",
-      "url": "https://github.com/sw1313/rk3588-playback-fix/releases/download/v0.6.6/rk3588-frameguard-0.1.0.zip"
+      "sha256": "8901eca3259d1716bae060ed6aad2a343788396020630a979af800f413eb5204",
+      "url": "https://github.com/sw1313/rk3588-playback-fix/releases/download/v0.6.7/rk3588-frameguard-0.1.1.zip"
     }
-  ]
+  ],
+  "original_project_license": "Apache-2.0",
+  "source_archive": {
+    "filename": "rk3588-playback-fix-0.6.7-source.zip",
+    "url": "https://github.com/sw1313/rk3588-playback-fix/releases/download/v0.6.7/rk3588-playback-fix-0.6.7-source.zip",
+    "scope": "Tracked project source; pinned upstream sources and private firmware prerequisites are separate as documented."
+  }
 }

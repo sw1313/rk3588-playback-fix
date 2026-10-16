@@ -1,0 +1,93 @@
+{
+  "project_version": "0.6.7",
+  "scope": "Licensing/source documentation and packaging only; no device installation or new playback test in this release.",
+  "preservation": [
+    {
+      "component": "decode-stack",
+      "unchanged_runtime_entries": 64,
+      "unchanged_elf": 26,
+      "original_license_texts_preserved": 14,
+      "changed_existing_metadata": [
+        "checksums.sha256",
+        "LICENSE",
+        "module.prop",
+        "VALIDATION.json"
+      ]
+    },
+    {
+      "component": "mali-global",
+      "unchanged_runtime_entries": 17,
+      "unchanged_elf": 8,
+      "original_license_texts_preserved": 0,
+      "changed_existing_metadata": [
+        "checksums.sha256",
+        "module.prop",
+        "VALIDATION.json"
+      ]
+    },
+    {
+      "component": "frameguard",
+      "unchanged_runtime_entries": 6
+    },
+    {
+      "component": "yamby-mpv-plugin",
+      "unchanged_hook_geometry_class_files": 16,
+      "settings_source_changed": false,
+      "only_buildconfig_version_and_assets_changed": true
+    }
+  ],
+  "license_package_verification": [
+    {
+      "component": "decode-stack",
+      "version": "0.6.7",
+      "documents": 7,
+      "license_texts_checked": 17,
+      "checksum_entries_checked": 401,
+      "passed": true
+    },
+    {
+      "component": "mali-global",
+      "version": "0.2.1",
+      "documents": 7,
+      "license_texts_checked": 1,
+      "checksum_entries_checked": 76,
+      "passed": true
+    },
+    {
+      "component": "yamby-mpv-plugin",
+      "version": "0.3.5",
+      "documents": 7,
+      "license_texts_checked": 1,
+      "checksum_entries_checked": 0,
+      "passed": true
+    },
+    {
+      "component": "frameguard",
+      "version": "0.1.1",
+      "documents": 7,
+      "license_texts_checked": 1,
+      "checksum_entries_checked": 0,
+      "passed": true
+    }
+  ],
+  "tests": {
+    "plugin_geometry_unit_tests": 4,
+    "native_resource_pairs": 12,
+    "english_module_message_lines": 104,
+    "apk_signature_verified": true,
+    "apk_signing_certificate_unchanged": true,
+    "root_and_nested_checksum_manifests_verified": true
+  },
+  "privacy": {
+    "source_and_all_installer_entries_scanned": true,
+    "findings": 0,
+    "source_archive_scan": "Verified separately before upload; no device logs, media, keys or proprietary firmware copied."
+  },
+  "previous_runtime_validation": "https://github.com/sw1313/rk3588-playback-fix/blob/v0.6.6/docs/validation/decode-0.6.6.json",
+  "limits": [
+    "No firmware/kernel/boot/player change.",
+    "Upstream licenses remain separate; proprietary Mali is install-time download only.",
+    "Project source archive requires documented upstream sources and private matching firmware link inputs to rebuild system components.",
+    "New source builds require their own runtime, precision and rollback tests."
+  ]
+}

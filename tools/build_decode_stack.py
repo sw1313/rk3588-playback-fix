@@ -1,6 +1,7 @@
 """Combine validated component packages without redistributing firmware files."""
 import argparse,hashlib,shutil,zipfile
 from pathlib import Path
+from package_licenses import stage as stage_licenses
 ROOT=Path(__file__).resolve().parents[1];MODULE=ROOT/'magisk-decode'
 def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 def package(folder,output):
@@ -53,5 +54,6 @@ def main():
    files.append(original+'  components/hdr/system/vendor/lib64/hw/hwcomposer.rk30board.rkhdr.so')
  (out/'files.sha256').write_bytes(('\n'.join(sorted(files))+'\n').encode())
  version=dict(line.split('=',1) for line in (out/'module.prop').read_text(encoding='utf-8').splitlines() if '=' in line)['version']
+ stage_licenses(out,'decode-stack')
  package(out,w/('rk3588-decode-stack-'+version+'.zip'))
 if __name__=='__main__':main()

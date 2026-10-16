@@ -2,7 +2,7 @@
 
 [**当前下载与版本表**](DOWNLOADS.md) · [GitHub 下载导航](https://github.com/sw1313/rk3588-playback-fix/blob/main/DOWNLOADS.md) · [English](README.md)
 
-**[项目整套版本 v0.6.6 — 四个安装包齐全](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.6)**
+**[项目整套版本 v0.6.7 — 四个安装包齐全](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.7)**
 
 每个公开 Release 都是完整项目快照，附齐 Decode Stack、全局 Mali、Yamby/mpv 插件
 和 Frame Guard。项目版本标识这次整套发布，包内继续保留各组件真实版本号。
@@ -10,10 +10,19 @@ GitHub **Latest** 指向最近更新的整套版本。系统组件仍为实验�
 
 | 组件 | 当前版本 | 用途 |
 | --- | --- | --- |
-| [Decode Stack 解码合并模块](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.6) | **0.6.6，实验组件** | 中英切换并记忆语言；版本单选、依赖联动与回退保持 |
-| [原厂 Mali 全局模块](magisk-mali-global/README.md) | **0.2.0，实验组件** | 32／64 位系统标准图形路径使用原厂 g18p0 用户态驱动 |
-| [Yamby／mpv LSPosed 插件](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.6) | **0.3.4** | 默认 HW+ 设置与可选灰白边修正；这是插件版本，不是 LSPosed 框架版本 |
-| [Frame Guard 刷新率模块](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.6) | **0.1.0** | 可选的固定刷新率黑屏规避 |
+| [Decode Stack 解码合并模块](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.7) | **0.6.7，实验组件** | 中英切换并记忆语言；版本单选、依赖联动与回退保持 |
+| [原厂 Mali 全局模块](magisk-mali-global/README.md) | **0.2.1，实验组件** | 32／64 位系统标准图形路径使用原厂 g18p0 用户态驱动 |
+| [Yamby／mpv LSPosed 插件](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.7) | **0.3.5** | 默认 HW+ 设置与可选灰白边修正；这是插件版本，不是 LSPosed 框架版本 |
+| [Frame Guard 刷新率模块](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.7) | **0.1.1** | 可选的固定刷新率黑屏规避 |
+
+## 开源许可与构建说明 · v0.6.7
+
+自写代码采用 **Apache-2.0**。四个安装包均补齐许可、归属、第三方声明和中英源码构建
+说明，Release 另附项目源码 ZIP。上游许可及专利声明保留，闭源 Mali 与原厂固件库
+不随包分发。本次仅改文档、打包和版本信息；解码/GPU 二进制、控制脚本和播放钩子
+不变，正常使用的设备无需为了性能重新安装。
+[开源范围](OPEN_SOURCE.md) · [第三方许可](THIRD_PARTY_NOTICES.md) ·
+[中文构建说明](SOURCE_CODE.zh-CN.md)。
 
 ## 四组件英文支持 · v0.6.6
 
@@ -35,8 +44,8 @@ HDR 和胶片颗粒，保留分项开关和整包回退。最终二进制在同�
 ## 安装与历史版本
 
 安装包文件名、直接下载链接和校验值统一见 [DOWNLOADS.md](DOWNLOADS.md)。
-本次更新 Decode Stack 与 LSPosed 插件的语言显示；Mali 与 Frame Guard 使用已发布的原包，
-不跟随解码模块更改版本号。旧系统合集包含的解码模块是 **0.3.2**，已不是当前版本。
+本次四包补充许可和构建说明，运行行为不变，包内版本随文档更新递增。
+旧系统合集包含的解码模块是 **0.3.2**，已不是当前版本。
 旧版保留用于回退和核对历史，不再作为当前安装入口。
 
 升级系统解码时，在 Magisk 安装统一 Decode Stack ZIP 并重启，保持旧独立
@@ -79,9 +88,9 @@ HDR10+ 指标准 Codec2 元数据桥，不代表原生 HDMI HDR10+ 输出；不�
 旧独立模块源码和测试记录保留在 `magisk-mpp`、`magisk-rga`、`magisk-codec2`，
 用于历史核查；不与当前解码合并模块叠加安装。
 
-## LSPosed 模块 0.3.4
+## LSPosed 模块 0.3.5
 
-下载安装 `RK3588-Mpv-Fix-0.3.4.apk`，在 LSPosed 启用模块并勾选 Yamby，打开一次模块设置，再强行停止并重开 Yamby。进入 **设置 → MPV 播放器 → 默认解码方式 → HW+**。
+下载安装 `RK3588-Mpv-Fix-0.3.5.apk`，在 LSPosed 启用模块并勾选 Yamby，打开一次模块设置，再强行停止并重开 Yamby。进入 **设置 → MPV 播放器 → 默认解码方式 → HW+**。
 
 已适配 Yamby **2.1.0.11（20010012）**，测试框架为 LSPosed **2.2.1**。Yamby 更新后可能需要重新适配。
 
@@ -109,9 +118,9 @@ RGB 着色器使用实际报告的顶部／左侧偏移，同时兼容填充纹�
 
 这是渲染补偿，不是厂商驱动补丁；不放大画面、不改变宽高比，也无法恢复前面处理已经丢弃的边缘像素。此前已在 `gpu` 确认 1080p H.264／HEVC 修正有效，本次用户已确认自动版在 `gpu-next` 下消除灰线。720p／4K 与其他编码通过了元数据和着色器测试，不等于已经实测播放。仅针对已观察到的 RK3588 AImageReader 填充问题，不能处理所有类型的白边。
 
-## Frame Guard 刷新率模块 0.1.0
+## Frame Guard 刷新率模块 0.1.1
 
-用 Magisk 安装 `rk3588-frameguard-0.1.0.zip`，服务在开机完成后运行。仅允许 RK3588、API 32。
+用 Magisk 安装 `rk3588-frameguard-0.1.1.zip`，服务在开机完成后运行。仅允许 RK3588、API 32。
 
 测试固件的 Rockchip HWC 反复拒绝 30／60Hz 切换请求，产生 `BadConfig` 和整屏黑屏。关闭自动内容帧率切换、固定请求为 60Hz 后，复现问题消失。模块设置：
 

@@ -6,6 +6,7 @@ Original firmware libraries are link inputs only and are never copied to output.
 """
 import argparse,hashlib,json,os,shutil,subprocess,zipfile
 from pathlib import Path
+from package_licenses import stage as stage_licenses
 ROOT=Path(__file__).resolve().parents[1];MODULE=ROOT/'magisk-mali-global'
 PACKAGES={'common':('android.hardware.common-V2-ndk.so',2),'graphics-common':('android.hardware.graphics.common-V3-ndk.so',3),'allocator':('android.hardware.graphics.allocator-V1-ndk.so',1)}
 def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
@@ -48,6 +49,7 @@ def main():
  for line in (MODULE/'contracts/driver-sources.txt').read_text(encoding='utf-8').splitlines():
   abi,size,digest,url=line.split();directory='lib' if abi=='arm' else 'lib64';lines.append(digest+'  payload/'+directory+'/egl/libGLES_mali.so')
  (out/'payload.sha256').write_bytes(('\n'.join(sorted(lines))+'\n').encode())
+ stage_licenses(out,'mali-global')
  files=sorted(f for f in out.rglob('*') if f.is_file())
  for f in files:
   if f.suffix in {'.sh','.md','.txt','.json','.sha256','.prop','.java','.c','.cpp','.h','.aidl'}:f.write_bytes(f.read_bytes().replace(b'\r\n',b'\n'))

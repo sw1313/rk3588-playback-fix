@@ -2,7 +2,7 @@
 
 [**Current downloads / 当前下载**](DOWNLOADS.md) · [Download table](https://github.com/sw1313/rk3588-playback-fix/blob/main/DOWNLOADS.md) · [中文说明](README.zh-CN.md)
 
-**[Project release v0.6.6 — all four installers](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.6)**
+**[Project release v0.6.7 — all four installers](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.7)**
 
 Every public Release is a complete project snapshot with Decode Stack, Native
 Mali Global, the Yamby/mpv plugin and Frame Guard attached together. The project
@@ -12,10 +12,21 @@ remain experimental and restricted to the firmware hashes in their contracts.
 
 | Component | Current version | Purpose |
 | --- | --- | --- |
-| [Decode Stack](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.6) | **0.6.6 — experimental** | English/Chinese WebUI with remembered language choice; backend selector, dependencies and rollback retained |
-| [Native Mali Global](magisk-mali-global/README.md) | **0.2.0 — experimental** | Global ARM32/ARM64 native Mali g18p0 userspace graphics paths |
-| [Yamby/mpv LSPosed plugin](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.6) | **0.3.4** | Default HW+ setting and optional RK3588 edge correction; this is the plugin version, not the LSPosed framework version |
-| [Frame Guard](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.6) | **0.1.0** | Optional fixed-refresh workaround for the reproduced HDMI blackouts |
+| [Decode Stack](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.7) | **0.6.7 — experimental** | English/Chinese WebUI with remembered language choice; backend selector, dependencies and rollback retained |
+| [Native Mali Global](magisk-mali-global/README.md) | **0.2.1 — experimental** | Global ARM32/ARM64 native Mali g18p0 userspace graphics paths |
+| [Yamby/mpv LSPosed plugin](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.7) | **0.3.5** | Default HW+ setting and optional RK3588 edge correction; this is the plugin version, not the LSPosed framework version |
+| [Frame Guard](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.7) | **0.1.1** | Optional fixed-refresh workaround for the reproduced HDMI blackouts |
+
+## Licensing and source · v0.6.7
+
+Original project code is **Apache-2.0**. All four installers now carry license,
+attribution, third-party and bilingual source/build documentation. A project
+source ZIP is attached to the complete release. Upstream licenses and patent
+grants remain; closed Mali and firmware binaries are not redistributed.
+This is a documentation/packaging update: decoder/graphics binaries, control
+scripts and playback hooks are unchanged. Installed working systems do not
+need to update for performance. [Open-source scope](OPEN_SOURCE.md) ·
+[Third-party notices](THIRD_PARTY_NOTICES.md) · [Source/build guide](SOURCE_CODE.md).
 
 ## English / Chinese · v0.6.6
 
@@ -41,9 +52,9 @@ See [actual playback, exact pixels and limits](docs/decode-av1-063.zh-CN.md).
 
 ## Choose and install
 
-Use the exact filenames and links in [DOWNLOADS.md](DOWNLOADS.md). The Mali and
-Frame Guard packages are unchanged; they do not need a new version
-number when Decode Stack changes. Old releases remain available for rollback
+Use the exact filenames and links in [DOWNLOADS.md](DOWNLOADS.md). This snapshot
+repackages all four components to include licensing documents; runtime behavior
+is unchanged. Old releases remain available for rollback
 and source history. The old system collection contains Decode Stack **0.3.2**,
 not the current decoder package.
 

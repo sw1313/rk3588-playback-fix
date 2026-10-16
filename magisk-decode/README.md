@@ -1,5 +1,13 @@
 # Unified RK3588 decode stack
 
+## v0.6.7 project licensing snapshot / 开源说明
+
+Original code: Apache-2.0. This installer includes LICENSE, NOTICE,
+OPEN_SOURCE.md, THIRD_PARTY_NOTICES.md and bilingual SOURCE_CODE guides.
+Upstream licenses remain. This package update changes documentation and version
+metadata only; executable payload, controls and rollback are unchanged.
+本次只补许可、源码与构建说明，不改驱动或播放行为。详见仓库根目录开源说明。
+
 ## 0.6.6 English / Chinese display
 
 The WebUI has an **English / 中文** button for the complete interface, including
