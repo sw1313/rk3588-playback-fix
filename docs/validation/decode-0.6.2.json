@@ -1,0 +1,471 @@
+{
+  "version": "0.6.2",
+  "scope": "AV1 signaled film grain fidelity; not a fix for real AV1 4K60 stutter",
+  "previous_validation_version": "0.6.1",
+  "previous_validation": {
+    "version": "0.6.1",
+    "date": "2026-10-16",
+    "stage": "local_validation_passed_with_documented_limits",
+    "previous_version": "0.6.0",
+    "previous_validation_source": "../docs/validation/decode-0.6.0.json",
+    "device_scope": {
+      "soc": "RK3588",
+      "android_api": 32,
+      "kernel": "5.10.66",
+      "firmware": "exact consumer/library contracts only"
+    },
+    "payload_sha256": {
+      "core": "dc9a6c82837e5dbdb41de62a611ca01fb6f83e08268a2d0bc7e11fca5cb83332",
+      "mpp32": "6fc33aa92f27b400436f27e711ccba0c422c00640945869b992dc578c7f1baa8",
+      "mpp64": "d7b6ce10806c0512769fe8be1c7cf25f8421427a198302cd1d1433e9804a18e7"
+    },
+    "route": {
+      "display_consumer": "full-ten-bit native NV15 when HW_COMPOSER is present and HW_VIDEO_ENCODER is absent",
+      "other_surface_consumers": "standard P010 hardware postprocessing with mapper/stride/size validation",
+      "buffer_clients": "retained full-precision copy",
+      "private_mpp_flag": "0x10000000, RK3588 scoped; not upstream public ABI",
+      "independent_switch": "av1_native; reboot required"
+    },
+    "local_exoplayer_ab": {
+      "engine": "installed SmartTube Amzn ExoPlayer 2.10.6, default renderers in an independent local diagnostic process",
+      "buffer_max_ms": 5000,
+      "buffer_target_bytes": 67108864,
+      "same_encoded_file": true,
+      "ten_bit_retained": true,
+      "frames": 360,
+      "old_copy_dropped": 299,
+      "new_native_dropped": 9,
+      "old_display_format": "RGB AB24",
+      "new_display_format": "ten-bit NV15"
+    },
+    "long_local_mediacodec": {
+      "decoded": 3600,
+      "render_callbacks": 3600,
+      "late_gt20ms": 0,
+      "max_lateness_ms": 0,
+      "gap_p95_ms": 16.667,
+      "hal_survived": true,
+      "complete": true
+    },
+    "long_local_exoplayer": {
+      "inputBufferCount": 3600,
+      "renderedOutputBufferCount": 3590,
+      "droppedBufferCount": 10,
+      "drops_after_first_2s": 0,
+      "actual_video_decoder": "OMX.c2.rk.av1.decoder",
+      "complete": true
+    },
+    "hdr_audio_local_exoplayer": [
+      {
+        "container_audio": "MP4 AAC",
+        "inputBufferCount": 1800,
+        "renderedOutputBufferCount": 1800,
+        "droppedBufferCount": 0,
+        "complete": true
+      },
+      {
+        "container_audio": "WebM Opus",
+        "inputBufferCount": 1800,
+        "renderedOutputBufferCount": 1800,
+        "droppedBufferCount": 0,
+        "complete": true
+      }
+    ],
+    "hdr_output": {
+      "cases": [
+        {
+          "case": "auto-hdr-av1-pq-uhd60-30s",
+          "complete": true,
+          "frames": 1800,
+          "late_gt20ms": 0,
+          "ten_bit_hdmi_driver": true,
+          "nv15_display_plane": true,
+          "packet_eotf": 2,
+          "expected_eotf": 2,
+          "wire_measurement": false
+        },
+        {
+          "case": "auto-hdr-synthetic-av1-hlg-4k60",
+          "complete": true,
+          "frames": 360,
+          "late_gt20ms": 0,
+          "ten_bit_hdmi_driver": true,
+          "nv15_display_plane": true,
+          "packet_eotf": 3,
+          "expected_eotf": 3,
+          "wire_measurement": false
+        }
+      ],
+      "exit_returns_sdr": true
+    },
+    "quality": {
+      "native_exact_cases": 11,
+      "all_native_visible_samples_exact": true,
+      "same_mpp_decode_payload_bitdepth_retained": true,
+      "native_nv15_display_plane_observed": true,
+      "standard_p010_texture_uhd_frames": 360,
+      "nonaligned_854x480_display_and_texture_pass": true
+    },
+    "lifecycle": {
+      "cases": 5,
+      "pause_seek_eos_pass": true
+    },
+    "local_format_matrix": {
+      "attempted_paths": 17,
+      "available_paths_complete": 16,
+      "unavailable_hardware_name": "c2.rk.m4v.decoder",
+      "same_unavailable_name_reproduced_on_0_6_0": true,
+      "system_mpeg4_software_complete": true
+    },
+    "persistent_rollback": {
+      "whole-off": {
+        "mode": "off",
+        "verified_boot": true,
+        "kernel_unchanged": true,
+        "boot_unchanged": true,
+        "global_mali_unchanged": true,
+        "original_core_mpp_service_verified": true,
+        "av1_property_disabled": true
+      },
+      "whole-on-native-off": {
+        "mode": "on",
+        "verified_boot": true,
+        "kernel_unchanged": true,
+        "boot_unchanged": true,
+        "global_mali_unchanged": true,
+        "original_core_mpp_service_verified": false,
+        "independent_native_disabled": true,
+        "new_sdk_still_loaded": true
+      },
+      "native-on": {
+        "mode": "reboot",
+        "verified_boot": true,
+        "kernel_unchanged": true,
+        "boot_unchanged": true,
+        "global_mali_unchanged": true,
+        "original_core_mpp_service_verified": false,
+        "independent_native_reenabled": true,
+        "final_guarded_core_loaded": true
+      }
+    },
+    "protected_state": {
+      "boot_unchanged": true,
+      "kernel_unchanged": true,
+      "yamby_native_libraries_unchanged": 18,
+      "lsposed_module_version": "0.3.3",
+      "lsposed_package_path_unchanged": true,
+      "mali_global_unchanged": true,
+      "active_manifest_pass": true
+    },
+    "limitations": [
+      "Complete SmartTube UI/custom-renderer/network playback not revalidated; final performance tests used local files.",
+      "Small startup drop counts remain in video-only Exo tests; no universal zero-drop or all-stream claim.",
+      "Synthetic/transcoded/repeated samples are not independent HDR photography, a thermal soak, or exhaustive codec-tool coverage.",
+      "AV1+Opus MP4 local playback clock stalls with both output routes in this old Exo diagnostic path; exact encoded audio/video streams remuxed as WebM pass. This container case is excluded from the passing matrix.",
+      "P010 texture consumers have no NV15 display-plane performance guarantee.",
+      "HDR wire signaling inferred from driver and packet registers; no external HDMI analyzer.",
+      "Existing HDR4000 client-composition boundary, inherited capability registry, lack of Dolby/HDR10+ HDMI support remain."
+    ],
+    "measurement_lineage": {
+      "final_core_sha256": "dc9a6c82837e5dbdb41de62a611ca01fb6f83e08268a2d0bc7e11fca5cb83332",
+      "earlier_core_before_explicit_request_guards": "04582ed16fbf8b94c2aab702bc5f7e7a29ddc8d44ba80684565f731a8bf60de0",
+      "final_core_exact_pixel_cases": 11,
+      "final_core_explicit_standard_p010_and_crop_requests": [
+        {
+          "case": "explicit-request_p010",
+          "complete": true,
+          "decoded": 6
+        },
+        {
+          "case": "explicit-vendor_crop",
+          "complete": true,
+          "decoded": 6
+        }
+      ],
+      "final_core_exoplayer_ab": true,
+      "final_core_exoplayer_webm_opus": true,
+      "final_core_exoplayer_long": true,
+      "final_core_exoplayer_aac": true,
+      "final_core_lifecycle": true,
+      "broad_format_matrix_and_60s_mediacodec_and_hdr_register_suite": "measured before the two explicit-request exclusion guards; unchanged default routes, retained as versioned evidence"
+    }
+  },
+  "payload_sha256": {
+    "arm": "056231851f1a3c88d4c05b983b8a6d4952aaddd2fac49a228f61e7fb1194e3d2",
+    "arm64": "fe653c09ee092b220dd43de4ab72543a52061c79d7f210b1aebc3ef7295dd860"
+  },
+  "grain32": [
+    {
+      "case": "grain8-854",
+      "depth": 8,
+      "width": 854,
+      "height": 480,
+      "grain_enabled": 0,
+      "frames": 12,
+      "all_samples_exact": true,
+      "bytes": 14757120,
+      "sha256": "f2952ec8f7ca96e093fde58d727e3a749c52d82488fc5f8a47cbc9455d6be6a0"
+    },
+    {
+      "case": "grain8-854",
+      "depth": 8,
+      "width": 854,
+      "height": 480,
+      "grain_enabled": 1,
+      "frames": 12,
+      "all_samples_exact": true,
+      "bytes": 14757120,
+      "sha256": "69ac5e382a7f47dcbfec17c199e93046a28a2e3292bffac7adb925813ba031d8"
+    },
+    {
+      "case": "grain10-854",
+      "depth": 10,
+      "width": 854,
+      "height": 480,
+      "grain_enabled": 0,
+      "frames": 12,
+      "all_samples_exact": true,
+      "bytes": 14757120,
+      "sha256": "49d1c806202d0d9e6e2358b83600260bdfbcca3062c7addda1adfa42d78d442d"
+    },
+    {
+      "case": "grain10-854",
+      "depth": 10,
+      "width": 854,
+      "height": 480,
+      "grain_enabled": 1,
+      "frames": 12,
+      "all_samples_exact": true,
+      "bytes": 14757120,
+      "sha256": "a57b4c8fdb34d195483fbb0a672f3cd338bae21d2e5c9506819966a7282b3239"
+    },
+    {
+      "case": "grain10-1080",
+      "depth": 10,
+      "width": 1920,
+      "height": 1080,
+      "grain_enabled": 0,
+      "frames": 12,
+      "all_samples_exact": true,
+      "bytes": 74649600,
+      "sha256": "4e35e82cf4f132b9f86f88b836cb04c8dc6ea02fcf7696b02f3b95918b6ed8d5"
+    },
+    {
+      "case": "grain10-1080",
+      "depth": 10,
+      "width": 1920,
+      "height": 1080,
+      "grain_enabled": 1,
+      "frames": 12,
+      "all_samples_exact": true,
+      "bytes": 74649600,
+      "sha256": "24bbefd5e670c2e65f8d79d4e72aab2ca046ce6328ee8c01fb8c7279314c7b6d"
+    },
+    {
+      "case": "plain10-1080",
+      "depth": 10,
+      "width": 1920,
+      "height": 1080,
+      "grain_enabled": 0,
+      "frames": 12,
+      "all_samples_exact": true,
+      "bytes": 74649600,
+      "sha256": "2f56d04b384c41c67123b2c82f7202df6e6dc31b7f1d061b2113530ae3ee86a6"
+    },
+    {
+      "case": "plain10-1080",
+      "depth": 10,
+      "width": 1920,
+      "height": 1080,
+      "grain_enabled": 1,
+      "frames": 12,
+      "all_samples_exact": true,
+      "bytes": 74649600,
+      "sha256": "2f56d04b384c41c67123b2c82f7202df6e6dc31b7f1d061b2113530ae3ee86a6"
+    }
+  ],
+  "grain64": [
+    {
+      "case": "grain10",
+      "abi": "arm64-v8a",
+      "grain_enabled": 0,
+      "frames": 12,
+      "all_samples_exact": true
+    },
+    {
+      "case": "grain10",
+      "abi": "arm64-v8a",
+      "grain_enabled": 1,
+      "frames": 12,
+      "all_samples_exact": true
+    },
+    {
+      "case": "grain10-1080",
+      "abi": "arm64-v8a",
+      "grain_enabled": 0,
+      "frames": 12,
+      "all_samples_exact": true
+    },
+    {
+      "case": "grain10-1080",
+      "abi": "arm64-v8a",
+      "grain_enabled": 1,
+      "frames": 12,
+      "all_samples_exact": true
+    },
+    {
+      "case": "plain10-1080",
+      "abi": "arm64-v8a",
+      "grain_enabled": 0,
+      "frames": 12,
+      "all_samples_exact": true
+    },
+    {
+      "case": "plain10-1080",
+      "abi": "arm64-v8a",
+      "grain_enabled": 1,
+      "frames": 12,
+      "all_samples_exact": true
+    }
+  ],
+  "pts_check": {
+    "captured_outputs": 600,
+    "non_monotonic_pts": 0,
+    "pts_step_min_us": 16000,
+    "pts_step_max_us": 17000,
+    "timestamp_rewrite_applied": false
+  },
+  "dmc_trial": {
+    "baseline_dropped": 2197,
+    "performance_dropped": 2253,
+    "accepted": false,
+    "original_governor_restored": true
+  },
+  "persistent_rollback": {
+    "whole_off": {
+      "mode": "off",
+      "verified_boot": true,
+      "kernel_unchanged": true,
+      "boot_unchanged": true,
+      "global_mali_unchanged": true,
+      "original_core_mpp_service_verified": true
+    },
+    "independent_off": {
+      "persistent_flag": 0,
+      "actual_installed_mpp": true,
+      "frames": 12,
+      "eos": true,
+      "all_samples_exact_to_no_grain_reference": true
+    },
+    "independent_on": {
+      "persistent_flag": 1,
+      "actual_installed_mpp": true,
+      "frames": 12,
+      "eos": true,
+      "all_samples_exact_to_grain_reference": true
+    }
+  },
+  "stage": "local_fidelity_fix_verified_real_4k60_stutter_unresolved",
+  "grain32_uhd": [
+    {
+      "case": "grain10-uhd6",
+      "depth": 10,
+      "width": 3840,
+      "height": 2160,
+      "grain_enabled": 0,
+      "frames": 6,
+      "all_samples_exact": true,
+      "bytes": 149299200,
+      "sha256": "b3740aada35761f5bc4fe7e06ce239bfc810f96c77336e28cda205ea964f2054"
+    },
+    {
+      "case": "grain10-uhd6",
+      "depth": 10,
+      "width": 3840,
+      "height": 2160,
+      "grain_enabled": 1,
+      "frames": 6,
+      "all_samples_exact": true,
+      "bytes": 149299200,
+      "sha256": "496e82e65dae7a88f859343cfc3f0e90a6376b5ab0460e9321e00dcb153d1215"
+    }
+  ],
+  "real_source": {
+    "case": "real-exo-grain062",
+    "mode": "installed-SmartTube-ExoPlayer-local-file",
+    "network_source": false,
+    "local_buffer_max_ms": 5000,
+    "local_buffer_target_bytes": 67108864,
+    "clip": "costa-rica-701-251-first60.webm",
+    "actual_video_decoder": "OMX.c2.rk.av1.decoder",
+    "startup_ms": 588.864559,
+    "audio_format": {
+      "sampleMimeType": "audio/opus",
+      "sampleRate": 48000,
+      "channelCount": 2,
+      "encoderDelay": 0,
+      "encoderPadding": 0,
+      "csd": [
+        "4f707573486561640102380180bb0000000000",
+        "a02e630000000000",
+        "00b4c40400000000"
+      ]
+    },
+    "eos": true,
+    "complete": true,
+    "elapsed_seconds": 60.85064678,
+    "position_ms": 60220,
+    "duration_ms": 60010,
+    "decoderInitCount": 1,
+    "decoderReleaseCount": 0,
+    "inputBufferCount": 3525,
+    "skippedInputBufferCount": 0,
+    "renderedOutputBufferCount": 1307,
+    "skippedOutputBufferCount": 0,
+    "droppedBufferCount": 2290,
+    "droppedToKeyframeCount": 4,
+    "maxConsecutiveDroppedBufferCount": 43,
+    "pixelcopy": 0,
+    "observed_drm_format": "NV15"
+  },
+  "grain_surface": {
+    "case": "grain062-surface-uhd30",
+    "mode": "installed-SmartTube-ExoPlayer-local-file",
+    "network_source": false,
+    "local_buffer_max_ms": 5000,
+    "local_buffer_target_bytes": 67108864,
+    "clip": "grain-uhd30-6s.mp4",
+    "actual_video_decoder": "OMX.c2.rk.av1.decoder",
+    "startup_ms": 436.91321,
+    "eos": true,
+    "complete": true,
+    "elapsed_seconds": 6.443363564,
+    "position_ms": 6006,
+    "duration_ms": 6000,
+    "decoderInitCount": 1,
+    "decoderReleaseCount": 0,
+    "inputBufferCount": 180,
+    "skippedInputBufferCount": 0,
+    "renderedOutputBufferCount": 179,
+    "skippedOutputBufferCount": 0,
+    "droppedBufferCount": 1,
+    "droppedToKeyframeCount": 0,
+    "maxConsecutiveDroppedBufferCount": 1,
+    "pixelcopy": 0,
+    "observed_drm_format": "NV15"
+  },
+  "preservation": {
+    "boot_unchanged": true,
+    "kernel_unchanged": true,
+    "yamby_native_libraries_unchanged": 18,
+    "lsposed_module_version": "0.3.3",
+    "lsposed_package_path_unchanged": true,
+    "mali_global_unchanged": true,
+    "active_manifest_pass": true
+  },
+  "final_configuration": {
+    "av1_grain": 1,
+    "dmc_governor": "dmc_ondemand",
+    "published": false
+  }
+}

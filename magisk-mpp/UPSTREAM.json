@@ -25,7 +25,9 @@
     "012-hevc-first-task-ps-rps.patch",
     "mpp-a12-prep-bridge.patch",
     "mpp-jpeg-partition-stride.patch",
-    "mpp-rk3588-jpeg-route.patch"
+    "mpp-rk3588-jpeg-route.patch",
+    "013-av1-native-p010.patch",
+    "014-av1-film-grain.patch"
   ],
   "paired_vpu_wrapper": true,
   "patch_level": "0.4.0",
@@ -66,5 +68,16 @@
       "subject": "fix[h265d]: Force PS/RPS update for the first sent task",
       "source": "https://github.com/rockchip-linux/mpp/commit/8f88b50df0af9dc367bf2f9943808e82a8d14482"
     }
-  ]
+  ],
+  "local_av1_extension": {
+    "decode_stack": "0.6.1",
+    "private_format_flag": "0x10000000",
+    "purpose": "bounded RK3588 full-ten-bit hardware P010 output for paired Codec2 texture consumers; no kernel ABI or clock change"
+  },
+  "av1_grain": {
+    "source": "https://github.com/rockchip-linux/mpp/issues/974",
+    "property": "debug.rkcodec2.av1_grain",
+    "default": 1,
+    "disable_retains_prior_no_grain_behavior": true
+  }
 }

@@ -1,0 +1,31 @@
+{
+  "version": "1.14.16_[0]",
+  "decode_stack": "0.6.3",
+  "stage": "local_playback_precision_and_selector_validation",
+  "sha256": "c07bdfa3d3ee96e1d7104d7ca48542f243024db403b30f22cb686e0f5e3b3ac3",
+  "details_in_unified_package": "../../VALIDATION.json",
+  "details_in_source_tree": "../magisk-decode/VALIDATION.json",
+  "afbc_sample_cases": 5,
+  "native_exact_cases": 6,
+  "prior_validation": {
+    "version": "1.14.16_[0]",
+    "decode_stack": "0.6.1",
+    "stage": "local_validation_passed_with_documented_limits",
+    "sha256": "dc9a6c82837e5dbdb41de62a611ca01fb6f83e08268a2d0bc7e11fca5cb83332",
+    "native_exact_cases": 11,
+    "local_lifecycle_cases": 5,
+    "local_available_format_paths": 16,
+    "details_in_unified_package": "../../VALIDATION.json",
+    "details_in_source_tree": "../magisk-decode/VALIDATION.json",
+    "prior_validation": "../docs/validation/decode-0.6.0.json",
+    "limitations": [
+      "Complete SmartTube UI/custom-renderer/network playback not revalidated; final performance tests used local files.",
+      "Small startup drop counts remain in video-only Exo tests; no universal zero-drop or all-stream claim.",
+      "Synthetic/transcoded/repeated samples are not independent HDR photography, a thermal soak, or exhaustive codec-tool coverage.",
+      "AV1+Opus MP4 local playback clock stalls with both output routes in this old Exo diagnostic path; exact encoded audio/video streams remuxed as WebM pass. This container case is excluded from the passing matrix.",
+      "P010 texture consumers have no NV15 display-plane performance guarantee.",
+      "HDR wire signaling inferred from driver and packet registers; no external HDMI analyzer.",
+      "Existing HDR4000 client-composition boundary, inherited capability registry, lack of Dolby/HDR10+ HDMI support remain."
+    ]
+  }
+}

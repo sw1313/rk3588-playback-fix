@@ -1,0 +1,26 @@
+{
+  "repository": "https://github.com/khadas/android_vendor_rockchip_hardware_interfaces_codec2",
+  "commit": "e3c30156793f778541b6eaec54ac2a1ac0f6a70c",
+  "sdk": "khadas-edge-2l-android14",
+  "reported_version": "1.14.16_[0]",
+  "target": "ARM32 vendor HIDL service on verified Android12 API32 firmware",
+  "scope": "Decoder-only 1.14.16 core on API32 with cached internal copy buffers, read-only DMA synchronization, standard work flow, original full-precision/HDR contracts and stop/drain ownership repair. Existing HIDL registry, secure and encoder routes remain firmware-backed.",
+  "mpp": "Existing newer source-built MPP 1.1.0 compatibility pair retained; 2024 SDK MPP evaluated privately and not bundled.",
+  "kernel": "Original 5.10.66 built-in Rockchip VPU driver, no kernel replacement or clock changes.",
+  "rollback": "codec2_sdk_next off restores the separately packaged 1.14.3 SIMD core; codec2_sdk off restores the legacy backend.",
+  "local_av1_extension": {
+    "decode_stack": "0.6.1",
+    "patch": "patches/av1-native-surface.patch",
+    "switch": "av1_native",
+    "quality": "AV1 native display output explicitly retains bitdepth; no ten-to-eight fallback",
+    "route": "consumer-usage selected native NV15 display or validated P010 texture output"
+  },
+  "local_av1_afbc_extension": {
+    "decode_stack": "0.6.3",
+    "patch": "patches/av1-afbc-surface.patch",
+    "switch": "av1_afbc; reboot required",
+    "scope": "RK3588, native composer Surface, original eight/ten-bit precision, width divisible by 64; honors client FBC-disable",
+    "layout": "lossless AFBC; completed-frame crop for filter-dependent top padding",
+    "fallback": "linear NV15; explicit P010, texture and CPU consumers retain existing paths"
+  }
+}

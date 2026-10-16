@@ -1,6 +1,10 @@
 #!/system/bin/sh
+resetprop --delete debug.rkcodec2.av1_afbc
+resetprop --delete debug.rkcodec2.av1_grain
+resetprop --delete debug.rkcodec2.av1_direct
 resetprop --delete debug.rkcodec2.surface_upgrade
 resetprop --delete debug.rkcodec2.buffer_upgrade
+resetprop --delete debug.rkcodec2.p010_fast
 resetprop --delete debug.rkcodec2.hdr_static_buffer
 resetprop --delete debug.rkcodec2.hdr10plus
 resetprop --delete debug.rkhdr.static

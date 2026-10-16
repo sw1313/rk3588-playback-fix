@@ -1,0 +1,828 @@
+{
+  "version": "0.6.0",
+  "date": "2026-10-16",
+  "stage": "installed_local_validation_passed_with_documented_limits",
+  "previous_version": "0.5.2",
+  "previous_validation_source": "../docs/validation/decode-0.5.2.json",
+  "device_scope": {
+    "soc": "RK3588",
+    "android_api": 32,
+    "kernel": "5.10.66",
+    "firmware": "hash-gated Android12 vendor stack"
+  },
+  "new_core": {
+    "version": "1.14.16_[0]",
+    "repository": "https://github.com/khadas/android_vendor_rockchip_hardware_interfaces_codec2",
+    "commit": "e3c30156793f778541b6eaec54ac2a1ac0f6a70c",
+    "sha256": "dbc07c31cc6f9a87c64ac69328c686e213387017a9332bb268520eb62d4bf05f",
+    "elf": {
+      "elf": "ELF32 ARM",
+      "needed": [
+        "libdl.so",
+        "libm.so",
+        "libmpp.so",
+        "librga.so",
+        "libbase.so",
+        "libcodec2.so",
+        "libcodec2_vndk.so",
+        "libsfplugin_ccodec_utils.so",
+        "libstagefright_foundation.so",
+        "libgralloc_priv.so",
+        "libutils.so",
+        "libcutils.so",
+        "libui.so",
+        "libc++.so",
+        "liblog.so",
+        "libhidlbase.so",
+        "libgralloctypes.so",
+        "android.hardware.graphics.mapper@4.0.so",
+        "libdmabufheap.so",
+        "libhardware.so",
+        "libc.so"
+      ]
+    },
+    "decoder_only": true,
+    "retained_prior_sdk_sha256": "a63e0338469baf8d5fcabc895f974e670d197e373694a8c67153623e75c1633c"
+  },
+  "changes": [
+    "Cacheable MPP internal copy buffers with paired read-only DMA synchronization; existing mapper owns destination synchronization",
+    "Full-ten-bit NEON and exact mapped layout retained; no resolution, bitrate, frame-rate or pixel-depth reduction",
+    "Newer standard work flow, output-delay and buffer management code adapted to API32",
+    "Atomic handler stop/barrier keeps asynchronous callbacks disabled before synchronous EOS drain",
+    "Retained service parameter reflector exports HDR10/HDR10+ descriptors correctly; no additional Binder service registration",
+    "Independent codec2_sdk_next rollback retains the previous SIMD SDK core in the same installer; stock encoder and secure routes retained"
+  ],
+  "native_precision": [
+    {
+      "clip": "h264",
+      "codec": "avc",
+      "format": 35,
+      "bits": 8,
+      "bytes": 8294400,
+      "all_samples_exact": true,
+      "pass": true
+    },
+    {
+      "clip": "h264-1080",
+      "codec": "avc",
+      "format": 35,
+      "bits": 8,
+      "bytes": 37324800,
+      "all_samples_exact": true,
+      "pass": true
+    },
+    {
+      "clip": "hevc10",
+      "codec": "hevc",
+      "format": 54,
+      "bits": 10,
+      "bytes": 8294400,
+      "all_samples_exact": true,
+      "pass": true
+    },
+    {
+      "clip": "hevc10-854",
+      "codec": "hevc",
+      "format": 54,
+      "bits": 10,
+      "bytes": 7378560,
+      "all_samples_exact": true,
+      "pass": true
+    },
+    {
+      "clip": "hevc10-720",
+      "codec": "hevc",
+      "format": 54,
+      "bits": 10,
+      "bytes": 16588800,
+      "all_samples_exact": true,
+      "pass": true
+    },
+    {
+      "clip": "hevc10-1080",
+      "codec": "hevc",
+      "format": 54,
+      "bits": 10,
+      "bytes": 37324800,
+      "all_samples_exact": true,
+      "pass": true
+    },
+    {
+      "clip": "hevc10-4k",
+      "codec": "hevc",
+      "format": 54,
+      "bits": 10,
+      "bytes": 74649600,
+      "all_samples_exact": true,
+      "pass": true
+    },
+    {
+      "clip": "av1-8",
+      "codec": "av1",
+      "format": 35,
+      "bits": 8,
+      "bytes": 8294400,
+      "all_samples_exact": true,
+      "pass": true
+    },
+    {
+      "clip": "av1-10",
+      "codec": "av1",
+      "format": 54,
+      "bits": 10,
+      "bytes": 8294400,
+      "all_samples_exact": true,
+      "pass": true
+    },
+    {
+      "clip": "av1-10-1080",
+      "codec": "av1",
+      "format": 54,
+      "bits": 10,
+      "bytes": 37324800,
+      "all_samples_exact": true,
+      "pass": true
+    },
+    {
+      "clip": "vp9-10-720",
+      "codec": "vp9",
+      "format": 54,
+      "bits": 10,
+      "bytes": 16588800,
+      "all_samples_exact": true,
+      "pass": true
+    }
+  ],
+  "precision_recorder": "Independent planar sample recording uses row batching; slow per-pixel file writes can artificially exceed the native EOS timeout. MediaCodec Surface tests use a separate application.",
+  "surface_regression": [
+    {
+      "case": "av1-10-720",
+      "max_rgb_difference": 0
+    },
+    {
+      "case": "av1-10-full-720",
+      "max_rgb_difference": 0
+    },
+    {
+      "case": "av1-8-720",
+      "max_rgb_difference": 0
+    },
+    {
+      "case": "h263-8-cif",
+      "max_rgb_difference": 0
+    },
+    {
+      "case": "h264-8-720",
+      "max_rgb_difference": 0
+    },
+    {
+      "case": "hevc10-1080",
+      "max_rgb_difference": 0
+    },
+    {
+      "case": "hevc10-4k",
+      "max_rgb_difference": 0
+    },
+    {
+      "case": "hevc10-854",
+      "max_rgb_difference": 0
+    },
+    {
+      "case": "hevc10-hdr-720",
+      "max_rgb_difference": 0
+    },
+    {
+      "case": "hevc8-720",
+      "max_rgb_difference": 0
+    },
+    {
+      "case": "m4v-8-720",
+      "max_rgb_difference": 0
+    },
+    {
+      "case": "mpeg2-8-720",
+      "max_rgb_difference": 0
+    },
+    {
+      "case": "vp8-8-720",
+      "max_rgb_difference": 0
+    },
+    {
+      "case": "vp9-10-720",
+      "max_rgb_difference": 0
+    }
+  ],
+  "real_time_playback": [
+    {
+      "case": "aerial-av1-10-4k60",
+      "codec": "c2.rk.av1.decoder",
+      "complete": true,
+      "queued": 360,
+      "decoded": 360,
+      "eos": true,
+      "late_gt20ms": 250,
+      "max_lateness_ms": 725.521603,
+      "elapsed_seconds": 7.034997207,
+      "stop_ok": true,
+      "hal_survived": true,
+      "codec_name": "av1",
+      "width": 4096,
+      "height": 2160,
+      "pix_fmt": "yuv420p10le",
+      "r_frame_rate": "60/1",
+      "nb_read_frames": "360"
+    },
+    {
+      "case": "aerial-av1-10-uhd60",
+      "codec": "c2.rk.av1.decoder",
+      "complete": true,
+      "queued": 360,
+      "decoded": 360,
+      "eos": true,
+      "late_gt20ms": 0,
+      "max_lateness_ms": 0,
+      "elapsed_seconds": 6.664042961,
+      "stop_ok": true,
+      "hal_survived": true,
+      "codec_name": "av1",
+      "width": 3840,
+      "height": 2160,
+      "pix_fmt": "yuv420p10le",
+      "r_frame_rate": "60/1",
+      "nb_read_frames": "360"
+    },
+    {
+      "case": "aerial-av1-8-4k60",
+      "codec": "c2.rk.av1.decoder",
+      "complete": true,
+      "queued": 360,
+      "decoded": 360,
+      "eos": true,
+      "late_gt20ms": 0,
+      "max_lateness_ms": 0,
+      "elapsed_seconds": 6.687970713,
+      "stop_ok": true,
+      "hal_survived": true,
+      "codec_name": "av1",
+      "width": 4096,
+      "height": 2160,
+      "pix_fmt": "yuv420p",
+      "r_frame_rate": "60/1",
+      "nb_read_frames": "360"
+    },
+    {
+      "case": "aerial-avc-4k60",
+      "codec": "c2.rk.avc.decoder",
+      "complete": true,
+      "queued": 360,
+      "decoded": 360,
+      "eos": true,
+      "late_gt20ms": 0,
+      "max_lateness_ms": 0,
+      "elapsed_seconds": 2.713789147,
+      "stop_ok": true,
+      "hal_survived": true,
+      "codec_name": "h264",
+      "width": 4096,
+      "height": 2160,
+      "pix_fmt": "yuv420p",
+      "r_frame_rate": "60/1",
+      "nb_read_frames": "360"
+    },
+    {
+      "case": "aerial-hevc10-4k60",
+      "codec": "c2.rk.hevc.decoder",
+      "complete": true,
+      "queued": 360,
+      "decoded": 360,
+      "eos": true,
+      "late_gt20ms": 0,
+      "max_lateness_ms": 0,
+      "elapsed_seconds": 2.873022538,
+      "stop_ok": true,
+      "hal_survived": true,
+      "codec_name": "hevc",
+      "width": 4096,
+      "height": 2160,
+      "pix_fmt": "yuv420p10le",
+      "r_frame_rate": "60/1",
+      "nb_read_frames": "360"
+    },
+    {
+      "case": "aerial-hevc8-4k60",
+      "codec": "c2.rk.hevc.decoder",
+      "complete": true,
+      "queued": 360,
+      "decoded": 360,
+      "eos": true,
+      "late_gt20ms": 0,
+      "max_lateness_ms": 0,
+      "elapsed_seconds": 2.892958832,
+      "stop_ok": true,
+      "hal_survived": true,
+      "codec_name": "hevc",
+      "width": 4096,
+      "height": 2160,
+      "pix_fmt": "yuv420p",
+      "r_frame_rate": "60/1",
+      "nb_read_frames": "360"
+    },
+    {
+      "case": "aerial-original-vp9",
+      "codec": "c2.rk.vp9.decoder",
+      "complete": true,
+      "queued": 1200,
+      "decoded": 1200,
+      "eos": true,
+      "late_gt20ms": 0,
+      "max_lateness_ms": 0,
+      "elapsed_seconds": 15.430167758,
+      "stop_ok": true,
+      "hal_survived": true,
+      "codec_name": "vp9",
+      "width": 4096,
+      "height": 2160,
+      "pix_fmt": "yuv420p",
+      "r_frame_rate": "60/1",
+      "nb_read_frames": "1200"
+    },
+    {
+      "case": "aerial-vp9-10-4k60",
+      "codec": "c2.rk.vp9.decoder",
+      "complete": true,
+      "queued": 360,
+      "decoded": 360,
+      "eos": true,
+      "late_gt20ms": 0,
+      "max_lateness_ms": 0,
+      "elapsed_seconds": 6.666775878,
+      "stop_ok": true,
+      "hal_survived": true,
+      "codec_name": "vp9",
+      "width": 4096,
+      "height": 2160,
+      "pix_fmt": "yuv420p10le",
+      "r_frame_rate": "60/1",
+      "nb_read_frames": "360"
+    },
+    {
+      "case": "coaster-h263-cif30",
+      "codec": "c2.rk.h263.decoder",
+      "complete": true,
+      "queued": 180,
+      "decoded": 180,
+      "eos": true,
+      "late_gt20ms": 0,
+      "max_lateness_ms": 0,
+      "elapsed_seconds": 0.274455736,
+      "stop_ok": true,
+      "hal_survived": true,
+      "codec_name": "h263",
+      "width": 352,
+      "height": 288,
+      "pix_fmt": "yuv420p",
+      "r_frame_rate": "30/1",
+      "nb_read_frames": "180"
+    },
+    {
+      "case": "coaster-mpeg2-1080p60",
+      "codec": "c2.rk.mpeg2.decoder",
+      "complete": true,
+      "queued": 360,
+      "decoded": 360,
+      "eos": true,
+      "late_gt20ms": 0,
+      "max_lateness_ms": 0,
+      "elapsed_seconds": 3.302254415,
+      "stop_ok": true,
+      "hal_survived": true,
+      "codec_name": "mpeg2video",
+      "width": 1920,
+      "height": 1080,
+      "pix_fmt": "yuv420p",
+      "r_frame_rate": "60/1",
+      "nb_read_frames": "360"
+    },
+    {
+      "case": "coaster-mpeg4-1080p60",
+      "codec": "c2.rk.m4v.decoder",
+      "complete": false,
+      "hal_survived": true,
+      "codec_name": "mpeg4",
+      "width": 1920,
+      "height": 1080,
+      "pix_fmt": "yuv420p",
+      "r_frame_rate": "60/1",
+      "nb_read_frames": "360",
+      "classification": "Hardware MPEG-4 entry absent from actual framework catalog in the firmware baseline; tested using the existing system software entry instead."
+    },
+    {
+      "case": "coaster-mpeg4-software-1080p60",
+      "codec": "c2.android.mpeg4.decoder",
+      "complete": true,
+      "queued": 360,
+      "decoded": 360,
+      "eos": true,
+      "late_gt20ms": 0,
+      "max_lateness_ms": 0,
+      "elapsed_seconds": 6.635975875,
+      "stop_ok": true,
+      "hal_survived": true,
+      "codec_name": "mpeg4",
+      "width": 1920,
+      "height": 1080,
+      "pix_fmt": "yuv420p",
+      "r_frame_rate": "60/1",
+      "nb_read_frames": "360"
+    },
+    {
+      "case": "coaster-original-vp9",
+      "codec": "c2.rk.vp9.decoder",
+      "complete": true,
+      "queued": 1200,
+      "decoded": 1200,
+      "eos": true,
+      "late_gt20ms": 0,
+      "max_lateness_ms": 0,
+      "elapsed_seconds": 11.450311234,
+      "stop_ok": true,
+      "hal_survived": true,
+      "codec_name": "vp9",
+      "width": 4096,
+      "height": 2160,
+      "pix_fmt": "yuv420p",
+      "r_frame_rate": "60/1",
+      "nb_read_frames": "1200"
+    },
+    {
+      "case": "coaster-vp8-1080p60",
+      "codec": "c2.rk.vp8.decoder",
+      "complete": true,
+      "queued": 360,
+      "decoded": 360,
+      "eos": true,
+      "late_gt20ms": 0,
+      "max_lateness_ms": 0,
+      "elapsed_seconds": 3.626155239,
+      "stop_ok": true,
+      "hal_survived": true,
+      "codec_name": "vp8",
+      "width": 1920,
+      "height": 1080,
+      "pix_fmt": "yuv420p",
+      "r_frame_rate": "60/1",
+      "nb_read_frames": "360"
+    },
+    {
+      "case": "synthetic-av1-4k10",
+      "codec": "c2.rk.av1.decoder",
+      "complete": true,
+      "queued": 360,
+      "decoded": 360,
+      "eos": true,
+      "late_gt20ms": 0,
+      "max_lateness_ms": 0,
+      "elapsed_seconds": 6.636250626,
+      "stop_ok": true,
+      "hal_survived": true,
+      "codec_name": "av1",
+      "width": 3840,
+      "height": 2160,
+      "pix_fmt": "yuv420p10le",
+      "r_frame_rate": "60/1",
+      "nb_read_frames": "360"
+    },
+    {
+      "case": "synthetic-av1-hlg-4k60",
+      "codec": "c2.rk.av1.decoder",
+      "complete": true,
+      "queued": 360,
+      "decoded": 360,
+      "eos": true,
+      "late_gt20ms": 0,
+      "max_lateness_ms": 0,
+      "elapsed_seconds": 6.660418128,
+      "stop_ok": true,
+      "hal_survived": true,
+      "codec_name": "av1",
+      "width": 3840,
+      "height": 2160,
+      "pix_fmt": "yuv420p10le",
+      "r_frame_rate": "60/1",
+      "nb_read_frames": "360"
+    },
+    {
+      "case": "synthetic-av1-pq-4k60",
+      "codec": "c2.rk.av1.decoder",
+      "complete": true,
+      "queued": 360,
+      "decoded": 360,
+      "eos": true,
+      "late_gt20ms": 0,
+      "max_lateness_ms": 0,
+      "elapsed_seconds": 6.621599332,
+      "stop_ok": true,
+      "hal_survived": true,
+      "codec_name": "av1",
+      "width": 3840,
+      "height": 2160,
+      "pix_fmt": "yuv420p10le",
+      "r_frame_rate": "60/1",
+      "nb_read_frames": "360"
+    }
+  ],
+  "playback_summary": {
+    "usable_paths": 16,
+    "complete_eos_stop": 16,
+    "zero_output_lateness_over_20ms": 15,
+    "remaining_late_case": "aerial-av1-10-4k60",
+    "late_frames": 250,
+    "max_lateness_ms": 725.521603,
+    "stale_reports_excluded": true,
+    "freshness": "Exact old remote JSON/PNG removed and absence verified before each final run. playback-r2 intermediate results were discarded.",
+    "timestamp_limit": "Render callback timestamps may echo scheduled times; perfect callback gaps do not prove smooth playback."
+  },
+  "throughput": {
+    "previous_sdk": {
+      "fast": 1,
+      "frames": 360,
+      "eos": true,
+      "seconds": 5.319,
+      "fps": 67.68189509306261
+    },
+    "new_sdk": {
+      "frames": 360,
+      "seconds": 5.3,
+      "fps": 67.9245283018868,
+      "complete_eos": true
+    },
+    "interpretation": "Essentially unchanged throughput, no substantial increase demonstrated by this SDK port."
+  },
+  "hdr_static_driver": {
+    "same_surface": true,
+    "cases": [
+      {
+        "clip": "hevc10-hlg-720",
+        "pass": true,
+        "eotf": 3,
+        "frames": 190,
+        "packet": {
+          "register_packet_checksum_valid": true,
+          "eotf": 3,
+          "metadata_descriptor": 0,
+          "fields": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "hdr_static_info_hex": "00000000000000000000000000000000000000000000000000",
+          "wire_measurement": false
+        },
+        "ten_bit_bt2020": true,
+        "capture": {
+          "pixelcopy": 3
+        },
+        "pause_seek_eos": true
+      },
+      {
+        "clip": "hevc10-hdr-720",
+        "pass": true,
+        "eotf": 2,
+        "frames": 100,
+        "packet": {
+          "register_packet_checksum_valid": true,
+          "eotf": 2,
+          "metadata_descriptor": 0,
+          "fields": [
+            34000,
+            16000,
+            13250,
+            34500,
+            7500,
+            3000,
+            15635,
+            16450,
+            1000,
+            50,
+            1000,
+            400
+          ],
+          "hdr_static_info_hex": "00d084803ec233c4864c1db80b133d4240e8033200e8039001",
+          "wire_measurement": false
+        },
+        "ten_bit_bt2020": true,
+        "capture": {
+          "pixelcopy": 0,
+          "min": 34,
+          "max": 191,
+          "sum": 28623098,
+          "nonzero": 230400,
+          "green_pixels": 39388
+        },
+        "pause_seek_eos": true
+      },
+      {
+        "clip": "hevc8-720",
+        "pass": true,
+        "eotf": 0,
+        "frames": 100,
+        "packet": {
+          "register_packet_checksum_valid": true,
+          "eotf": 0,
+          "metadata_descriptor": 0,
+          "fields": [
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+          ],
+          "hdr_static_info_hex": "00000000000000000000000000000000000000000000000000",
+          "wire_measurement": false
+        },
+        "ten_bit_bt2020": false,
+        "capture": {
+          "pixelcopy": 0,
+          "min": 20,
+          "max": 192,
+          "sum": 28898870,
+          "nonzero": 230400,
+          "green_pixels": 40060
+        },
+        "pause_seek_eos": true
+      }
+    ],
+    "exit_returns_sdr": true,
+    "wire_measurement": false
+  },
+  "hdr_client_switches": [
+    {
+      "clip": "hevc10-hlg-720",
+      "expected_eotf": 3,
+      "actual_eotf": 3,
+      "frames": 190,
+      "pass": true
+    },
+    {
+      "clip": "hdr4000",
+      "expected_eotf": 0,
+      "actual_eotf": 0,
+      "frames": 130,
+      "pass": true
+    },
+    {
+      "clip": "hevc10-hdr-720",
+      "expected_eotf": 2,
+      "actual_eotf": 2,
+      "frames": 100,
+      "pass": true
+    },
+    {
+      "clip": "pq-no-master",
+      "expected_eotf": 0,
+      "actual_eotf": 0,
+      "frames": 130,
+      "pass": true
+    },
+    {
+      "clip": "hevc10-hlg-720",
+      "expected_eotf": 3,
+      "actual_eotf": 3,
+      "frames": 190,
+      "pass": true
+    },
+    {
+      "clip": "hevc8-720",
+      "expected_eotf": 0,
+      "actual_eotf": 0,
+      "frames": 100,
+      "pass": true
+    }
+  ],
+  "hdr10plus_standard_metadata": [
+    {
+      "clip": "hdr10p",
+      "frames": 12,
+      "exact_payloads": 3,
+      "explicit_empty": 9,
+      "pause_seek_eos": false,
+      "pass": true
+    },
+    {
+      "clip": "hevc10-hdr-720",
+      "frames": 100,
+      "exact_payloads": 0,
+      "explicit_empty": 100,
+      "pause_seek_eos": true,
+      "pass": true
+    },
+    {
+      "clip": "hdr10p-long",
+      "frames": 196,
+      "exact_payloads": 49,
+      "explicit_empty": 147,
+      "pause_seek_eos": true,
+      "pass": true
+    }
+  ],
+  "stop_stress": {
+    "early_prototype_complete": 2,
+    "early_prototype_runs": 6,
+    "revised_core_complete": 12,
+    "revised_core_runs": 12,
+    "slow_observer": true,
+    "scope": "Prototype revisions are compared; not a claim that the entire original upstream SDK fails on every platform."
+  },
+  "switch_dependencies": {
+    "combinations": 32,
+    "pass": true,
+    "saved_choices_preserved": true
+  },
+  "rollback": {
+    "independent_new_core_off_restores_prior_sdk_hash": true,
+    "saved_new_core_selection_survives_whole_disable": true,
+    "whole_off_originals_verified": true,
+    "whole_on_new_sdk_hash_verified": true,
+    "boot_kernel_mali_unchanged": true,
+    "hdr4000_existing_client_sdr_path_confirmed_old_and_new": true
+  },
+  "preservation": {
+    "boot_unchanged": true,
+    "kernel_unchanged": true,
+    "yamby_native_libraries_unchanged": 18,
+    "lsposed_module_version": "0.3.3",
+    "lsposed_package_path_unchanged": true,
+    "mali_global_unchanged": true,
+    "active_manifest_pass": true
+  },
+  "smarttube_live": {
+    "video": "https://www.youtube.com/watch?v=LXb3EKWsInQ",
+    "player": "SmartTube beta 32.56",
+    "format": "AV1 itag701 / 3840x2160@60 / HDR / 26.16Mbps / 1x",
+    "decoder": "OMX.c2.rk.av1.decoder",
+    "av1_clock_hz": 396000000,
+    "clock_enabled": true,
+    "samples": [
+      {
+        "timing": "Ten-second wait plus screenshot transfer overhead; exact interval not recorded",
+        "start_dropped": 5360,
+        "end_dropped": 5681,
+        "delta_dropped": 321,
+        "start_rendered": 1332,
+        "end_rendered": 1760,
+        "delta_rendered": 428,
+        "buffer_seconds": [
+          25,
+          19
+        ]
+      },
+      {
+        "snapshot_midpoint_interval_seconds": 12.078,
+        "start_dropped": 6769,
+        "end_dropped": 7420,
+        "delta_dropped": 651,
+        "start_rendered": 2352,
+        "end_rendered": 2443,
+        "delta_rendered": 91,
+        "buffer_seconds": [
+          21,
+          23
+        ]
+      }
+    ],
+    "both_samples": "paused=false,state=ready",
+    "interpretation": "Severe scene-dependent late/drop behavior remains with buffered playback. The newer SDK does not solve this SmartTube AV1 UHD60 HDR case. No clock cap at 300MHz observed. Earlier cores were sampled at different content positions; no controlled segment-identical speedup claim.",
+    "log_observation": "Repeated MediaCodecVideoRenderer dropOutputBuffer messages; raw logs and screenshots remain private."
+  },
+  "sources": {
+    "motion_clips": "Same Xiph Aerial/RollerCoaster preview and transcode matrix as 0.5.2",
+    "preview_actual_format": "Eight-bit SDR; ten-bit upconversion validates format/load, not native HDR photography",
+    "hdr_signals": "Separately marked BT.2020 PQ/HLG ten-bit AV1 signals and existing static/dynamic HDR vectors",
+    "media_redistributed": false
+  },
+  "limits": [
+    "4096-wide ten-bit AV1 60fps real-motion stream still misses output deadlines; no universal 4K60 or 8K promise",
+    "No substantial raw throughput increase over the existing SIMD core demonstrated",
+    "HDR4000 client-composition SDR path reproduced with both old and new cores; the existing output boundary remains",
+    "Standard HDR10+ metadata bridge does not add HDR10+ HDMI signaling or Dolby Vision",
+    "Core/framework capability advertisement remains inherited through the retained service registry",
+    "Short bounded media cases do not establish sustained thermal performance or every stream compatibility"
+  ],
+  "manual_yamby": "User confirmed normal original Yamby HW+ ten-bit playback, pause, seek, exit/reenter, usual GPU configuration, picture, sound, top edge and HDMI blackout behavior after final-core install on 2026-10-16."
+}

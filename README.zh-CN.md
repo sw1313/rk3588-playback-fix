@@ -2,7 +2,7 @@
 
 [**当前下载与版本表**](DOWNLOADS.md) · [GitHub 下载导航](https://github.com/sw1313/rk3588-playback-fix/blob/main/DOWNLOADS.md) · [English](README.md)
 
-**[项目整套版本 v0.5.1 — 四个安装包齐全](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.5.1)**
+**[项目整套版本 v0.6.3 — 四个安装包齐全](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.3)**
 
 每个公开 Release 都是完整项目快照，附齐 Decode Stack、全局 Mali、Yamby/mpv 插件
 和 Frame Guard。项目版本标识这次整套发布，包内继续保留各组件真实版本号。
@@ -10,10 +10,18 @@ GitHub **Latest** 指向最近更新的整套版本。系统组件仍为实验�
 
 | 组件 | 当前版本 | 用途 |
 | --- | --- | --- |
-| [Decode Stack 解码合并模块](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.5.1) | **0.5.1，实验组件** | 合并系统解码升级，修复已复现的 AVC／HEVC 八位缓冲区异步停止／排空崩溃 |
+| [Decode Stack 解码合并模块](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.3) | **0.6.3，实验组件** | 无损 AV1 AFBC 输出、Codec2 1.14.16 与累计解码升级，保留开关和回退 |
 | [原厂 Mali 全局模块](magisk-mali-global/README.md) | **0.2.0，实验组件** | 32／64 位系统标准图形路径使用原厂 g18p0 用户态驱动 |
-| [Yamby／mpv LSPosed 插件](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.5.1) | **0.3.3** | 默认 HW+ 设置与可选灰白边修正；这是插件版本，不是 LSPosed 框架版本 |
-| [Frame Guard 刷新率模块](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.5.1) | **0.1.0** | 可选的固定刷新率黑屏规避 |
+| [Yamby／mpv LSPosed 插件](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.3) | **0.3.3** | 默认 HW+ 设置与可选灰白边修正；这是插件版本，不是 LSPosed 框架版本 |
+| [Frame Guard 刷新率模块](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.3) | **0.1.0** | 可选的固定刷新率黑屏规避 |
+
+## Decode Stack 0.6.3
+
+Decode Stack **0.6.3** 补齐有保护条件的无损 AV1 AFBC 显示输出，保留源位深、
+HDR 和胶片颗粒，保留分项开关和整包回退。最终二进制在同一 60 秒本地 4K60 HDR
+片源上渲染全部 3597 帧、播放器零丢帧，收到全部 3597 个呈现回调、没有超过 25ms
+的间隔。另有同路径原型的 314 秒长片测试，未混记为最终二进制的整片测试。
+详见[播放对照、精度与适用边界](docs/decode-av1-063.zh-CN.md)。
 
 ## 安装与历史版本
 
@@ -48,8 +56,8 @@ Surface、P010、完整十位样本、分辨率和码率保持原样。未知／
 崩溃统计线程随后又访问已销毁的锁。第一次异常的故障回调尚未完整定位，未做原厂 Mali 对照，
 不宣称已经修复或排除驱动退出清理影响。见[退出路径证据](docs/antutu-image-effects.zh-CN.md)。
 
-0.5.1 自动播放、精度、生命周期和重启回退测试已通过，针对 0.5.1 的新一轮手动 Yamby
-验收仍待确认，历史版本确认不重复计入。有限样本不等于通用兼容性。
+0.6.3 本地播放、精度、生命周期和重启回退测试已通过。本次没有新增 0.6.3 的手动 Yamby
+验收；原版组件和 LSPosed 保持不动，历史版本确认不重复计入。有限样本不等于通用兼容性。
 HDR10+ 指标准 Codec2 元数据桥，不代表原生 HDMI HDR10+ 输出；不包含杜比视界／LLDV／FEL 或内核驱动升级。
 
 ## 组件说明

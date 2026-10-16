@@ -8,10 +8,15 @@ value() { sed -n "s/^$1=//p" "$MODROOT/active-config"; }
 MPP=$(value mpp); RGA=$(value rga); C2=$(value codec2); YUV=$(value libyuv); SOFT=$(value software)
 HDR_STATIC=$(value hdr_static); HDR_PLUS=$(value hdr10plus)
 SDK=$(value codec2_sdk)
+SDK_NEXT=$(value codec2_sdk_next)
 recover() {
  touch "$MODROOT/disable"
  resetprop debug.rkcodec2.surface_upgrade 0
+ resetprop -n debug.rkcodec2.av1_afbc 0
+ resetprop -n debug.rkcodec2.av1_grain 0
+ resetprop -n debug.rkcodec2.av1_direct 0
  resetprop -n debug.rkcodec2.buffer_upgrade 0
+ resetprop -n debug.rkcodec2.p010_fast 0
  resetprop -n debug.rkcodec2.hdr_static_buffer 0
  resetprop -n debug.rkcodec2.hdr10plus 0
  resetprop -n debug.rkhdr.static 0
@@ -53,7 +58,9 @@ for component in mpp rga codec2 libyuv software hdr; do
  sha256sum -c "$MODROOT/components/$component/contracts/$check" >> "$MODROOT/status.txt" 2>&1 || recover "$component dependency ABI differs"
 done
 if [ "$SDK" = 1 ]; then
- sha256sum -c "$MODROOT/components/codec2_sdk/contracts/platform.sha256" >> "$MODROOT/status.txt" 2>&1 || recover "SDK Codec2 additional API32 dependencies differ"
+ sdk_component=codec2_sdk
+ [ "$SDK_NEXT" != 1 ] || sdk_component=codec2_sdk_next
+ sha256sum -c "$MODROOT/components/$sdk_component/contracts/platform.sha256" >> "$MODROOT/status.txt" 2>&1 || recover "SDK Codec2 additional API32 dependencies differ"
 fi
 if [ "$MPP" = 1 ]; then
  c="$MODROOT/components/mpp"

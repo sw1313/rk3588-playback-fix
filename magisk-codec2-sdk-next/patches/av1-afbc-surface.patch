@@ -1,0 +1,60 @@
+--- a/component/video/C2RKMpiDec.cpp
++++ b/component/video/C2RKMpiDec.cpp
+@@ -1163,6 +1163,15 @@
+ 
+ int32_t C2RKMpiDec::getFbcOutputMode(const std::unique_ptr<C2Work> &work) {
+     int32_t fbcMode = C2RKChipCapDef::get()->getFbcOutputMode(mCodingType);
++    // RK3588 AV1 AFBC is lossless and avoids the linear ten-bit display path.
++    // The hardware has a known AFBC layout failure for widths not divisible by 64.
++    // Only native composer consumers qualify; texture/CPU/P010 requests stay linear.
++    if (mCodingType == MPP_VIDEO_CodingAV1 && mAv1VendorSurface &&
++            C2RKChipCapDef::get()->getChipType() == RK_CHIP_3588 &&
++            mWidth > 0 && (mWidth % 64) == 0 &&
++            property_get_bool("debug.rkcodec2.av1_afbc", false)) {
++        fbcMode = C2_COMPRESS_AFBC_16x16;
++    }
+ 
+     if (!fbcMode || mGraphicSourceMode || mBufferMode || mAv1PpDirect) {
+         return 0;
+@@ -1901,7 +1910,7 @@
+ 
+     if (block) {
+         c2Buffer = createGraphicBuffer(
+-                std::move(block), C2Rect(mWidth, mHeight).at(mBufferMode ? 0 : mLeftCorner, mBufferMode ? 0 : mTopCorner));
++                std::move(block), C2Rect(mWidth, mHeight).at(entry.cropLeft, entry.cropTop));
+         if (mBufferMode || (mColorFormat & 0x10000000u)) c2Buffer->setInfo(std::make_shared<C2StreamPixelFormatInfo::output>(0u, (mColorFormat & 0x10000000u) ? HAL_PIXEL_FORMAT_YCBCR_P010 : mCopyBlockFormat));
+         if (entry.hdrInfo && entry.hdrInfo->mastering.maxLuminance >= 0) c2Buffer->setInfo(entry.hdrInfo);
+         if (entry.hdr10Plus) c2Buffer->setInfo(entry.hdr10Plus);
+@@ -2891,6 +2900,21 @@
+ 
+     }
+ 
++    entry->cropLeft = mBufferMode ? 0 : mLeftCorner;
++    entry->cropTop = mBufferMode ? 0 : mTopCorner;
++    if (!mBufferMode && mCodingType == MPP_VIDEO_CodingAV1 && MPP_FRAME_FMT_IS_FBC(format)) {
++        // Hantro's AV1 postprocessor adds eight top rows only when filters run.
++        // Use the completed frame's crop, not a codec-wide fixed padding guess.
++        entry->cropLeft = mpp_frame_get_offset_x(frame);
++        entry->cropTop = mpp_frame_get_offset_y(frame);
++        auto block = outBuffer->getBlock();
++        if (!block || entry->cropLeft < 0 || entry->cropTop < 0 ||
++                uint64_t(entry->cropLeft) + width > block->width() ||
++                uint64_t(entry->cropTop) + height > block->height()) {
++            c2_err("AV1 AFBC crop exceeds allocated block");
++            ret = C2_CORRUPTED; goto cleanUp;
++        }
++    }
+     entry->block = mBufferMode ? std::move(mOutBlock) : std::move(outBuffer->getBlock());
+ 
+ cleanUp:
+--- a/component/video/C2RKMpiDec.h
++++ b/component/video/C2RKMpiDec.h
+@@ -121,6 +121,8 @@
+         int64_t frameIndex;
+         int64_t timestamp;
+         int32_t flags;
++        int32_t cropLeft = 0;
++        int32_t cropTop = 0;
+         std::shared_ptr<C2GraphicBlock> block;
+     };
+ 

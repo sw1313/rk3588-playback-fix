@@ -1,0 +1,188 @@
+{
+  "version": "0.6.1",
+  "date": "2026-10-16",
+  "stage": "local_validation_passed_with_documented_limits",
+  "previous_version": "0.6.0",
+  "previous_validation_source": "../docs/validation/decode-0.6.0.json",
+  "device_scope": {
+    "soc": "RK3588",
+    "android_api": 32,
+    "kernel": "5.10.66",
+    "firmware": "exact consumer/library contracts only"
+  },
+  "payload_sha256": {
+    "core": "dc9a6c82837e5dbdb41de62a611ca01fb6f83e08268a2d0bc7e11fca5cb83332",
+    "mpp32": "6fc33aa92f27b400436f27e711ccba0c422c00640945869b992dc578c7f1baa8",
+    "mpp64": "d7b6ce10806c0512769fe8be1c7cf25f8421427a198302cd1d1433e9804a18e7"
+  },
+  "route": {
+    "display_consumer": "full-ten-bit native NV15 when HW_COMPOSER is present and HW_VIDEO_ENCODER is absent",
+    "other_surface_consumers": "standard P010 hardware postprocessing with mapper/stride/size validation",
+    "buffer_clients": "retained full-precision copy",
+    "private_mpp_flag": "0x10000000, RK3588 scoped; not upstream public ABI",
+    "independent_switch": "av1_native; reboot required"
+  },
+  "local_exoplayer_ab": {
+    "engine": "installed SmartTube Amzn ExoPlayer 2.10.6, default renderers in an independent local diagnostic process",
+    "buffer_max_ms": 5000,
+    "buffer_target_bytes": 67108864,
+    "same_encoded_file": true,
+    "ten_bit_retained": true,
+    "frames": 360,
+    "old_copy_dropped": 299,
+    "new_native_dropped": 9,
+    "old_display_format": "RGB AB24",
+    "new_display_format": "ten-bit NV15"
+  },
+  "long_local_mediacodec": {
+    "decoded": 3600,
+    "render_callbacks": 3600,
+    "late_gt20ms": 0,
+    "max_lateness_ms": 0,
+    "gap_p95_ms": 16.667,
+    "hal_survived": true,
+    "complete": true
+  },
+  "long_local_exoplayer": {
+    "inputBufferCount": 3600,
+    "renderedOutputBufferCount": 3590,
+    "droppedBufferCount": 10,
+    "drops_after_first_2s": 0,
+    "actual_video_decoder": "OMX.c2.rk.av1.decoder",
+    "complete": true
+  },
+  "hdr_audio_local_exoplayer": [
+    {
+      "container_audio": "MP4 AAC",
+      "inputBufferCount": 1800,
+      "renderedOutputBufferCount": 1800,
+      "droppedBufferCount": 0,
+      "complete": true
+    },
+    {
+      "container_audio": "WebM Opus",
+      "inputBufferCount": 1800,
+      "renderedOutputBufferCount": 1800,
+      "droppedBufferCount": 0,
+      "complete": true
+    }
+  ],
+  "hdr_output": {
+    "cases": [
+      {
+        "case": "auto-hdr-av1-pq-uhd60-30s",
+        "complete": true,
+        "frames": 1800,
+        "late_gt20ms": 0,
+        "ten_bit_hdmi_driver": true,
+        "nv15_display_plane": true,
+        "packet_eotf": 2,
+        "expected_eotf": 2,
+        "wire_measurement": false
+      },
+      {
+        "case": "auto-hdr-synthetic-av1-hlg-4k60",
+        "complete": true,
+        "frames": 360,
+        "late_gt20ms": 0,
+        "ten_bit_hdmi_driver": true,
+        "nv15_display_plane": true,
+        "packet_eotf": 3,
+        "expected_eotf": 3,
+        "wire_measurement": false
+      }
+    ],
+    "exit_returns_sdr": true
+  },
+  "quality": {
+    "native_exact_cases": 11,
+    "all_native_visible_samples_exact": true,
+    "same_mpp_decode_payload_bitdepth_retained": true,
+    "native_nv15_display_plane_observed": true,
+    "standard_p010_texture_uhd_frames": 360,
+    "nonaligned_854x480_display_and_texture_pass": true
+  },
+  "lifecycle": {
+    "cases": 5,
+    "pause_seek_eos_pass": true
+  },
+  "local_format_matrix": {
+    "attempted_paths": 17,
+    "available_paths_complete": 16,
+    "unavailable_hardware_name": "c2.rk.m4v.decoder",
+    "same_unavailable_name_reproduced_on_0_6_0": true,
+    "system_mpeg4_software_complete": true
+  },
+  "persistent_rollback": {
+    "whole-off": {
+      "mode": "off",
+      "verified_boot": true,
+      "kernel_unchanged": true,
+      "boot_unchanged": true,
+      "global_mali_unchanged": true,
+      "original_core_mpp_service_verified": true,
+      "av1_property_disabled": true
+    },
+    "whole-on-native-off": {
+      "mode": "on",
+      "verified_boot": true,
+      "kernel_unchanged": true,
+      "boot_unchanged": true,
+      "global_mali_unchanged": true,
+      "original_core_mpp_service_verified": false,
+      "independent_native_disabled": true,
+      "new_sdk_still_loaded": true
+    },
+    "native-on": {
+      "mode": "reboot",
+      "verified_boot": true,
+      "kernel_unchanged": true,
+      "boot_unchanged": true,
+      "global_mali_unchanged": true,
+      "original_core_mpp_service_verified": false,
+      "independent_native_reenabled": true,
+      "final_guarded_core_loaded": true
+    }
+  },
+  "protected_state": {
+    "boot_unchanged": true,
+    "kernel_unchanged": true,
+    "yamby_native_libraries_unchanged": 18,
+    "lsposed_module_version": "0.3.3",
+    "lsposed_package_path_unchanged": true,
+    "mali_global_unchanged": true,
+    "active_manifest_pass": true
+  },
+  "limitations": [
+    "Complete SmartTube UI/custom-renderer/network playback not revalidated; final performance tests used local files.",
+    "Small startup drop counts remain in video-only Exo tests; no universal zero-drop or all-stream claim.",
+    "Synthetic/transcoded/repeated samples are not independent HDR photography, a thermal soak, or exhaustive codec-tool coverage.",
+    "AV1+Opus MP4 local playback clock stalls with both output routes in this old Exo diagnostic path; exact encoded audio/video streams remuxed as WebM pass. This container case is excluded from the passing matrix.",
+    "P010 texture consumers have no NV15 display-plane performance guarantee.",
+    "HDR wire signaling inferred from driver and packet registers; no external HDMI analyzer.",
+    "Existing HDR4000 client-composition boundary, inherited capability registry, lack of Dolby/HDR10+ HDMI support remain."
+  ],
+  "measurement_lineage": {
+    "final_core_sha256": "dc9a6c82837e5dbdb41de62a611ca01fb6f83e08268a2d0bc7e11fca5cb83332",
+    "earlier_core_before_explicit_request_guards": "04582ed16fbf8b94c2aab702bc5f7e7a29ddc8d44ba80684565f731a8bf60de0",
+    "final_core_exact_pixel_cases": 11,
+    "final_core_explicit_standard_p010_and_crop_requests": [
+      {
+        "case": "explicit-request_p010",
+        "complete": true,
+        "decoded": 6
+      },
+      {
+        "case": "explicit-vendor_crop",
+        "complete": true,
+        "decoded": 6
+      }
+    ],
+    "final_core_exoplayer_ab": true,
+    "final_core_exoplayer_webm_opus": true,
+    "final_core_exoplayer_long": true,
+    "final_core_exoplayer_aac": true,
+    "final_core_lifecycle": true,
+    "broad_format_matrix_and_60s_mediacodec_and_hdr_register_suite": "measured before the two explicit-request exclusion guards; unchanged default routes, retained as versioned evidence"
+  }
+}

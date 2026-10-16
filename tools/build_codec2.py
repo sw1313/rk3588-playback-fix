@@ -23,6 +23,8 @@ def main():
  if source.exists():raise SystemExit('Use a fresh build directory; existing source is never overwritten')
  shutil.copytree(upstream,source,ignore=shutil.ignore_patterns('.git'))
  run('git','-C',source,'--git-dir='+str(upstream/'.git'),'--work-tree='+str(source),'apply',MODULE/'patches/codec2-p010.patch')
+ if (source/'component/include/RKPacked10.h').read_bytes().replace(b'\r\n',b'\n') != (ROOT/'tools/pixel-conversion/RKPacked10.h').read_bytes().replace(b'\r\n',b'\n'):
+  raise SystemExit('Packed-ten-bit patch differs from the tested canonical header')
  run('git','-C',source,'--git-dir='+str(upstream/'.git'),'--work-tree='+str(source),'apply',MODULE/'patches/codec2-hdr-bridge.patch')
  for header in (MODULE/'bridge-src').glob('*.h'):shutil.copyfile(header,source/'component/include'/header.name)
  for name in ['aosp-codec2','aosp-hardware','platform-private','vendor32']:

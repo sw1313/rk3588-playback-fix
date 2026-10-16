@@ -3,10 +3,12 @@ Private firmware files are link inputs only; they are never packaged.
 """
 from pathlib import Path
 import argparse,hashlib,json,os,shutil,subprocess
-R=Path(__file__).resolve().parents[1];M=R/'magisk-codec2-sdk'
+R=Path(__file__).resolve().parents[1]
 p=argparse.ArgumentParser(description=__doc__)
 for name in ['upstream','prepared-root','vndk-headers','ndk','rga-source','libhardware','work']:p.add_argument('--'+name,type=Path,required=True)
+p.add_argument('--sdk-next',action='store_true',help='Build the separately selectable 1.14.16 decoder core')
 a=p.parse_args();W=a.work.resolve();SDK=a.prepared_root.resolve();H=a.vndk_headers.resolve();N=a.ndk.resolve();G=a.rga_source.resolve();S=W/'source'
+M=R/('magisk-codec2-sdk-next' if a.sdk_next else 'magisk-codec2-sdk')
 def run(*args):subprocess.run([str(x) for x in args],check=True)
 def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 contracts={line.split()[1]:line.split()[0] for line in (M/'contracts/platform.sha256').read_text().splitlines()}
@@ -18,6 +20,11 @@ if subprocess.check_output(['git','-C',str(a.upstream),'status','--porcelain'],t
 if W.exists():raise SystemExit('Use a fresh build directory')
 W.mkdir(parents=True);shutil.copytree(a.upstream,S,ignore=shutil.ignore_patterns('.git'))
 run('git','-C',S,'--git-dir='+str(a.upstream.resolve()/'.git'),'--work-tree='+str(S),'apply',M/'patches/api32-full-precision.patch')
+if a.sdk_next:
+ run('git','-C',S,'--git-dir='+str(a.upstream.resolve()/'.git'),'--work-tree='+str(S),'apply',M/'patches/av1-native-surface.patch')
+ run('git','-C',S,'--git-dir='+str(a.upstream.resolve()/'.git'),'--work-tree='+str(S),'apply',M/'patches/av1-afbc-surface.patch')
+if (S/'component/osal/include/RKPacked10.h').read_bytes().replace(b'\r\n',b'\n') != (R/'tools/pixel-conversion/RKPacked10.h').read_bytes().replace(b'\r\n',b'\n'):
+ raise SystemExit('Packed-ten-bit patch differs from the tested canonical header')
 def q(p):return '"'+Path(p).as_posix()+'"'
 incs=[S/'store',S/'component/base',S/'component/base/include',S/'component/video',S/'component/osal/include',S/'component/osal/include/mpp',SDK/'aosp-codec2/core/include',SDK/'aosp-codec2/vndk/include',SDK/'aosp-codec2/vndk/internal',SDK/'aosp-codec2/components/base/include',SDK/'aosp-codec2/sfplugin',SDK/'aosp-codec2/sfplugin/utils',SDK/'aosp-hardware',SDK/'platform-private',G/'include',G/'im2d_api',G/'core/3rdparty/android_hal',H/'system/memory/libion/kernel-headers']
 names={'include','include_vndk','include_types','include_private','include_outside_system'}
@@ -25,6 +32,8 @@ incs+=sorted(p for p in H.rglob('*') if p.is_dir() and p.name in names and 'exte
 incs+=sorted(p for p in (H/'generated-headers').rglob('gen') if (p/'android').exists())
 incs+=[H/'system/libfmq/base',H/'frameworks/native/libs/binder/ndk/include_cpp',H/'frameworks/native/libs/binder/ndk/include_ndk']
 srcs=[S/'component/C2RKComponentFactory.cpp',*sorted((S/'component/base').glob('*.cpp')),*sorted((S/'component/video').glob('*.cpp')),*sorted((S/'component/osal').glob('*.cpp')),*sorted((S/'store').glob('*.cpp'))]
+if a.sdk_next:
+ srcs=[p for p in srcs if p.name not in {'C2RKMpiEnc.cpp','C2RKMlvecLegacy.cpp','C2RKMpiRoiUtils.cpp'}]
 V=SDK/'vendor32';libs=['libmpp.so','librga.so','libbase.so','libcodec2.so','libcodec2_vndk.so','libsfplugin_ccodec_utils.so','libstagefright_foundation.so','libgralloc_priv.so','libutils.so','libcutils.so','libui.so','libc++.so','liblog.so','libhidlbase.so','libgralloctypes.so','android.hardware.graphics.mapper@4.0.so','libdmabufheap.so']
 paths=[V/lib for lib in libs]
 paths.append(a.libhardware.resolve())

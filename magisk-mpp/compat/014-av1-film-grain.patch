@@ -1,0 +1,17 @@
+--- a/mpp/hal/vpu/av1d/hal_av1d_vdpu.c
++++ b/mpp/hal/vpu/av1d/hal_av1d_vdpu.c
+@@ -1712,8 +1712,12 @@
+        }
+        asic_buff->fg_params[asic_buff->out_buffer_i] = *fg_params;*/
+ 
+-    // film grain applied on secondary output
+-    //  sw_ctrl->sw_apply_grain = dec_cont->pp_enabled ? 1 : 0;
++    /* AV1 grain belongs on the secondary output, never on DPB references.
++     * This HAL always enables that postprocessor. Keep an independent
++     * compatibility switch for kernels/consumers needing the prior path. */
++    RK_U32 apply_grain = 1;
++    mpp_env_get_u32("debug.rkcodec2.av1_grain", &apply_grain, 1);
++    regs->swreg7.sw_apply_grain = !!apply_grain;
+     regs->swreg7.sw_num_y_points_b = dxva->film_grain.num_y_points > 0;
+     regs->swreg7.sw_num_cb_points_b = dxva->film_grain.num_cb_points > 0;
+     regs->swreg7.sw_num_cr_points_b = dxva->film_grain.num_cr_points > 0;

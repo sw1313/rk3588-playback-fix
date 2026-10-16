@@ -1,0 +1,90 @@
+[
+  {
+    "case": "grain8-854",
+    "depth": 8,
+    "width": 854,
+    "height": 480,
+    "grain_enabled": 0,
+    "frames": 12,
+    "all_samples_exact": true,
+    "bytes": 14757120,
+    "sha256": "f2952ec8f7ca96e093fde58d727e3a749c52d82488fc5f8a47cbc9455d6be6a0"
+  },
+  {
+    "case": "grain8-854",
+    "depth": 8,
+    "width": 854,
+    "height": 480,
+    "grain_enabled": 1,
+    "frames": 12,
+    "all_samples_exact": true,
+    "bytes": 14757120,
+    "sha256": "69ac5e382a7f47dcbfec17c199e93046a28a2e3292bffac7adb925813ba031d8"
+  },
+  {
+    "case": "grain10-854",
+    "depth": 10,
+    "width": 854,
+    "height": 480,
+    "grain_enabled": 0,
+    "frames": 12,
+    "all_samples_exact": true,
+    "bytes": 14757120,
+    "sha256": "49d1c806202d0d9e6e2358b83600260bdfbcca3062c7addda1adfa42d78d442d"
+  },
+  {
+    "case": "grain10-854",
+    "depth": 10,
+    "width": 854,
+    "height": 480,
+    "grain_enabled": 1,
+    "frames": 12,
+    "all_samples_exact": true,
+    "bytes": 14757120,
+    "sha256": "a57b4c8fdb34d195483fbb0a672f3cd338bae21d2e5c9506819966a7282b3239"
+  },
+  {
+    "case": "grain10-1080",
+    "depth": 10,
+    "width": 1920,
+    "height": 1080,
+    "grain_enabled": 0,
+    "frames": 12,
+    "all_samples_exact": true,
+    "bytes": 74649600,
+    "sha256": "4e35e82cf4f132b9f86f88b836cb04c8dc6ea02fcf7696b02f3b95918b6ed8d5"
+  },
+  {
+    "case": "grain10-1080",
+    "depth": 10,
+    "width": 1920,
+    "height": 1080,
+    "grain_enabled": 1,
+    "frames": 12,
+    "all_samples_exact": true,
+    "bytes": 74649600,
+    "sha256": "24bbefd5e670c2e65f8d79d4e72aab2ca046ce6328ee8c01fb8c7279314c7b6d"
+  },
+  {
+    "case": "plain10-1080",
+    "depth": 10,
+    "width": 1920,
+    "height": 1080,
+    "grain_enabled": 0,
+    "frames": 12,
+    "all_samples_exact": true,
+    "bytes": 74649600,
+    "sha256": "2f56d04b384c41c67123b2c82f7202df6e6dc31b7f1d061b2113530ae3ee86a6"
+  },
+  {
+    "case": "plain10-1080",
+    "depth": 10,
+    "width": 1920,
+    "height": 1080,
+    "grain_enabled": 1,
+    "frames": 12,
+    "all_samples_exact": true,
+    "bytes": 74649600,
+    "sha256": "2f56d04b384c41c67123b2c82f7202df6e6dc31b7f1d061b2113530ae3ee86a6"
+  }
+]

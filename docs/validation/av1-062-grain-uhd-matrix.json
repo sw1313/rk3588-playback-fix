@@ -1,0 +1,24 @@
+[
+  {
+    "case": "grain10-uhd6",
+    "depth": 10,
+    "width": 3840,
+    "height": 2160,
+    "grain_enabled": 0,
+    "frames": 6,
+    "all_samples_exact": true,
+    "bytes": 149299200,
+    "sha256": "b3740aada35761f5bc4fe7e06ce239bfc810f96c77336e28cda205ea964f2054"
+  },
+  {
+    "case": "grain10-uhd6",
+    "depth": 10,
+    "width": 3840,
+    "height": 2160,
+    "grain_enabled": 1,
+    "frames": 6,
+    "all_samples_exact": true,
+    "bytes": 149299200,
+    "sha256": "496e82e65dae7a88f859343cfc3f0e90a6376b5ab0460e9321e00dcb153d1215"
+  }
+]

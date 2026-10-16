@@ -1,0 +1,83 @@
+--- a/mpp/base/mpp_buf_slot.c
++++ b/mpp/base/mpp_buf_slot.c
+@@ -507,6 +507,16 @@
+     mpp_frame_set_height(impl->info_set, height);
+     mpp_frame_set_fmt(impl->info_set, fmt);
+     info_set_ptr = (use_legacy_align != 0) ? &legacy_info_set : &sys_cfg_info_set;
++    /* Paired opt-in AV1 PP output has a standard linear P010 allocation.
++     * The reconstruction/MV/CDF buffers remain separately owned by the HAL. */
++    if ((fmt & 0x10000000u) && impl->coding_type == MPP_VIDEO_CodingAV1 &&
++        (fmt & MPP_FRAME_FMT_MASK) == MPP_FMT_YUV420SP_10BIT &&
++        !MPP_FRAME_FMT_IS_FBC(fmt) && !MPP_FRAME_FMT_IS_TILE(fmt)) {
++        info_set_ptr->h_stride_by_byte = MPP_ALIGN(width, 64) * 2;
++        info_set_ptr->v_stride = MPP_ALIGN(height, 16);
++        info_set_ptr->h_stride_by_pixel = info_set_ptr->h_stride_by_byte / 2;
++        info_set_ptr->size_total = info_set_ptr->h_stride_by_byte * info_set_ptr->v_stride * 3 / 2;
++    }
+     mpp_frame_set_hor_stride(impl->info_set, info_set_ptr->h_stride_by_byte);
+     mpp_frame_set_ver_stride(impl->info_set, info_set_ptr->v_stride);
+     mpp_frame_set_hor_stride_pixel(impl->info_set, info_set_ptr->h_stride_by_pixel);
+--- a/mpp/codec/dec/av1/av1d_parser.c
++++ b/mpp/codec/dec/av1/av1d_parser.c
+@@ -103,6 +103,15 @@
+ 
+     if (pix_fmt == MPP_FMT_BUTT)
+         return MPP_ERR_UNKNOW;
++    /* Private opt-in protocol with the paired Codec2 core. Never alters
++     * ordinary callers, AFBC/tile layouts, or other decoder hardware. */
++    if (mpp_get_soc_type() == ROCKCHIP_SOC_RK3588 &&
++        pix_fmt == MPP_FMT_YUV420SP_10BIT &&
++        (ctx->usr_set_fmt & 0x10000000u) &&
++        (ctx->cfg->base.out_fmt & 0x10000000u) &&
++        !MPP_FRAME_FMT_IS_FBC(ctx->cfg->base.out_fmt) &&
++        !MPP_FRAME_FMT_IS_TILE(ctx->cfg->base.out_fmt))
++        pix_fmt |= 0x10000000u;
+     ctx->pix_fmt = pix_fmt;
+     s->bit_depth = bit_depth;
+     return MPP_OK;
+@@ -680,12 +689,14 @@
+      * If user config 8bit output when input video is 10bti,
+      * here should set hor_stride according to 8bit.
+      */
+-    if (MPP_FRAME_FMT_IS_YUV_10BIT(ctx->pix_fmt))
++    if (ctx->pix_fmt & 0x10000000u)
++        mpp_frame_set_hor_stride(frame->f, MPP_ALIGN(s->frame_width, 64) * 2);
++    else if (MPP_FRAME_FMT_IS_YUV_10BIT(ctx->pix_fmt))
+         mpp_frame_set_hor_stride(frame->f, MPP_ALIGN(s->frame_width * s->bit_depth / 8, 8));
+     else
+         mpp_frame_set_hor_stride(frame->f, MPP_ALIGN(s->frame_width, 8));
+ 
+-    mpp_frame_set_ver_stride(frame->f, MPP_ALIGN(s->frame_height, 8));
++    mpp_frame_set_ver_stride(frame->f, MPP_ALIGN(s->frame_height, (ctx->pix_fmt & 0x10000000u) ? 16 : 8));
+     mpp_frame_set_errinfo(frame->f, 0);
+     mpp_frame_set_discard(frame->f, 0);
+     mpp_frame_set_pts(frame->f, s->pts);
+@@ -736,9 +747,9 @@
+     else
+         mpp_frame_set_thumbnail_en(frame->f, 0);
+ 
+-    value = 4;
++    value = (ctx->pix_fmt & 0x10000000u) ? 3 : 4;
+     mpp_slots_set_prop(ctx->slots, SLOTS_NUMERATOR, &value);
+-    value = 1;
++    value = (ctx->pix_fmt & 0x10000000u) ? 2 : 1;
+     mpp_slots_set_prop(ctx->slots, SLOTS_DENOMINATOR, &value);
+     mpp_buf_slot_get_unused(ctx->slots, &frame->slot_index);
+     av1d_dbg(AV1D_DBG_REF, "get frame->slot_index %d", frame->slot_index);
+--- a/mpp/hal/vpu/av1d/hal_av1d_vdpu.c
++++ b/mpp/hal/vpu/av1d/hal_av1d_vdpu.c
+@@ -2219,6 +2219,14 @@
+          * 0 is 8bit or 10bit output by syntax
+          * 3 is force 8bit output
+          */
++        if (mpp_frame_get_fmt(mframe) & 0x10000000u) {
++            /* AV1 postprocessor P010 output, matching upstream hardware
++             * programming: format=1 and byte-based 16-bit plane strides. */
++            if (dxva->bitdepth != 10 || hor_stride < width * 2 ||
++                mpp_buffer_get_size(buffer) < (size_t)hor_stride * ver_stride * 3 / 2)
++                return MPP_ERR_VALUE;
++            out_fmt = 1;
++        }
+         regs->vdpu_av1d_pp_cfg.swreg322.sw_pp_out_format = out_fmt;
+         regs->vdpu_av1d_pp_cfg.swreg326.sw_pp_out_lu_base_lsb = mpp_buffer_get_fd(buffer);
+         regs->vdpu_av1d_pp_cfg.swreg328.sw_pp_out_ch_base_lsb = mpp_buffer_get_fd(buffer);

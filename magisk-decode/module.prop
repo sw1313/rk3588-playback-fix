@@ -1,6 +1,6 @@
 id=rk3588_decode_stack
 name=RK3588 Decode Stack
-version=0.5.1
-versionCode=501
+version=0.6.3
+versionCode=603
 author=sw1313
-description=SDK14 Codec2 core for verified API32 firmware with guarded AVC/HEVC eight-bit buffer routing and serialized stop. Full ten-bit/P010 and HDR preserved, independent buffer/backend switches and reboot rollback. Original kernel, player and hooks retained.
+description=Firmware-specific RK3588 API32 decode stack with guarded lossless ten-bit AV1 AFBC display delivery, per-feature switches and rollback. No boot, kernel or player changes.

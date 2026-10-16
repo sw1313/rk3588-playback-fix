@@ -1,9 +1,37 @@
 # Unified RK3588 decode stack
 
+## 0.6.3 AV1 output delivery
+
+Adds independently switchable lossless ten-bit AV1 AFBC on verified RK3588
+composer surfaces with 64-aligned width. The local real AV1 4K60 HDR source
+completed 18808 rendered outputs with zero player-reported drops. This is a
+source-specific measurement, not a universal smoothness guarantee. Other widths,
+explicit P010 and texture/CPU consumers retain their full-precision paths.
+Filter-dependent top padding comes from the completed frame.
+See [comparison, exact pixels and limitations](../docs/decode-av1-063.zh-CN.md).
+The prior `av1_grain` correction and all component/whole-stack rollback remain.
+
+
 One Magisk module combines the verified Android 12 / API32 system decode
 components. It is restricted to the tested RK3588 firmware hashes and original
 5.10 kernel interfaces. Yamby files, LSPosed 0.3.3, the GPU driver, clocks and
 Frame Guard are retained.
+
+Version 0.6.1 selects full-ten-bit AV1 output by actual consumer usage. Display
+composer surfaces use native NV15 planes; texture consumers retain validated
+standard P010 hardware output, with the previous full-precision copy route
+available through `av1_native off`. Local file tests include the installed
+SmartTube ExoPlayer engine. See [measurements, quality checks and limits](../docs/decode-av1-061.zh-CN.md).
+
+Version 0.6.0 adds the separately selectable Codec2 1.14.16 decoder core with
+cacheable internal copy buffers, read-only DMA synchronization and the newer
+work/output-delay logic. The retained 1.14.3 SIMD core is packaged independently
+for rollback. See the [port, test scope and remaining limits](../docs/decode-sdk-060.zh-CN.md).
+
+Version 0.5.2 accelerates packed ten-bit to P010 conversion with bounded NEON
+unpacking, an aligned cacheable row and sequential bulk writes. The independent
+`p010_fast` switch restores scalar full-ten-bit conversion after reboot. See the
+[performance, format coverage and remaining limits](../docs/decode-simd-052.zh-CN.md).
 
 Version 0.5.0 ports the pinned SDK14 Codec2 core to this API32 stack, retains
 the newer MPP compatibility pair and adds a `codec2_sdk` switch to restore
@@ -28,7 +56,7 @@ formats. The independent global Mali module is retained.
 | --- | --- |
 | MPP + VPU, ARM32/ARM64 | MPP 1.1.0 plus selected upstream VP9 probability, reset/CSD replay, empty CSD, AV1 metadata capacity/gating and HEVC first-task PS/RPS fixes; retains verified JPEG/PREP/HDR compatibility |
 | RGA, ARM32/ARM64 | Existing validated librga 1.10.6 for this firmware's gralloc4 ABI |
-| Codec2 | Selectable SDK14 core port with full-precision Surface/P010 and HDR metadata; previous backend and six guarded platform patches retained; all 21 original entries remain available |
+| Codec2 | Selectable SDK14 core port with full-precision Surface/P010 and HDR metadata; previous backend and six guarded platform patches retained; all 21 original registry entries are retained |
 | libyuv, system ARM64 | Version 1974 plus upstream scaling overflow fix `0b9e5c922dee`; all 710 original exports retained; 59 removed APIs use isolated Android 12 source implementations |
 | HDR metadata | Full HDR10 static mastering/light values on the verified direct Surface path; standard per-frame Codec2 HDR10+ metadata bridge, with independent switches; no native HDR10+/Dolby HDMI claim |
 | Software Codec2, ARM64 APEX | libvpx 1.17.0 decoder-only backend and pinned libgav1; API32 wrappers retain CFI and use full-precision P010 for tested ten-bit output; original shared libvpx and VP8/VP9 encoders remain original |
@@ -49,7 +77,7 @@ retained.
 
 ## Installation and switches
 
-Install `rk3588-decode-stack-0.5.1.zip` in Magisk and reboot. The installer checks
+Install `rk3588-decode-stack-0.6.0.zip` in Magisk and reboot. The installer checks
 all components before disabling overlapping standalone MPP, RGA, Codec2 and
 libyuv modules. It also works from the original component state: Codec2's
 preflight uses the hash-verified staged dependencies. No vendor partition is
@@ -65,7 +93,14 @@ su -c 'sh /data/adb/modules/rk3588_decode_stack/mode-control.sh libyuv off'
 su -c 'sh /data/adb/modules/rk3588_decode_stack/mode-control.sh libyuv on'
 ```
 
-Replace `libyuv` with `mpp`, `rga`, `codec2`, `codec2_sdk`, `codec2_buffer`, `software`, `hdr_static` or `hdr10plus` for the other selections, and reboot.
+Replace `libyuv` with `mpp`, `rga`, `codec2`, `codec2_sdk`, `codec2_sdk_next`, `codec2_buffer`, `software`, `hdr_static`, `hdr10plus`, `p010_fast`, `av1_native`, `av1_grain` or `av1_afbc` for the other selections, and reboot.
+`av1_native` requires the effective `codec2_sdk_next` core and keeps its saved
+selection when dependencies are disabled. Turning it off retains ten-bit output
+through the previous copy path; it does not enable eight-bit conversion.
+`codec2_sdk_next off` restores the separately retained 1.14.3 SIMD core. It requires
+effective `codec2_sdk`; dependency suppression preserves the saved selection.
+`p010_fast` requires Codec2 and retains its saved selection when that dependency
+is disabled. Turning it off restores scalar unpacking with the same ten-bit values.
 `codec2_buffer` requires the effective SDK core. Turning it off restores the
 legacy buffer route, including the failure reproduced with that upgrade combination.
 Turning `codec2_sdk` off restores the prior 0.4.0 core; turning `codec2` off
@@ -223,3 +258,7 @@ only a scoped property read is overridden for client-only HDR sources already
 rendered to SDR. No global force-disable property is written. Original Yamby,
 LSPosed, decoder backends and boot remain unchanged. See
 [implementation, tests and limits](../docs/hdr-client-032.zh-CN.md).
+
+`av1_afbc off` and reboot restores the prior linear ten-bit composer route.
+It requires effective `av1_native` and `codec2_sdk_next`; saved choices survive
+suppressed dependencies. The switch does not change the film-grain or HDR flags.

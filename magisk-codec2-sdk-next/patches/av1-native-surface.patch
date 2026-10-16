@@ -1,0 +1,230 @@
+--- a/component/video/C2RKMpiDec.cpp
++++ b/component/video/C2RKMpiDec.cpp
+@@ -1164,7 +1164,7 @@
+ int32_t C2RKMpiDec::getFbcOutputMode(const std::unique_ptr<C2Work> &work) {
+     int32_t fbcMode = C2RKChipCapDef::get()->getFbcOutputMode(mCodingType);
+ 
+-    if (!fbcMode || mGraphicSourceMode || mBufferMode) {
++    if (!fbcMode || mGraphicSourceMode || mBufferMode || mAv1PpDirect) {
+         return 0;
+     }
+ 
+@@ -1432,6 +1432,27 @@
+ c2_status_t C2RKMpiDec::updateDecoderArgs(const std::shared_ptr<C2BlockPool> &pool) {
+     c2_status_t err  = C2_OK;
+     bool needsUpdate = false;
++    // Only a display-composer consumer can accept the vendor's packed ten-bit
++    // layout. Texture/CPU consumers retain the standard P010 path.
++    bool composerSurface = false;
++    const bool av1Native = mCodingType == MPP_VIDEO_CodingAV1 &&
++            C2RKChipCapDef::get()->getChipType() == RK_CHIP_3588 &&
++            pool->getLocalId() > C2BlockPool::PLATFORM_START &&
++            property_get_bool("debug.rkcodec2.av1_direct", false);
++    if (av1Native) {
++        std::shared_ptr<C2GraphicBlock> probe;
++        buffer_handle_t handle = nullptr;
++        if (pool->fetchGraphicBlock(176, 144, HAL_PIXEL_FORMAT_YCrCb_NV12,
++                {C2MemoryUsage::CPU_READ, C2MemoryUsage::CPU_WRITE}, &probe) == C2_OK &&
++                C2RKMediaUtils::importGraphicBuffer(probe->handle(), &handle) == C2_OK) {
++            const uint64_t consumerUsage = C2RKGrallocOps::get()->getUsage(handle);
++            composerSurface = (consumerUsage & GRALLOC_USAGE_HW_COMPOSER) &&
++                    !(consumerUsage & GRALLOC_USAGE_HW_VIDEO_ENCODER);
++            c2_info("AV1 surface consumer usage 0x%llx composer %d",
++                    (unsigned long long)consumerUsage, composerSurface);
++            C2RKMediaUtils::freeGraphicBuffer(handle);
++        }
++    }
+ 
+     {
+         IntfImpl::Lock lock = mIntf->lock();
+@@ -1440,15 +1461,22 @@
+         int32_t pixelFormat = mIntf->getPixelFormat_l()->value;
+         int32_t colorFormat = mIntf->getIs10bit() ? MPP_FMT_YUV420SP_10BIT : MPP_FMT_YUV420SP;
+         bool    tunneled    = mIntf->getIsTunnelMode();
+-        mSurfaceP010Copy = mCodingType == MPP_VIDEO_CodingAV1 &&
++        mAv1VendorSurface = mCodingType == MPP_VIDEO_CodingAV1 && !tunneled &&
++                av1Native && composerSurface && !mIntf->getOutputCropEnable() &&
++                pixelFormat != HAL_PIXEL_FORMAT_YCBCR_P010;
++        mAv1PpDirect = mCodingType == MPP_VIDEO_CodingAV1 && !tunneled && !mAv1VendorSurface &&
++                !mIntf->getOutputCropEnable() &&
++                pool->getLocalId() > C2BlockPool::PLATFORM_START &&
++                property_get_bool("debug.rkcodec2.av1_direct", false);
++        mSurfaceP010Copy = mCodingType == MPP_VIDEO_CodingAV1 && !mAv1PpDirect && !mAv1VendorSurface &&
+                 pool->getLocalId() > C2BlockPool::PLATFORM_START;
+-        bool bufferMode = mSurfaceP010Copy || (pool->getLocalId() <= C2BlockPool::PLATFORM_START);
++        bool bufferMode = !mAv1PpDirect && (mSurfaceP010Copy || (pool->getLocalId() <= C2BlockPool::PLATFORM_START));
+ 
+         // needs mpp frame update, initial setup in initDecoder()
+         needsUpdate = (mWidth != width) || (mHeight != height);
+ 
+         // av1 support convert to user-set format internally
+-        if (mCodingType == MPP_VIDEO_CodingAV1 && bufferMode) {
++        if (mCodingType == MPP_VIDEO_CodingAV1 && (bufferMode || mAv1VendorSurface)) {
+             colorFormat = MPP_FMT_YUV420SP_10BIT;
+         }
+ 
+@@ -1463,7 +1491,7 @@
+         // format,  switch to output buffer mode and do an extra copy operation to
+         // convert to P010 format.
+         if (colorFormat == MPP_FMT_YUV420SP_10BIT) {
+-            if (pixelFormat == HAL_PIXEL_FORMAT_YCBCR_P010) {
++            if (pixelFormat == HAL_PIXEL_FORMAT_YCBCR_P010 && !mAv1PpDirect) {
+                 c2_info("got p010 format request, use output buffer mode");
+                 bufferMode = true;
+             }
+@@ -1609,6 +1637,21 @@
+         }
+     }
+ 
++    if (mAv1PpDirect && (mColorFormat & 0x10000000u)) {
++        allocWidth = C2_ALIGN(mWidth, 64);
++        allocHeight = C2_ALIGN(mHeight, 16);
++        allocFormat = HAL_PIXEL_FORMAT_YCBCR_P010;
++        allocUsage = kCpuReadWriteUsage;
++        auto color = mIntf->getColorAspects_l();
++        allocUsage |= color && color->range == C2Color::RANGE_FULL
++                ? MALI_GRALLOC_USAGE_RANGE_WIDE : MALI_GRALLOC_USAGE_RANGE_NARROW;
++        allocUsage |= color && color->matrix == C2Color::MATRIX_BT2020
++                ? MALI_GRALLOC_USAGE_YUV_COLOR_SPACE_BT2020
++                : color && color->matrix == C2Color::MATRIX_BT709
++                ? MALI_GRALLOC_USAGE_YUV_COLOR_SPACE_BT709
++                : MALI_GRALLOC_USAGE_YUV_COLOR_SPACE_BT601;
++    }
++
+     mAllocParams.width  = allocWidth;
+     mAllocParams.height = allocHeight;
+     mAllocParams.usage  = allocUsage;
+@@ -1641,6 +1684,7 @@
+         format &= ~MPP_FRAME_FBC_AFBC_V2;
+     }
+ 
++    if (mAv1PpDirect) format = MPP_FMT_YUV420SP_10BIT | 0x10000000u;
+     mMppMpi->control(mMppCtx, MPP_DEC_SET_OUTPUT_FORMAT, (MppParam)&format);
+ 
+     mpp_frame_init(&frame);
+@@ -1657,6 +1701,7 @@
+ 
+     if (mCodingType == MPP_VIDEO_CodingAV1 && mBufferMode) {
+         uint32_t native10 = MPP_FMT_YUV420SP_10BIT;
++
+         if (mMppMpi->control(mMppCtx, MPP_DEC_SET_OUTPUT_FORMAT, &native10) != MPP_OK) {
+             mpp_frame_deinit(&frame); return C2_CORRUPTED;
+         }
+@@ -1664,6 +1709,11 @@
+     mHorStride   = mpp_frame_get_hor_stride(frame);
+     mVerStride   = mpp_frame_get_ver_stride(frame);
+     mColorFormat = mpp_frame_get_fmt(frame);
++    if (mAv1PpDirect && (format & 0x10000000u)) {
++        mHorStride = C2_ALIGN(mWidth, 64) * 2;
++        mVerStride = C2_ALIGN(mHeight, 16);
++        mColorFormat = (MppFrameFormat)format;
++    }
+     mLeftCorner  = leftCorner;
+     mTopCorner   = topCorner;
+ 
+@@ -1754,7 +1804,7 @@
+         mpp_dec_cfg_set_ptr(cfg, "cb:frm_rdy_ctx", this);
+ 
+         /* check HDR Vivid support */
+-        if (!mBufferMode && C2RKChipCapDef::get()->getHdrMetaCap()
++        if (!mBufferMode && !mAv1PpDirect && C2RKChipCapDef::get()->getHdrMetaCap()
+                 && !C2RKPropsDef::getHdrDisable()) {
+             c2_info("enable hdr meta");
+             mpp_dec_cfg_set_u32(cfg, "base:enable_hdr_meta", 1);
+@@ -1852,7 +1902,7 @@
+     if (block) {
+         c2Buffer = createGraphicBuffer(
+                 std::move(block), C2Rect(mWidth, mHeight).at(mBufferMode ? 0 : mLeftCorner, mBufferMode ? 0 : mTopCorner));
+-        if (mBufferMode) c2Buffer->setInfo(std::make_shared<C2StreamPixelFormatInfo::output>(0u, mCopyBlockFormat));
++        if (mBufferMode || (mColorFormat & 0x10000000u)) c2Buffer->setInfo(std::make_shared<C2StreamPixelFormatInfo::output>(0u, (mColorFormat & 0x10000000u) ? HAL_PIXEL_FORMAT_YCBCR_P010 : mCopyBlockFormat));
+         if (entry.hdrInfo && entry.hdrInfo->mastering.maxLuminance >= 0) c2Buffer->setInfo(entry.hdrInfo);
+         if (entry.hdr10Plus) c2Buffer->setInfo(entry.hdr10Plus);
+ 
+@@ -1865,7 +1915,7 @@
+         }
+     }
+ 
+-    const bool copyMode = mBufferMode; const uint32_t copyPixel = mCopyBlockFormat;
++    const bool copyMode = mBufferMode || (mColorFormat & 0x10000000u); const uint32_t copyPixel = (mColorFormat & 0x10000000u) ? HAL_PIXEL_FORMAT_YCBCR_P010 : mCopyBlockFormat;
+     auto fillWork = [c2Buffer, flags, timestamp, this, copyMode, copyPixel, hdrInfo=entry.hdrInfo, hdr10Plus=entry.hdr10Plus](const std::unique_ptr<C2Work> &work) {
+         work->worklets.front()->output.buffers.clear();
+         work->worklets.front()->output.ordinal = work->input.ordinal;
+@@ -2234,6 +2284,25 @@
+ 
+         c2_trace("reuse this buffer, bufferId %d", bufferId);
+     } else {
++        /* Validate the actual mapper layout before giving this allocation to
++         * hardware. No CPU frame conversion/copy is done on this path. */
++        if (mAv1PpDirect && (mColorFormat & 0x10000000u)) {
++            auto view = block->map().get(); auto l = view.layout();
++            bool ok = view.error() == C2_OK && l.numPlanes == 3 &&
++                l.planes[0].rowInc == mHorStride && l.planes[1].rowInc == mHorStride &&
++                l.planes[2].rowInc == mHorStride && l.planes[0].colInc == 2 &&
++                l.planes[1].colInc == 4 && l.planes[2].colInc == 4 &&
++                l.planes[0].bitDepth == 10 && l.planes[0].allocatedDepth == 16 &&
++                l.planes[0].rightShift == 6 && view.data()[1] == view.data()[0] + size_t(mHorStride) * mVerStride &&
++                view.data()[2] == view.data()[1] + 2 &&
++                C2RKGrallocOps::get()->getAllocationSize(handle) >= size_t(mHorStride) * mVerStride * 3 / 2;
++            if (!ok) {
++                c2_err("native P010 mapper layout mismatch: row %d/%d stride %d/%d offset %lld size %d",
++                    l.planes[0].rowInc,l.planes[1].rowInc,mHorStride,mVerStride,
++                    (long long)(view.data()[1]-view.data()[0]),C2RKGrallocOps::get()->getAllocationSize(handle));
++                C2RKMediaUtils::freeGraphicBuffer(handle); return C2_CORRUPTED;
++            }
++        }
+         /* register this buffer to decoder */
+         MppBuffer mppBuffer;
+ 
+@@ -2567,8 +2636,9 @@
+         Mutex::Autolock autoLock(mBufferLock);
+ 
+         releaseAllBuffers();
+-        if (!mBufferMode && !MPP_FRAME_FMT_IS_FBC(format) &&
+-                (format & MPP_FRAME_FMT_MASK) == MPP_FMT_YUV420SP_10BIT) {
++        if (!mBufferMode && !mAv1VendorSurface && !MPP_FRAME_FMT_IS_FBC(format) &&
++                ((!(format & 0x10000000u) && (format & MPP_FRAME_FMT_MASK) == MPP_FMT_YUV420SP_10BIT) ||
++                 (mAv1PpDirect && (format & MPP_FRAME_FMT_MASK) == MPP_FMT_YUV420SP))) {
+             MppBufferGroup internal = nullptr;
+             if (mpp_buffer_group_get_internal(&internal, MPP_BUFFER_TYPE_ION | MPP_BUFFER_FLAGS_CACHABLE) != MPP_OK ||
+                     mMppMpi->control(mMppCtx, MPP_DEC_SET_EXT_BUF_GROUP, internal) != MPP_OK) {
+@@ -2577,7 +2647,7 @@
+             }
+             if (mBufferGroup) mpp_buffer_group_put(mBufferGroup);
+             mBufferGroup = internal;
+-            mSurfaceP010Copy = true; mBufferMode = true;
++            mSurfaceP010Copy = true; mBufferMode = true; mAv1PpDirect = false;
+         }
+ 
+         mWidth = width;
+@@ -2685,7 +2755,19 @@
+             size_t dstYStride = layout.planes[C2PlanarLayout::PLANE_Y].rowInc;
+             size_t dstUVStride = layout.planes[C2PlanarLayout::PLANE_U].rowInc;
+ 
+-            if (mCopyBlockFormat != HAL_PIXEL_FORMAT_YCBCR_P010 ||
++            if (format & 0x10000000u) {
++                if (mCopyBlockFormat != HAL_PIXEL_FORMAT_YCBCR_P010 || !src || !dstY || !dstUV ||
++                    hstride < width * 2 || vstride < height ||
++                    dstYStride < size_t(width) * 2 || dstUVStride < size_t(width) * 2 ||
++                    mpp_buffer_get_size(mppBuffer) < size_t(hstride) * vstride * 3 / 2) {
++                    ret = C2_CORRUPTED; goto cleanUp;
++                }
++                for (int y = 0; y < height; ++y)
++                    memcpy(dstY + size_t(y) * dstYStride, src + size_t(y) * hstride, size_t(width) * 2);
++                for (int y = 0; y < height / 2; ++y)
++                    memcpy(dstUV + size_t(y) * dstUVStride,
++                           src + size_t(hstride) * vstride + size_t(y) * hstride, size_t(width) * 2);
++            } else if (mCopyBlockFormat != HAL_PIXEL_FORMAT_YCBCR_P010 ||
+                     !rkPacked10ToP010(src, mpp_buffer_get_size(mppBuffer), hstride, vstride,
+                             dstY, dstUV, dstYStride, dstUVStride, width, height, property_get_bool("debug.rkcodec2.p010_fast", true))) {
+                 ret = C2_CORRUPTED; goto cleanUp;
+--- a/component/video/C2RKMpiDec.h
++++ b/component/video/C2RKMpiDec.h
+@@ -184,6 +184,8 @@
+     uint32_t mCopyBlockFormat = 0;
+     uint64_t mCopyBlockUsage = 0;
+     bool mSurfaceP010Copy = false;
++    bool mAv1PpDirect = false;
++    bool mAv1VendorSurface = false;
+     bool mStandardWorkFlow;
+ 
+     std::shared_ptr<C2GraphicBlock> mOutBlock;

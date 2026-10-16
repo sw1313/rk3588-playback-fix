@@ -2,7 +2,7 @@
 
 [**Current downloads / 当前下载**](DOWNLOADS.md) · [Download table](https://github.com/sw1313/rk3588-playback-fix/blob/main/DOWNLOADS.md) · [中文说明](README.zh-CN.md)
 
-**[Project release v0.5.1 — all four installers](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.5.1)**
+**[Project release v0.6.3 — all four installers](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.3)**
 
 Every public Release is a complete project snapshot with Decode Stack, Native
 Mali Global, the Yamby/mpv plugin and Frame Guard attached together. The project
@@ -12,10 +12,19 @@ remain experimental and restricted to the firmware hashes in their contracts.
 
 | Component | Current version | Purpose |
 | --- | --- | --- |
-| [Decode Stack](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.5.1) | **0.5.1 — experimental** | Unified system decode updates; guarded 8-bit AVC/HEVC buffer route repairs the reproduced 4K asynchronous stop/drain crash |
+| [Decode Stack](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.3) | **0.6.3 — experimental** | Full-precision AV1 AFBC output, Codec2 1.14.16 and cumulative decode updates with feature/whole-stack rollback |
 | [Native Mali Global](magisk-mali-global/README.md) | **0.2.0 — experimental** | Global ARM32/ARM64 native Mali g18p0 userspace graphics paths |
-| [Yamby/mpv LSPosed plugin](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.5.1) | **0.3.3** | Default HW+ setting and optional RK3588 edge correction; this is the plugin version, not the LSPosed framework version |
-| [Frame Guard](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.5.1) | **0.1.0** | Optional fixed-refresh workaround for the reproduced HDMI blackouts |
+| [Yamby/mpv LSPosed plugin](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.3) | **0.3.3** | Default HW+ setting and optional RK3588 edge correction; this is the plugin version, not the LSPosed framework version |
+| [Frame Guard](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.3) | **0.1.0** | Optional fixed-refresh workaround for the reproduced HDMI blackouts |
+
+## Decode Stack 0.6.3
+
+Decode Stack **0.6.3** adds guarded lossless AV1 AFBC display output, preserving
+the source bit depth, HDR and signaled film grain. The final binary rendered
+all 3597 frames of the local 60-second 4K60 HDR source with zero player drops;
+all 3597 render callbacks arrived with no gap over 25ms. A same-route prototype
+also completed the 314-second source; that is distinct from final-binary validation.
+See [actual playback, exact pixels and limits](docs/decode-av1-063.zh-CN.md).
 
 ## Choose and install
 
@@ -61,9 +70,9 @@ reporting thread subsequently aborts on a destroyed mutex. The first-fault
 callback is not fully identified; no original-Mali comparison or fix is claimed.
 See the [exit-path evidence](docs/antutu-image-effects.zh-CN.md).
 
-0.5.1 automated playback, precision, lifecycle and reboot rollback tests passed.
-Fresh manual Yamby confirmation for 0.5.1 is pending; earlier confirmations are
-historical. Finite sample coverage does not establish universal compatibility.
+0.6.3 local playback, precision, lifecycle and reboot rollback tests passed.
+No new manual Yamby acceptance is recorded for 0.6.3; its original libraries and
+the LSPosed plugin remain unchanged. Earlier confirmations are historical. Finite sample coverage does not establish universal compatibility.
 HDR10+ refers to the standard Codec2 metadata bridge, not native HDMI HDR10+
 output. Dolby Vision/LLDV/FEL and kernel-driver upgrades are not included.
 

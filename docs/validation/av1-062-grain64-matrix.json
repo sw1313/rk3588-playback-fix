@@ -1,0 +1,44 @@
+[
+  {
+    "case": "grain10",
+    "abi": "arm64-v8a",
+    "grain_enabled": 0,
+    "frames": 12,
+    "all_samples_exact": true
+  },
+  {
+    "case": "grain10",
+    "abi": "arm64-v8a",
+    "grain_enabled": 1,
+    "frames": 12,
+    "all_samples_exact": true
+  },
+  {
+    "case": "grain10-1080",
+    "abi": "arm64-v8a",
+    "grain_enabled": 0,
+    "frames": 12,
+    "all_samples_exact": true
+  },
+  {
+    "case": "grain10-1080",
+    "abi": "arm64-v8a",
+    "grain_enabled": 1,
+    "frames": 12,
+    "all_samples_exact": true
+  },
+  {
+    "case": "plain10-1080",
+    "abi": "arm64-v8a",
+    "grain_enabled": 0,
+    "frames": 12,
+    "all_samples_exact": true
+  },
+  {
+    "case": "plain10-1080",
+    "abi": "arm64-v8a",
+    "grain_enabled": 1,
+    "frames": 12,
+    "all_samples_exact": true
+  }
+]

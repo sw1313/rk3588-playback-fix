@@ -8,6 +8,13 @@ This component pairs ARM32/ARM64 MPP **1.1.0** and its matching VPU wrapper,
 based on upstream revision `c08762ebfadeb4e986d2fed993bc7a54862d3ebe`.
 The kernel and original vendor Codec2/hardware-JPEG consumers stay unchanged.
 
+Decode Stack 0.6.1 adds the scoped `013-av1-native-p010.patch`. It allows the
+paired Codec2 core to request full-ten-bit P010 hardware postprocessing for
+texture consumers, with explicit stride/size checks. Its private format flag
+is not a generic upstream MPP API. Display-composer AV1 surfaces retain the
+existing native ten-bit NV15 layout. The patch does not change kernel clocks,
+replace a kernel driver or authorize ten-to-eight-bit fallback.
+
 The RK3588 compatibility patches recognize enhanced VEPU2 JPEG kernel client
 19, translate the tested Android 12 legacy PREP configuration ABI into modern
 configuration keys, and use the resolved byte stride for JPEG multi-core
@@ -48,3 +55,10 @@ See [decode-stack 0.4.0](../docs/decode-upgrade-040.zh-CN.md) and `UPSTREAM.json
 Use the unified decode package for installation; keep overlapping standalone
 modules disabled. `tests/reset_probe.c` links against the candidate `libmpp`
 and exercises a consumed parameter-header cache through two reset cycles.
+
+## Local 0.6.2 AV1 grain correction
+
+Restores signaled AV1 film grain on the secondary output, with an independent
+`av1_grain` switch in the unified stack. This is a picture fidelity correction;
+real AV1 4K60 stutter remains unresolved. No DDR performance lock is retained.
+See [validation details](../docs/decode-av1-062.zh-CN.md).
