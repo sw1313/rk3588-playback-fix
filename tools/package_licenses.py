@@ -26,7 +26,7 @@ def metadata(component):
         version = fields['version']
     return {
         'component': component, 'component_version': version,
-        'project_release': RELEASE_TAG, 'original_project_license': 'Apache-2.0',
+        'project_release': RELEASE_TAG, 'original_project_license': 'MIT',
         'source': URL + '/tree/' + RELEASE_TAG,
         'build_guide': URL + '/blob/' + RELEASE_TAG + '/SOURCE_CODE.md',
         'third_party_licenses_retained': True,
@@ -43,7 +43,7 @@ def stage(destination, component):
         shutil.copytree(ROOT / 'LICENSES', destination / 'LICENSES', dirs_exist_ok=True)
     elif component == 'mali-global':
         (destination / 'LICENSES').mkdir(exist_ok=True)
-        shutil.copyfile(ROOT / 'LICENSE', destination / 'LICENSES/Apache-2.0.txt')
+        shutil.copyfile(ROOT / 'third_party/Apache-2.0.txt', destination / 'LICENSES/Apache-2.0.txt')
     (destination / 'OPEN_SOURCE.json').write_text(
         json.dumps(metadata(component), indent=2) + '\n', encoding='utf-8', newline='\n')
 

@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: MIT
 // Android 12 firmware-pinned HIDL bridge: the installed vendor library owns the
 // complete IComponentStore implementation. Never substitute guessed vtables.
 #include <C2PlatformSupport.h>

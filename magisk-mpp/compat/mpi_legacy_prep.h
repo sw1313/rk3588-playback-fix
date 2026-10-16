@@ -1,4 +1,4 @@
-/* SPDX-License-Identifier: Apache-2.0 */
+/* SPDX-License-Identifier: MIT */
 /* Translate the firmware's Android 12 PREP ABI only.
  * The caller's struct is not today's MppEncPrepCfg. Unselected fields may
  * contain uninitialized stack data; never read them. */

@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: MIT
 #include "RKPacked10.h"
 #include <stdio.h>
 #include <stdlib.h>

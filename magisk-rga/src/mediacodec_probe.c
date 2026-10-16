@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: MIT
 // Runs an existing vendor MediaCodec against a synthetic MP4 fixture.
 #include <media/NdkMediaCodec.h>
 #include <media/NdkMediaExtractor.h>

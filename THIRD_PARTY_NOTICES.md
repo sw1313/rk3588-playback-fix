@@ -1,7 +1,7 @@
 # Third-party notices / 第三方许可
 
 This inventory supplements, and does not replace, original file-level notices.
-The project Apache-2.0 license covers original contributions only. Components
+The project MIT license covers original contributions only. Components
 are not all governed by one license. Source links and revisions are in
 SOURCE_CODE.md and component UPSTREAM.json/SOURCE.json files.
 本表补充上游声明，不替代原许可；未列为随包分发的软件不受本项目重新授权。
@@ -11,14 +11,14 @@ SOURCE_CODE.md and component UPSTREAM.json/SOURCE.json files.
 | Rockchip MPP 1.1.0 and legacy VPU wrapper, local patches | Decode Stack | Apache-2.0 and MIT on respective files; `LICENSES/mpp/` and component copies |
 | Rockchip librga 1.10.6 [3] | Decode Stack | Apache-2.0, `LICENSES/rga/Apache-2.0`; original COPYING retained |
 | Rockchip Codec2 API32, SDK 1.14.3 and SDK 1.14.16 | Decode Stack | Apache-2.0, `LICENSES/codec2*/Apache-2.0`; original Rockchip notices retained |
-| AOSP Codec2 wrappers, Android platform interfaces and derived service code | Decode Stack | Apache-2.0; original notices in source/patches and project LICENSE |
+| AOSP Codec2 wrappers, Android platform interfaces and derived service code | Decode Stack | Apache-2.0; original notices in source/patches and `LICENSES/codec2/Apache-2.0` |
 | libyuv 1974 and isolated Android 12 compatibility objects | Decode Stack | BSD-style license for each source tree and PATENTS in `LICENSES/libyuv/` |
 | libvpx 1.17.0 decoder code | Decode Stack | BSD-style license and PATENTS in `LICENSES/software/libvpx-*` |
 | libgav1 AV1 decoder | Decode Stack | Apache-2.0 with AUTHORS in `LICENSES/software/libgav1-*` |
-| LLVM/libc++ portions and Android NDK headers/runtime | Decode Stack | License depends on source/runtime version; preserve `LICENSES/rga/LLVM-libcxx.txt` and complete NDK notices in `LICENSES/ndk/` rather than applying project Apache terms to all portions |
+| LLVM/libc++ portions and Android NDK headers/runtime | Decode Stack | License depends on source/runtime version; preserve `LICENSES/rga/LLVM-libcxx.txt` and complete NDK notices in `LICENSES/ndk/` rather than applying project MIT terms to all portions |
 | AOSP common V2, graphics.common V3, allocator V1 frozen AIDL, Binder C++ support and Vulkan HAL header | Mali Global | Apache-2.0; `LICENSES/Apache-2.0.txt`, original file notices in `src/` and NOTICE.txt |
-| Original plugin source/resources | LSPosed plugin | Project Apache-2.0; no Xposed/LSPosed framework classes or player libraries bundled |
-| Original refresh policy/installer scripts | Frame Guard | Project Apache-2.0; no separately compiled third-party payload |
+| Original plugin source/resources | LSPosed plugin | Project MIT; no Xposed/LSPosed framework classes or player libraries bundled |
+| Original refresh policy/installer scripts | Frame Guard | Project MIT; no separately compiled third-party payload |
 
 Copyright holders include Rockchip Electronics Co. LTD, The Android Open
 Source Project, The LibYuv Project Authors, The WebM Project authors, Google

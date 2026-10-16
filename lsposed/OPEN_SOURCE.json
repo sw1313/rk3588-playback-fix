@@ -2,7 +2,7 @@
   "component": "yamby-mpv-plugin",
   "component_version": "0.3.5",
   "project_release": "v0.6.7",
-  "original_project_license": "Apache-2.0",
+  "original_project_license": "MIT",
   "source": "https://github.com/sw1313/rk3588-playback-fix/tree/v0.6.7",
   "build_guide": "https://github.com/sw1313/rk3588-playback-fix/blob/v0.6.7/SOURCE_CODE.md",
   "third_party_licenses_retained": true,

@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: MIT
 #include <C2ComponentFactory.h>
 #include <dlfcn.h>
 #include <stdio.h>

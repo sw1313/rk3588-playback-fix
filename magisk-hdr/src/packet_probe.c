@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: MIT
 // Read only. The stock debug status starts these static fields one byte early.
 #include <stdint.h>
 #include <stdio.h>

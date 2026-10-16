@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: MIT
 #include "CompatRouter.h"
 #include <C2Config.h>
 #include <cutils/properties.h>

@@ -11,7 +11,7 @@
       "version": "0.6.7",
       "filename": "rk3588-decode-stack-0.6.7.zip",
       "status": "experimental",
-      "sha256": "505ed6f97b8d2ca73fd55f72f0fa5c9414760e4e4d1704ded2538e021e5ab8aa",
+      "sha256": "a469476467e0c1fc2129b082a79396f8be4580cdd7eed4dd19fc68dfb9915812",
       "url": "https://github.com/sw1313/rk3588-playback-fix/releases/download/v0.6.7/rk3588-decode-stack-0.6.7.zip"
     },
     {
@@ -19,7 +19,7 @@
       "version": "0.2.1",
       "filename": "rk3588-mali-global-0.2.1.zip",
       "status": "experimental",
-      "sha256": "6f74f65c64dfaf5436d067fe4aa2cef6aa5ff4f4202c693dade4109a6ab0de3b",
+      "sha256": "cb8822c137bbe85cf258520cc812a849c9fa0a9e53ed2afa97ff7ab90f56d3b6",
       "url": "https://github.com/sw1313/rk3588-playback-fix/releases/download/v0.6.7/rk3588-mali-global-0.2.1.zip"
     },
     {
@@ -27,7 +27,7 @@
       "version": "0.3.5",
       "filename": "RK3588-Mpv-Fix-0.3.5.apk",
       "status": "released",
-      "sha256": "f8f1d0b25ff9f267d92d9ab77e8aed366d5b6b23a8a2fd9f73a7b691b475e39b",
+      "sha256": "7ec7796a00afac5bb69763d132bc190d9719b3ba9e726026c545f00eb42eb2fa",
       "url": "https://github.com/sw1313/rk3588-playback-fix/releases/download/v0.6.7/RK3588-Mpv-Fix-0.3.5.apk"
     },
     {
@@ -35,11 +35,11 @@
       "version": "0.1.1",
       "filename": "rk3588-frameguard-0.1.1.zip",
       "status": "released",
-      "sha256": "8901eca3259d1716bae060ed6aad2a343788396020630a979af800f413eb5204",
+      "sha256": "a248d93828123800c0100aab7959f1da50e765706fa661ad12db6afc398a9c59",
       "url": "https://github.com/sw1313/rk3588-playback-fix/releases/download/v0.6.7/rk3588-frameguard-0.1.1.zip"
     }
   ],
-  "original_project_license": "Apache-2.0",
+  "original_project_license": "MIT",
   "source_archive": {
     "filename": "rk3588-playback-fix-0.6.7-source.zip",
     "url": "https://github.com/sw1313/rk3588-playback-fix/releases/download/v0.6.7/rk3588-playback-fix-0.6.7-source.zip",

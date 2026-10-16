@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: MIT
 // Retain the complete hash-pinned stock factory registry. The candidate library
 // has a smaller map intentionally; it must never define the service registry.
 #pragma once

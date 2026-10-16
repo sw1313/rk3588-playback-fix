@@ -6,11 +6,48 @@
       "component": "decode-stack",
       "unchanged_runtime_entries": 64,
       "unchanged_elf": 26,
-      "original_license_texts_preserved": 14,
-      "changed_existing_metadata": [
+      "original_upstream_license_texts_preserved": 14,
+      "changed_existing_documentation_or_license_metadata": [
         "checksums.sha256",
+        "components/codec2/bridge-src/Hdr10PlusPayload.h",
+        "components/codec2/bridge-src/RKHdrBridge.h",
+        "components/codec2/checksums.sha256",
+        "components/codec2/patches/codec2-p010.patch",
+        "components/codec2/service-src/CompatRouter.cpp",
+        "components/codec2/service-src/CompatRouter.h",
+        "components/codec2/service-src/main.cpp",
+        "components/codec2/service-src/PublishedComponents.h",
+        "components/codec2/src/hdr_payload_probe.cpp",
+        "components/codec2/src/patcher.c",
+        "components/codec2_sdk/checksums.sha256",
+        "components/codec2_sdk/patches/api32-full-precision.patch",
+        "components/codec2_sdk_next/checksums.sha256",
+        "components/codec2_sdk_next/patches/api32-full-precision.patch",
+        "components/hdr/checksums.sha256",
+        "components/hdr/LICENSE",
+        "components/hdr/src/check.c",
+        "components/hdr/src/client_policy.h",
+        "components/hdr/src/hwc_bridge.cpp",
+        "components/hdr/src/packet_probe.c",
+        "components/hdr/src/transfer_policy.h",
+        "components/hdr/tests/client_test.cpp",
+        "components/hdr/tests/transfer_test.cpp",
+        "components/libyuv/checksums.sha256",
+        "components/libyuv/src/a12_class_probe.cpp",
+        "components/libyuv/src/quality_probe.cpp",
+        "components/libyuv/src/scale_boundary_probe.cpp",
+        "components/mpp/checksums.sha256",
+        "components/mpp/compat/mpi_legacy_prep.h",
+        "components/mpp/src/compat_probe.c",
+        "components/mpp/tests/reset_probe.c",
+        "components/rga/checksums.sha256",
+        "components/rga/src/mediacodec_probe.c",
+        "components/rga/src/rga_probe.cpp",
+        "components/software/checksums.sha256",
+        "components/software/src/factory_probe.cpp",
         "LICENSE",
         "module.prop",
+        "README.md",
         "VALIDATION.json"
       ]
     },
@@ -18,10 +55,11 @@
       "component": "mali-global",
       "unchanged_runtime_entries": 17,
       "unchanged_elf": 8,
-      "original_license_texts_preserved": 0,
-      "changed_existing_metadata": [
+      "original_upstream_license_texts_preserved": 1,
+      "changed_existing_documentation_or_license_metadata": [
         "checksums.sha256",
         "module.prop",
+        "README.md",
         "VALIDATION.json"
       ]
     },
@@ -89,5 +127,6 @@
     "Upstream licenses remain separate; proprietary Mali is install-time download only.",
     "Project source archive requires documented upstream sources and private matching firmware link inputs to rebuild system components.",
     "New source builds require their own runtime, precision and rollback tests."
-  ]
+  ],
+  "original_project_license": "MIT"
 }

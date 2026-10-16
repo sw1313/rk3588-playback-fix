@@ -1,9 +1,9 @@
 # Open-source information / 开源说明
 
 Original RK3588 Playback Fix code and documentation are licensed under
-**Apache-2.0**. See [LICENSE](LICENSE) and [NOTICE](NOTICE). Existing third-party
+**MIT**. See [LICENSE](LICENSE) and [NOTICE](NOTICE). Existing third-party
 licenses and copyright notices take precedence for their respective files.
-本项目自写代码与文档采用 Apache-2.0；上游代码保留原许可、版权及专利声明。
+本项目自写代码与文档采用 MIT；上游代码保留原许可、版权及专利声明。
 允许商业使用；修改和再分发须遵守对应许可。本说明不重新授权第三方闭源库。
 
 | Installer / 安装包 | Open-source material / 开源内容 | External material / 外部组件 |
@@ -30,3 +30,8 @@ Public releases exclude personal paths, device addresses/identifiers, private
 logs, accounts, keys, test media and original firmware libraries. Local builds
 must keep those inputs outside the source/package tree and use path mapping.
 公开材料不含私人路径、设备地址和标识、原始日志、账号、密钥、测试影片或原厂固件库。
+
+MIT applies to original project contributions, including newly added helper files.
+Upstream-derived files keep their original license; changes to those files do
+not remove upstream rights or notices. Earlier published Apache-2.0 grants
+remain valid for the versions that carried them. / 自写部分采用 MIT，上游及历史已授予许可不撤回。

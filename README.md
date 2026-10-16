@@ -19,7 +19,7 @@ remain experimental and restricted to the firmware hashes in their contracts.
 
 ## Licensing and source · v0.6.7
 
-Original project code is **Apache-2.0**. All four installers now carry license,
+Original project code is **MIT**. All four installers now carry license,
 attribution, third-party and bilingual source/build documentation. A project
 source ZIP is attached to the complete release. Upstream licenses and patent
 grants remain; closed Mali and firmware binaries are not redistributed.

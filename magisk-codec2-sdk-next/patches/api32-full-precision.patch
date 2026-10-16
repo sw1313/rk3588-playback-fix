@@ -93,7 +93,7 @@
 --- /dev/null
 +++ b/component/osal/include/Hdr10PlusPayload.h
 @@ -0,0 +1,38 @@
-+// SPDX-License-Identifier: Apache-2.0
++// SPDX-License-Identifier: MIT
 +#pragma once
 +#include <stdint.h>
 +#include <stddef.h>
@@ -134,7 +134,7 @@
 --- /dev/null
 +++ b/component/osal/include/RKHdrBridge.h
 @@ -0,0 +1,93 @@
-+// SPDX-License-Identifier: Apache-2.0
++// SPDX-License-Identifier: MIT
 +#pragma once
 +#include <C2Config.h>
 +#include <C2AllocatorGralloc.h>
@@ -230,7 +230,7 @@
 --- /dev/null
 +++ b/component/osal/include/RKPacked10.h
 @@ -0,0 +1,84 @@
-+// SPDX-License-Identifier: Apache-2.0
++// SPDX-License-Identifier: MIT
 +#pragma once
 +#include <stddef.h>
 +#include <stdint.h>

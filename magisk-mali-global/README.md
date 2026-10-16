@@ -2,7 +2,7 @@
 
 ## v0.6.7 project licensing snapshot / 开源说明
 
-Original code: Apache-2.0. This installer includes LICENSE, NOTICE,
+Original code: MIT. This installer includes LICENSE, NOTICE,
 OPEN_SOURCE.md, THIRD_PARTY_NOTICES.md and bilingual SOURCE_CODE guides.
 Upstream licenses remain. This package update changes documentation and version
 metadata only; executable payload, controls and rollback are unchanged.

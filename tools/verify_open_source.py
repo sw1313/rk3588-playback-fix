@@ -45,7 +45,7 @@ def verify():
                 assert set(DOCUMENTS) | {'OPEN_SOURCE.json'} <= checked
             if item['id'] == 'mali-global':
                 assert not any(n.endswith('/libGLES_mali.so') for n in names)
-                assert archive.read('LICENSES/Apache-2.0.txt') == archive.read('LICENSE')
+                assert archive.read('LICENSES/Apache-2.0.txt') == (ROOT / 'third_party/Apache-2.0.txt').read_bytes().replace(b'\r\n', b'\n')
             if prefix:
                 assert not any(n.startswith('lib/') for n in names), 'Unexpected player/framework native library'
             results.append({'component': item['id'], 'version': item['version'],

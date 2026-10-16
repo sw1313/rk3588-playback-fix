@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: MIT
 // Explicit non-Surface MediaCodec lifecycle and buffer validation probe.
 #include <media/NdkMediaCodec.h>
 #include <media/NdkMediaExtractor.h>

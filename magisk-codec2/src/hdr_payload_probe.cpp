@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: MIT
 #include "Hdr10PlusPayload.h"
 #include <cstdio>
 #include <vector>

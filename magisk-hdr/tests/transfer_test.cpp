@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: MIT
 #include "../src/transfer_policy.h"
 #include <cstdio>
 #include <cstdlib>

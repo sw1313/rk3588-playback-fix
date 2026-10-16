@@ -14,6 +14,6 @@
     "url": "https://github.com/sw1313/rk3588-playback-fix/releases/download/v0.6.6/rk3588-mali-global-0.2.0.zip"
   },
   "previous_validation": "Historical runtime tests remain with v0.6.6 and its cited records; no fresh playback claim.",
-  "licenses": "Original project Apache-2.0; upstream permissions, patent grants and notices retained.",
+  "licenses": "Original project MIT; upstream permissions, patent grants and notices retained.",
   "preservation": "Executable payload and control scripts must match previous installer exactly; see release validation."
 }

@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: MIT
 // Hash-gated adapter for the original HWC. Pixel buffers and the native plane
 // planner are retained; HDR metadata joins the original atomic commit.
 #include <hardware/hardware.h>

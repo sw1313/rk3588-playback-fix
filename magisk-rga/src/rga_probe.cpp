@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: MIT
 // Exercises real dma-buf backed RGA jobs without changing system libraries.
 #include <dlfcn.h>
 #include <fcntl.h>

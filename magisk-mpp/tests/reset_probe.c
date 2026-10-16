@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: Apache-2.0
+// SPDX-License-Identifier: MIT
 // Exercise consumed CSD replay across EOS/reset without resubmitting headers.
 #include <stdint.h>
 #include <stdio.h>

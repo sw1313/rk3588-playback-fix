@@ -152,7 +152,7 @@ SHA256SUMS together. Never overwrite an older immutable package with new bytes.
 
 ## Licensing boundaries
 
-Apache-2.0 applies to original project code. Preserve upstream notices and the
+MIT applies to original project code. Preserve upstream notices and the
 licenses/patent grants in LICENSES and component directories. Upstream source
 links do not grant permission to redistribute proprietary Mali or firmware.
 No boot/kernel update, Dolby component or player modification is introduced.
