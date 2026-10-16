@@ -1,11 +1,35 @@
 # Unified RK3588 decode stack
 
+## 0.6.4 offline KSU WebUI
+
+Open Decode Stack in KernelSU's compatible WebUI host, or use the standalone
+KsuWebUI app with Magisk. The `webroot/index.html` panel is offline and calls
+only this module's allowlisted `webui.sh` / existing `mode-control.sh` interface.
+It displays all fourteen saved selections, direct dependencies, effective
+next-boot choices, active boot choices, health and pending reboot/update state.
+It does not manage the separate Mali, LSPosed or Frame Guard modules.
+
+Selections remain saved while dependencies are disabled. Every change still
+requires reboot; toggling a choice back cancels the pending change if the
+effective configuration again matches the active boot. A boot-only receipt
+prevents installer assembly or stale `active-config` from being presented as
+active. Upgrading from older releases without a receipt shows unknown active
+state and requests reboot. Configuration errors disable individual controls,
+while the whole-module switch remains available for rollback.
+
+Existing CLI, Magisk enable switch, Action, firmware preflights and automatic
+recovery remain. No decoder ELF, quality setting, Yamby or LSPosed file changes.
+The WebUI API is compatible with KernelSU; this is not validation of the entire
+firmware-specific mounting stack on arbitrary KernelSU devices.
+See [operation and validation](../docs/decode-webui-064.zh-CN.md).
+
 ## 0.6.3 AV1 output delivery
 
 Adds independently switchable lossless ten-bit AV1 AFBC on verified RK3588
 composer surfaces with 64-aligned width. The local real AV1 4K60 HDR source
-completed 18808 rendered outputs with zero player-reported drops. This is a
-source-specific measurement, not a universal smoothness guarantee. Other widths,
+rendered all 3597 frames of the final-binary 60-second test with zero player
+drops; the earlier prototype separately rendered 18808 frames. These are
+source-specific measurements, not universal smoothness guarantees. Other widths,
 explicit P010 and texture/CPU consumers retain their full-precision paths.
 Filter-dependent top padding comes from the completed frame.
 See [comparison, exact pixels and limitations](../docs/decode-av1-063.zh-CN.md).
@@ -77,7 +101,7 @@ retained.
 
 ## Installation and switches
 
-Install `rk3588-decode-stack-0.6.0.zip` in Magisk and reboot. The installer checks
+Install `rk3588-decode-stack-0.6.4.zip` in Magisk and reboot. The installer checks
 all components before disabling overlapping standalone MPP, RGA, Codec2 and
 libyuv modules. It also works from the original component state: Codec2's
 preflight uses the hash-verified staged dependencies. No vendor partition is
@@ -86,6 +110,10 @@ written, and no APK or boot image is replaced.
 Magisk's module switch or **Action** toggles the whole stack; reboot to apply.
 The Action button preserves component selections. Individual switches are
 available from a root shell:
+
+The WebUI exposes these same choices graphically. On the verified Magisk box,
+open the standalone KsuWebUI app and select **RK3588 Decode Stack**; grant root
+when requested. Magisk itself does not embed the WebUI. See the linked guide.
 
 ```sh
 su -c 'sh /data/adb/modules/rk3588_decode_stack/mode-control.sh status'

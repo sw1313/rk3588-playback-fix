@@ -1,352 +1,67 @@
 {
-  "version": "0.6.3",
-  "date": "2026-10-16",
-  "stage": "local_playback_precision_and_selector_validation",
-  "previous_validation": "decode-0.6.2.json",
-  "device_scope": {
-    "soc": "RK3588",
-    "android_api": 32,
-    "kernel": "5.10.66",
-    "firmware": "exact platform/library hash contracts only"
+  "version": "0.6.4",
+  "publication": {
+    "tag": "v0.6.4",
+    "kind": "complete_project_release"
   },
-  "core_sha256": "c07bdfa3d3ee96e1d7104d7ca48542f243024db403b30f22cb686e0f5e3b3ac3",
-  "feature": "guarded lossless ten-bit AV1 AFBC composer output and per-frame padding crop",
-  "independent_switch": "av1_afbc; reboot required",
-  "source": {
-    "public_url": "https://www.youtube.com/watch?v=LXb3EKWsInQ",
-    "video": "AV1 3840x2160 60000/1001 ten-bit PQ BT2020",
-    "audio": "Opus",
-    "local_original_packets": true,
-    "reencoded": false,
-    "player_engine": "installed SmartTube ExoPlayer via independent diagnostic app",
-    "drop_threshold_modified": false,
-    "pts_modified": false
-  },
-  "guards": [
-    "RK3588",
-    "native composer Surface",
-    "preserve original eight/ten-bit frame format",
-    "width divisible by 64",
-    "client FBC-disable honored",
-    "explicit P010/CPU/texture/crop/tunnel paths unchanged"
-  ],
-  "repeatable_reboot_ab": [
-    {
-      "complete": true,
-      "renderedOutputBufferCount": 1163,
-      "droppedBufferCount": 2434,
-      "droppedToKeyframeCount": 5,
-      "av1_afbc": "off"
+  "scope": "offline KSU WebUI, fixed-command control bridge, boot-only activation receipt; decoder payloads unchanged from 0.6.3",
+  "tests": {
+    "isolated_android_shell": {
+      "assertions": 78,
+      "passed": true,
+      "live_module_modified": false
     },
-    {
-      "complete": true,
+    "desktop_browser_mock_bridge": {
+      "assertions": 16,
+      "passed": true,
+      "keyboard_and_mobile_layout": true
+    },
+    "actual_android_webview": {
+      "host": "KsuWebUI standalone 1.0 / versionCode 34 on Magisk",
+      "displayed_and_native_exec_passed": true,
+      "mpp_dependency_off_on": true,
+      "whole_off_on": true,
+      "saved_vs_active_and_pending_correct": true,
+      "reenable_from_original_state_boot": true
+    },
+    "reboot_rollback": {
+      "original_files_verified": 31,
+      "all_hashes_exact": true,
+      "disabled_boot_not_misreported_as_active": true,
+      "saved_selections_preserved": true
+    },
+    "reenabled_boot": {
+      "health": "passed",
+      "all_fourteen_selections_preserved": true,
+      "pending_reboot_cleared": true
+    },
+    "local_av1_playback": {
+      "actual_video_decoder": "OMX.c2.rk.av1.decoder",
+      "inputBufferCount": 3597,
       "renderedOutputBufferCount": 3597,
       "droppedBufferCount": 0,
       "droppedToKeyframeCount": 0,
-      "av1_afbc": "on"
+      "decoderInitCount": 1,
+      "eos": true,
+      "complete": true,
+      "elapsed_seconds": 60.488859328
     }
-  ],
-  "first60_afbc": {
-    "eos": true,
-    "complete": true,
-    "elapsed_seconds": 60.630648717,
-    "inputBufferCount": 3597,
-    "renderedOutputBufferCount": 3597,
-    "droppedBufferCount": 0,
-    "droppedToKeyframeCount": 0,
-    "maxConsecutiveDroppedBufferCount": 0
-  },
-  "repeat60_afbc": {
-    "eos": true,
-    "complete": true,
-    "elapsed_seconds": 60.510330663,
-    "inputBufferCount": 3597,
-    "renderedOutputBufferCount": 3597,
-    "droppedBufferCount": 0,
-    "droppedToKeyframeCount": 0,
-    "maxConsecutiveDroppedBufferCount": 0
-  },
-  "full314_afbc": {
-    "eos": true,
-    "complete": true,
-    "elapsed_seconds": 314.307609373,
-    "inputBufferCount": 18808,
-    "renderedOutputBufferCount": 18808,
-    "droppedBufferCount": 0,
-    "droppedToKeyframeCount": 0,
-    "maxConsecutiveDroppedBufferCount": 0,
-    "stage": "AFBC prototype before final width guard and per-frame crop"
-  },
-  "afbc_exact_pixels": [
-    {
-      "case": "plain10-1080",
-      "all_samples_exact": true,
-      "bytes": 74649600,
-      "sha256": "2f56d04b384c41c67123b2c82f7202df6e6dc31b7f1d061b2113530ae3ee86a6"
-    },
-    {
-      "case": "grain10-1080",
-      "all_samples_exact": true,
-      "bytes": 74649600,
-      "sha256": "24bbefd5e670c2e65f8d79d4e72aab2ca046ce6328ee8c01fb8c7279314c7b6d"
-    },
-    {
-      "case": "grain10-uhd6",
-      "all_samples_exact": true,
-      "bytes": 149299200,
-      "sha256": "496e82e65dae7a88f859343cfc3f0e90a6376b5ab0460e9321e00dcb153d1215"
-    },
-    {
-      "case": "costa-rica-six",
-      "all_samples_exact": true,
-      "bytes": 149299200,
-      "sha256": "91a3bd091051f594882b5572688e57eebfabbbacbd9460530efd69c29af85fb8"
-    }
-  ],
-  "afbc_eight_bit_exact_pixels": {
-    "case": "AV1 eight-bit 4096x2160",
-    "frames": 6,
-    "all_samples_exact": true,
-    "bytes": 159252480
-  },
-  "codec2_exact_pixels": [
-    {
-      "clip": "h264-1080",
-      "codec": "avc",
-      "bits": 8,
-      "all_samples_exact": true,
-      "bytes": 37324800
-    },
-    {
-      "clip": "hevc10-1080",
-      "codec": "hevc",
-      "bits": 10,
-      "all_samples_exact": true,
-      "bytes": 37324800
-    },
-    {
-      "clip": "hevc10-4k",
-      "codec": "hevc",
-      "bits": 10,
-      "all_samples_exact": true,
-      "bytes": 74649600
-    },
-    {
-      "clip": "vp9-10-720",
-      "codec": "vp9",
-      "bits": 10,
-      "all_samples_exact": true,
-      "bytes": 16588800
-    },
-    {
-      "clip": "av1-8",
-      "codec": "av1",
-      "bits": 8,
-      "all_samples_exact": true,
-      "bytes": 8294400
-    },
-    {
-      "clip": "av1-10-1080",
-      "codec": "av1",
-      "bits": 10,
-      "all_samples_exact": true,
-      "bytes": 37324800
-    }
-  ],
-  "filtered_1080_surface": {
-    "eos": true,
-    "complete": true,
-    "elapsed_seconds": 10.255395364,
-    "inputBufferCount": 240,
-    "renderedOutputBufferCount": 240,
-    "droppedBufferCount": 0,
-    "droppedToKeyframeCount": 0,
-    "maxConsecutiveDroppedBufferCount": 0,
-    "drm_format": "YU10",
-    "afbc": true,
-    "actual_top_crop": 8
-  },
-  "width854_surface": {
-    "eos": true,
-    "complete": true,
-    "elapsed_seconds": 10.22366961,
-    "inputBufferCount": 240,
-    "renderedOutputBufferCount": 240,
-    "droppedBufferCount": 0,
-    "droppedToKeyframeCount": 0,
-    "maxConsecutiveDroppedBufferCount": 0,
-    "drm_format": "NV15",
-    "afbc": false
-  },
-  "pause_seek": {
-    "eos": true,
-    "complete": true,
-    "elapsed_seconds": 33.577248415,
-    "inputBufferCount": 2008,
-    "renderedOutputBufferCount": 1590,
-    "droppedBufferCount": 1,
-    "droppedToKeyframeCount": 0,
-    "maxConsecutiveDroppedBufferCount": 1,
-    "actions": [
-      {
-        "elapsed_ms": 3109.491604,
-        "play": false,
-        "seek_ms": -1
-      },
-      {
-        "elapsed_ms": 4109.453663,
-        "play": true,
-        "seek_ms": -1
-      },
-      {
-        "elapsed_ms": 7109.145297,
-        "play": true,
-        "seek_ms": 15000
-      },
-      {
-        "elapsed_ms": 12108.849133,
-        "play": true,
-        "seek_ms": 2000
-      },
-      {
-        "elapsed_ms": 16109.465035,
-        "play": true,
-        "seek_ms": 45000
-      }
-    ],
-    "skipped_after_intentional_seek": 346
-  },
-  "hdr_regression": [
-    {
-      "clip": "hevc10-hlg-360",
-      "pass": true,
-      "expected_eotf": 0,
-      "actual_eotf": 0,
-      "pause_seek_eos": true
-    },
-    {
-      "clip": "hevc10-hdr-720",
-      "pass": true,
-      "expected_eotf": 2,
-      "actual_eotf": 2,
-      "pause_seek_eos": true
-    },
-    {
-      "clip": "hdr4000",
-      "pass": true,
-      "expected_eotf": 0,
-      "actual_eotf": 0,
-      "pause_seek_eos": true
-    },
-    {
-      "clip": "hevc10-hlg-360",
-      "pass": true,
-      "expected_eotf": 0,
-      "actual_eotf": 0,
-      "pause_seek_eos": true
-    },
-    {
-      "clip": "hevc10-hlg-720",
-      "pass": true,
-      "expected_eotf": 3,
-      "actual_eotf": 3,
-      "pause_seek_eos": true
-    },
-    {
-      "clip": "hevc8-720",
-      "pass": true,
-      "expected_eotf": 0,
-      "actual_eotf": 0,
-      "pause_seek_eos": true
-    }
-  ],
-  "mpp_hw_wait_including_callback_average_us": {
-    "linear": 15487,
-    "afbc": 12479,
-    "pure_hardware_cycles": false
-  },
-  "rejected_candidates": [
-    "batch ready frames before pool refill",
-    "synchronous return-fence polling",
-    "legacy asynchronous input work completion",
-    "cached CDF probability table with correct DMA sync",
-    "asynchronous pool refill"
-  ],
-  "quality_reduction": false,
-  "boot_flash": false,
-  "kernel_replaced": false,
-  "limitations": [
-    "Measured playback improvement applies to the tested original local source, not all AV1 streams or firmware.",
-    "Only listed sample frames were compared pixel-for-pixel.",
-    "Non-64-aligned widths retain full-precision linear output and may retain performance limitations.",
-    "Texture and CPU consumers retain prior P010 paths.",
-    "Network stalls and unrelated application bugs are outside this local-source test."
-  ],
-  "presentation_callbacks": {
-    "complete": true,
-    "eos": true,
-    "queued": 3597,
-    "decoded": 3597,
-    "late_gt20ms": 0,
-    "max_lateness_ms": 0,
-    "elapsed_seconds": 60.7878174,
-    "render_callbacks": 3597,
-    "gaps_gt25ms": 0,
-    "gap_p50_ms": 17,
-    "gap_p95_ms": 17,
-    "gap_max_ms": 17,
-    "stop_ok": true,
-    "core_sha256": "c07bdfa3d3ee96e1d7104d7ca48542f243024db403b30f22cb686e0f5e3b3ac3"
   },
   "preservation": {
-    "boot_unchanged": true,
-    "kernel_unchanged": true,
-    "yamby_native_libraries_unchanged": 18,
-    "lsposed_module_version": "0.3.3",
-    "lsposed_package_path_unchanged": true,
-    "mali_global_unchanged": true,
-    "active_manifest_pass": true
+    "unchanged_component_and_rollback_files": 188,
+    "yamby_native_libraries_exact": 18,
+    "lsposed_plugin_path_unchanged": true,
+    "global_mali_active_hashes_exact": true,
+    "kernel": "5.10.66",
+    "boot_hash_unchanged": true,
+    "core_sha256": "c07bdfa3d3ee96e1d7104d7ca48542f243024db403b30f22cb686e0f5e3b3ac3"
   },
-  "whole_stack_original_rollback": {
-    "mode": "off",
-    "original_system_files_checked": 31,
-    "original_hashes_exact": true,
-    "kernel_unchanged": true,
-    "boot_unchanged": true,
-    "global_mali_unchanged": true,
-    "generated_codec2_plugin_absent": true
-  },
-  "final_boot": {
-    "mode": "reboot",
-    "verified_boot": true,
-    "kernel_unchanged": true,
-    "boot_unchanged": true,
-    "global_mali_unchanged": true,
-    "original_core_mpp_service_verified": false
-  },
-  "final063-8bit-surface-fixed": {
-    "eos": true,
-    "complete": true,
-    "elapsed_seconds": 6.462737816,
-    "inputBufferCount": 360,
-    "renderedOutputBufferCount": 354,
-    "droppedBufferCount": 6,
-    "droppedToKeyframeCount": 0,
-    "maxConsecutiveDroppedBufferCount": 5
-  },
-  "final063-final-exo-fixed": {
-    "eos": true,
-    "complete": true,
-    "elapsed_seconds": 60.409799861,
-    "inputBufferCount": 3597,
-    "renderedOutputBufferCount": 3597,
-    "droppedBufferCount": 0,
-    "droppedToKeyframeCount": 0,
-    "maxConsecutiveDroppedBufferCount": 0
-  },
-  "publication": {
-    "tag": "v0.6.3",
-    "kind": "complete_project_release",
-    "runtime_payload_changed_for_publication": false
-  }
+  "limits": [
+    "Browser callback tests use a mock; real Android host tested separately.",
+    "Local playback uses installed SmartTube original ExoPlayer engine, not the full streaming UI.",
+    "No new full-format precision matrix; component ELF bytes are identical to 0.6.3.",
+    "Not a validation of all KernelSU mounting configurations or other firmwares.",
+    "AnTuTu editing/EOS and image-effect exit issues remain unresolved."
+  ],
+  "previous_validation": "https://github.com/sw1313/rk3588-playback-fix/blob/main/docs/validation/decode-0.6.3.json"
 }

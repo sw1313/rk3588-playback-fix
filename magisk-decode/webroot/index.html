@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data:; connect-src 'none'; object-src 'none'; base-uri 'none'; form-action 'none'">
+  <title>Decode Stack · 解码组件</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="app.js" defer></script>
+</head>
+<body>
+  <main>
+    <header><div><p class="eyebrow">RK3588 · DECODE STACK</p><h1>解码组件</h1><p id="version">正在读取模块…</p></div><button id="refresh" type="button">刷新状态</button></header>
+    <section id="notice" class="notice" aria-live="polite">正在连接 KSU WebUI…</section>
+    <section class="summary" aria-label="整包状态">
+      <div><h2>整包启用</h2><p>关闭并重启后恢复原厂解码组件，保留分项选择。</p><p id="whole-state" class="detail"></p></div>
+      <button id="whole" type="button" role="switch" aria-checked="false" aria-label="整包启用" disabled><span></span></button>
+    </section>
+    <p class="legend">开关表示已保存的选择；“当前”是本次启动配置，“重启后”包含依赖判断。</p>
+    <div id="components"></div>
+    <footer><p>保存后请从系统菜单重启。不会热替换运行中的库。</p><p>开关只管理 Decode Stack；Mali、Yamby、LSPosed 和 Frame Guard 保持独立。</p><p id="health">启动检查：等待读取</p></footer>
+  </main>
+</body>
+</html>

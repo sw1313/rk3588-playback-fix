@@ -51,4 +51,5 @@ for root in /data/adb/modules /data/adb/modules_update; do
 done
 ui_print "Unified stack ready. Previous decode modules disabled; reboot to activate."
 ui_print "Action toggles the whole stack. mode-control.sh provides component switches."
+ui_print "Open Decode Stack in a compatible KSU WebUI host for graphical switches."
 ui_print "Yamby, LSPosed, kernel and display configuration are retained."

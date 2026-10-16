@@ -2,7 +2,7 @@
 
 [**当前下载与版本表**](DOWNLOADS.md) · [GitHub 下载导航](https://github.com/sw1313/rk3588-playback-fix/blob/main/DOWNLOADS.md) · [English](README.md)
 
-**[项目整套版本 v0.6.3 — 四个安装包齐全](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.3)**
+**[项目整套版本 v0.6.4 — 四个安装包齐全](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.4)**
 
 每个公开 Release 都是完整项目快照，附齐 Decode Stack、全局 Mali、Yamby/mpv 插件
 和 Frame Guard。项目版本标识这次整套发布，包内继续保留各组件真实版本号。
@@ -10,10 +10,17 @@ GitHub **Latest** 指向最近更新的整套版本。系统组件仍为实验�
 
 | 组件 | 当前版本 | 用途 |
 | --- | --- | --- |
-| [Decode Stack 解码合并模块](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.3) | **0.6.3，实验组件** | 无损 AV1 AFBC 输出、Codec2 1.14.16 与累计解码升级，保留开关和回退 |
+| [Decode Stack 解码合并模块](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.4) | **0.6.4，实验组件** | 离线 KSU WebUI 分项开关、依赖和待重启状态，保留无损解码与回退 |
 | [原厂 Mali 全局模块](magisk-mali-global/README.md) | **0.2.0，实验组件** | 32／64 位系统标准图形路径使用原厂 g18p0 用户态驱动 |
-| [Yamby／mpv LSPosed 插件](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.3) | **0.3.3** | 默认 HW+ 设置与可选灰白边修正；这是插件版本，不是 LSPosed 框架版本 |
-| [Frame Guard 刷新率模块](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.3) | **0.1.0** | 可选的固定刷新率黑屏规避 |
+| [Yamby／mpv LSPosed 插件](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.4) | **0.3.3** | 默认 HW+ 设置与可选灰白边修正；这是插件版本，不是 LSPosed 框架版本 |
+| [Frame Guard 刷新率模块](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.4) | **0.1.0** | 可选的固定刷新率黑屏规避 |
+
+## Decode Stack 0.6.4 图形面板
+
+在盒子已安装的独立版 **KsuWebUI** 中选择 **RK3588 Decode Stack**，即可操作
+十四个分项开关，查看依赖、当前／重启后状态和待重启提示。页面完全离线，
+沿用原控制脚本和回退逻辑；解码二进制、Yamby 和 LSPosed 不变。修改后需重启。
+详见[操作与验证](docs/decode-webui-064.zh-CN.md)。
 
 ## Decode Stack 0.6.3
 

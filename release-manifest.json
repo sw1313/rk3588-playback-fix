@@ -1,18 +1,18 @@
 {
   "kind": "complete_project_release",
-  "project_version": "0.6.3",
-  "release_tag": "v0.6.3",
+  "project_version": "0.6.4",
+  "release_tag": "v0.6.4",
   "release_date": "2026-10-16",
   "system_modules_firmware_pinned": true,
   "system_components_experimental": true,
   "components": [
     {
       "id": "decode-stack",
-      "version": "0.6.3",
-      "filename": "rk3588-decode-stack-0.6.3.zip",
+      "version": "0.6.4",
+      "filename": "rk3588-decode-stack-0.6.4.zip",
       "status": "experimental",
-      "sha256": "72c02f3f181cf332ad8d1f24bbe866cc1e9a4e22381cec9d277baa9dec5813d2",
-      "url": "https://github.com/sw1313/rk3588-playback-fix/releases/download/v0.6.3/rk3588-decode-stack-0.6.3.zip"
+      "sha256": "c051f7c89b97ce978659176a09be66191ca3bed7ea38ed8ada25a48f58d7ad89",
+      "url": "https://github.com/sw1313/rk3588-playback-fix/releases/download/v0.6.4/rk3588-decode-stack-0.6.4.zip"
     },
     {
       "id": "mali-global",
@@ -20,7 +20,7 @@
       "filename": "rk3588-mali-global-0.2.0.zip",
       "status": "experimental",
       "sha256": "9d6959f68ba4fe54591d4ccac1e91a677272668a6d20bf61eb0bb64087cbec03",
-      "url": "https://github.com/sw1313/rk3588-playback-fix/releases/download/v0.6.3/rk3588-mali-global-0.2.0.zip"
+      "url": "https://github.com/sw1313/rk3588-playback-fix/releases/download/v0.6.4/rk3588-mali-global-0.2.0.zip"
     },
     {
       "id": "yamby-mpv-plugin",
@@ -28,7 +28,7 @@
       "filename": "RK3588-Mpv-Fix-0.3.3.apk",
       "status": "released",
       "sha256": "acf8a2d4f721552ccfe95c67388e7f1fe5c54de3410b61183e5c30f0558aa23e",
-      "url": "https://github.com/sw1313/rk3588-playback-fix/releases/download/v0.6.3/RK3588-Mpv-Fix-0.3.3.apk"
+      "url": "https://github.com/sw1313/rk3588-playback-fix/releases/download/v0.6.4/RK3588-Mpv-Fix-0.3.3.apk"
     },
     {
       "id": "frameguard",
@@ -36,7 +36,7 @@
       "filename": "rk3588-frameguard-0.1.0.zip",
       "status": "released",
       "sha256": "30d816e2a704cfb8004184c5be879e45ca1858ae42887f20e29c8150a8d07480",
-      "url": "https://github.com/sw1313/rk3588-playback-fix/releases/download/v0.6.3/rk3588-frameguard-0.1.0.zip"
+      "url": "https://github.com/sw1313/rk3588-playback-fix/releases/download/v0.6.4/rk3588-frameguard-0.1.0.zip"
     }
   ]
 }

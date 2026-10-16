@@ -12,6 +12,9 @@ if sh "$MODROOT/assemble.sh"; then
  resetprop -n debug.rkhdr.static "$(sed -n 's/^hdr_static=//p' "$MODROOT/active-config")"
  resetprop -n debug.rkcodec2.hdr10plus "$(sed -n 's/^hdr10plus=//p' "$MODROOT/active-config")"
  resetprop -n vendor.rkhdr.adapter pending
+ # Only boot execution writes this receipt; installer assembly is not activation.
+ cat /proc/sys/kernel/random/boot_id > "$MODROOT/active-boot-id"
+ sed -n 's/^version=//p' "$MODROOT/module.prop" > "$MODROOT/active-version"
 else
  touch "$MODROOT/disable" "$MODROOT/skip_mount"
  resetprop -n debug.rkcodec2.surface_upgrade 0

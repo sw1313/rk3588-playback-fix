@@ -1,6 +1,6 @@
 id=rk3588_decode_stack
 name=RK3588 Decode Stack
-version=0.6.3
-versionCode=603
+version=0.6.4
+versionCode=604
 author=sw1313
-description=Firmware-specific RK3588 API32 decode stack with guarded lossless ten-bit AV1 AFBC display delivery, per-feature switches and rollback. No boot, kernel or player changes.
+description=Firmware-specific RK3588 API32 decode stack with offline KSU WebUI, dependency-aware switches and reboot status. Lossless AV1 AFBC and existing rollback retained.
