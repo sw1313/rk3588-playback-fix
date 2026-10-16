@@ -2,7 +2,7 @@
 
 [**Current downloads / 当前下载**](DOWNLOADS.md) · [Download table](https://github.com/sw1313/rk3588-playback-fix/blob/main/DOWNLOADS.md) · [中文说明](README.zh-CN.md)
 
-**[Project release v0.6.4 — all four installers](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.4)**
+**[Project release v0.6.5 — all four installers](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.5)**
 
 Every public Release is a complete project snapshot with Decode Stack, Native
 Mali Global, the Yamby/mpv plugin and Frame Guard attached together. The project
@@ -12,18 +12,20 @@ remain experimental and restricted to the firmware hashes in their contracts.
 
 | Component | Current version | Purpose |
 | --- | --- | --- |
-| [Decode Stack](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.4) | **0.6.4 — experimental** | Offline KSU WebUI with saved/active selections, dependencies and reboot status; existing lossless decode stack retained |
+| [Decode Stack](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.5) | **0.6.5 — experimental** | One Codec2 version selector, nested dependency controls and retained gray inactive choices; lossless decode stack retained |
 | [Native Mali Global](magisk-mali-global/README.md) | **0.2.0 — experimental** | Global ARM32/ARM64 native Mali g18p0 userspace graphics paths |
-| [Yamby/mpv LSPosed plugin](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.4) | **0.3.3** | Default HW+ setting and optional RK3588 edge correction; this is the plugin version, not the LSPosed framework version |
-| [Frame Guard](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.4) | **0.1.0** | Optional fixed-refresh workaround for the reproduced HDMI blackouts |
+| [Yamby/mpv LSPosed plugin](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.5) | **0.3.3** | Default HW+ setting and optional RK3588 edge correction; this is the plugin version, not the LSPosed framework version |
+| [Frame Guard](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.5) | **0.1.0** | Optional fixed-refresh workaround for the reproduced HDMI blackouts |
 
-## Decode Stack 0.6.4 WebUI
+## Decode Stack 0.6.5 WebUI
 
-Open **RK3588 Decode Stack** in the standalone **KsuWebUI** app on Magisk.
-The offline panel shows all fourteen selections, dependencies, active/next-boot
-state and pending reboot/update status. It uses the existing control and rollback
-scripts; decoder binaries, Yamby and LSPosed are unchanged. Every change needs
-reboot. [Operation and validation](docs/decode-webui-064.zh-CN.md).
+Open **RK3588 Decode Stack** in standalone **KsuWebUI** on Magisk. Codec2
+versions share one selector: legacy, 1.14.3 SIMD or 1.14.16. Dependent controls
+are nested below prerequisites. Parent-off grays retained child choices;
+parent-on restores them. Enabling a child links required dependencies and
+backend selection in one configuration commit. Reboot to apply. Decoder
+binaries, Yamby and LSPosed are unchanged.
+[Operation and validation](docs/decode-webui-065.zh-CN.md).
 
 ## Decode Stack 0.6.3
 

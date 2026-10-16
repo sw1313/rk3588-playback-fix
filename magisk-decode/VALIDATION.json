@@ -1,67 +1,61 @@
 {
-  "version": "0.6.4",
+  "version": "0.6.5",
   "publication": {
-    "tag": "v0.6.4",
+    "tag": "v0.6.5",
     "kind": "complete_project_release"
   },
-  "scope": "offline KSU WebUI, fixed-command control bridge, boot-only activation receipt; decoder payloads unchanged from 0.6.3",
+  "scope": "single Codec2 backend selector, nested dependency controls, retained gray inactive choices and atomic linked selection writes",
   "tests": {
-    "isolated_android_shell": {
-      "assertions": 78,
+    "android_shell_isolated": {
       "passed": true,
-      "live_module_modified": false
+      "assertions": 100,
+      "live_module_modified": false,
+      "covers": [
+        "three backend flag pairs",
+        "recursive enable",
+        "retained child selection",
+        "whole/Action rollback controls",
+        "pending update synchronization",
+        "invalid arguments and uninstall marker"
+      ]
     },
-    "desktop_browser_mock_bridge": {
-      "assertions": 16,
+    "browser_mock_bridge": {
       "passed": true,
-      "keyboard_and_mobile_layout": true
+      "assertions": 28,
+      "covers": [
+        "one selector replacing two toggles",
+        "dependency DOM hierarchy",
+        "gray retained selections",
+        "automatic backend dependency",
+        "keyboard and mobile layout",
+        "failure handling"
+      ]
     },
     "actual_android_webview": {
-      "host": "KsuWebUI standalone 1.0 / versionCode 34 on Magisk",
-      "displayed_and_native_exec_passed": true,
-      "mpp_dependency_off_on": true,
-      "whole_off_on": true,
-      "saved_vs_active_and_pending_correct": true,
-      "reenable_from_original_state_boot": true
+      "host": "standalone KsuWebUI 1.0 / versionCode 34 on Magisk",
+      "three_native_dropdown_choices_saved": true,
+      "gray_checked_child_when_parent_off": true,
+      "parent_on_restores_child": true,
+      "child_enable_selects_required_1_14_16": true,
+      "no_pending_reboot_after_restoring_original_choices": true,
+      "legacy_and_simd_choices_saved_without_rebooting_into_them": true
     },
-    "reboot_rollback": {
-      "original_files_verified": 31,
-      "all_hashes_exact": true,
-      "disabled_boot_not_misreported_as_active": true,
-      "saved_selections_preserved": true
-    },
-    "reenabled_boot": {
-      "health": "passed",
-      "all_fourteen_selections_preserved": true,
-      "pending_reboot_cleared": true
-    },
-    "local_av1_playback": {
-      "actual_video_decoder": "OMX.c2.rk.av1.decoder",
-      "inputBufferCount": 3597,
-      "renderedOutputBufferCount": 3597,
-      "droppedBufferCount": 0,
-      "droppedToKeyframeCount": 0,
-      "decoderInitCount": 1,
-      "eos": true,
-      "complete": true,
-      "elapsed_seconds": 60.488859328
+    "boot": {
+      "candidate_0_6_5_healthy": true,
+      "active_latest_core_hash_verified": true
     }
   },
   "preservation": {
-    "unchanged_component_and_rollback_files": 188,
-    "yamby_native_libraries_exact": 18,
-    "lsposed_plugin_path_unchanged": true,
-    "global_mali_active_hashes_exact": true,
-    "kernel": "5.10.66",
-    "boot_hash_unchanged": true,
-    "core_sha256": "c07bdfa3d3ee96e1d7104d7ca48542f243024db403b30f22cb686e0f5e3b3ac3"
+    "preserved_component_boot_and_rollback_files": 188,
+    "identical_elf_files": 26,
+    "passed": true
   },
+  "quality": "All 26 ELF files are byte-identical to 0.6.4; no decoder setting, bit-depth, resolution, bitrate or frame-rate reduction.",
+  "previous_validation": "https://github.com/sw1313/rk3588-playback-fix/blob/main/docs/validation/decode-0.6.4.json",
   "limits": [
-    "Browser callback tests use a mock; real Android host tested separately.",
-    "Local playback uses installed SmartTube original ExoPlayer engine, not the full streaming UI.",
-    "No new full-format precision matrix; component ELF bytes are identical to 0.6.3.",
-    "Not a validation of all KernelSU mounting configurations or other firmwares.",
-    "AnTuTu editing/EOS and image-effect exit issues remain unresolved."
-  ],
-  "previous_validation": "https://github.com/sw1313/rk3588-playback-fix/blob/main/docs/validation/decode-0.6.3.json"
+    "No new full playback/precision matrix; decoder payload unchanged.",
+    "Three backend choices were tested for configuration and dependency updates, not a new playback run on each backend.",
+    "The 31-file original-stack reboot rollback and 3597-frame AV1 playback evidence belong to 0.6.4; not recounted as new 0.6.5 measurements.",
+    "Firmware contracts, existing AnTuTu limitations and KernelSU mounting scope unchanged."
+  ]
 }

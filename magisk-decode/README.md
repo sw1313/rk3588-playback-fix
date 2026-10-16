@@ -1,5 +1,24 @@
 # Unified RK3588 decode stack
 
+## 0.6.5 backend selector and dependency tree
+
+Codec2 versions now share one selector: legacy 0.4.0 backend, 1.14.3 SIMD or
+1.14.16. Exactly one backend is loaded. The Codec2 compatibility switch remains
+separate, and disabling it restores the stock Codec2 after reboot.
+
+Dependent controls appear beneath their prerequisite. Codec2 also lists RGA as
+an additional requirement. Unmet dependencies gray the dependent card and its
+saved switch without clearing the choice; re-enabling the parent restores it.
+Controls remain editable. Enabling a child automatically enables required
+parents, including selecting 1.14.16 when AV1 native/AFBC requires it. Explicitly
+selecting a backend enables the Codec2/MPP/RGA prerequisites. Disabling the whole
+module is never reversed implicitly. All writes still require reboot.
+
+The WebUI uses atomic dependency plans through mode-control.sh. Existing direct
+CLI on/off controls remain available with their original behavior; Action,
+boot assembly, health checks and whole-stack rollback remain unchanged.
+See [operation and validation](../docs/decode-webui-065.zh-CN.md).
+
 ## 0.6.4 offline KSU WebUI
 
 Open Decode Stack in KernelSU's compatible WebUI host, or use the standalone
@@ -101,7 +120,7 @@ retained.
 
 ## Installation and switches
 
-Install `rk3588-decode-stack-0.6.4.zip` in Magisk and reboot. The installer checks
+Install `rk3588-decode-stack-0.6.5.zip` in Magisk and reboot. The installer checks
 all components before disabling overlapping standalone MPP, RGA, Codec2 and
 libyuv modules. It also works from the original component state: Codec2's
 preflight uses the hash-verified staged dependencies. No vendor partition is

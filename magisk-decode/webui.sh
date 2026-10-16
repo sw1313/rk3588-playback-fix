@@ -80,12 +80,23 @@ status() {
 }
 case "$1" in
  status) [ "$#" = 1 ] || exit 2; status ;;
+ backend)
+  [ "$#" = 2 ] || exit 2
+  case "$2" in legacy|simd|latest) ;; *) exit 2 ;; esac
+  [ ! -e "$CURRENTROOT/remove" ] && [ ! -e "$MODROOT/remove" ] || exit 3
+  sh "$CURRENTROOT/mode-control.sh" codec2_backend "$2" >&2 || exit $?
+  status
+  ;;
  set)
   [ "$#" = 3 ] || exit 2
   case " $keys all " in *" $2 "*) ;; *) exit 2 ;; esac
   case "$3" in on|off) ;; *) exit 2 ;; esac
   [ ! -e "$CURRENTROOT/remove" ] && [ ! -e "$MODROOT/remove" ] || exit 3
-  sh "$CURRENTROOT/mode-control.sh" "$2" "$3" >&2 || exit $?
+  if [ "$2" = all ]; then
+   sh "$CURRENTROOT/mode-control.sh" all "$3" >&2 || exit $?
+  else
+   sh "$CURRENTROOT/mode-control.sh" linked "$2" "$3" >&2 || exit $?
+  fi
   status
   ;;
  *) exit 2 ;;

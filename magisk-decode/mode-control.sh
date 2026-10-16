@@ -12,6 +12,25 @@ sync_selection() {
  if [ -e "$MODROOT/disable" ]; then touch "$CURRENTROOT/disable"; else rm -f "$CURRENTROOT/disable"; fi
 }
 case "$1" in
+ codec2_backend)
+  [ "$#" = 2 ] || exit 2
+  case "$2" in legacy|simd|latest) ;; *) exit 2 ;; esac
+  resolve || exit 1
+  . "$MODROOT/selection.sh"
+  apply_selection backend "$2" '' || exit 1
+  sync_selection || exit 1
+  echo "Codec2 backend=$2 saved. Reboot to apply."
+  ;;
+ linked)
+  [ "$#" = 3 ] || exit 2
+  case "$2" in mpp|rga|codec2|libyuv|software|hdr_static|hdr10plus|codec2_sdk|codec2_sdk_next|codec2_buffer|p010_fast|av1_native|av1_grain|av1_afbc) ;; *) exit 2 ;; esac
+  case "$3" in on|off) ;; *) exit 2 ;; esac
+  resolve || exit 1
+  . "$MODROOT/selection.sh"
+  apply_selection flag "$2" "$3" || exit 1
+  sync_selection || exit 1
+  echo "$2=$3 saved with dependencies. Reboot to apply."
+  ;;
  status)
   if [ -e "$MODROOT/disable" ]; then echo "Whole module: disabled for next boot"; else echo "Whole module: enabled for next boot"; fi
   echo "Requested next boot:"; cat "$MODROOT/config"
@@ -36,5 +55,5 @@ case "$1" in
   sync_selection || exit 1
   echo "$1=$value saved. Reboot to apply. Codec2 requires MPP/RGA; software P010 requires Codec2. Selections are preserved when dependencies are off."
   ;;
- *) echo "Usage: sh mode-control.sh status | all on|off | mpp|rga|codec2|libyuv|software|hdr_static|hdr10plus|codec2_sdk|codec2_sdk_next|codec2_buffer|p010_fast|av1_native|av1_grain|av1_afbc on|off"; exit 2 ;;
+ *) echo "Usage: sh mode-control.sh status | all on|off | codec2_backend legacy|simd|latest | mpp|rga|codec2|libyuv|software|hdr_static|hdr10plus|codec2_sdk|codec2_sdk_next|codec2_buffer|p010_fast|av1_native|av1_grain|av1_afbc on|off"; exit 2 ;;
 esac

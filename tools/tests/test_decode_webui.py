@@ -4,7 +4,6 @@ Usage: python tools/tests/test_decode_webui.py --adb /path/to/adb
 Only fixed module-directory literals are redirected into the disposable fixture.
 """
 import argparse
-import hashlib
 import json
 from pathlib import Path
 import shlex
@@ -17,7 +16,7 @@ def main():
     parser.add_argument('--adb', default='adb')
     args = parser.parse_args()
     source = Path(__file__).resolve().parents[2] / 'magisk-decode'
-    fixture = '/data/local/tmp/rk-webui-test064'
+    fixture = '/data/local/tmp/rk-webui-test065'
     current = fixture + '/modules/rk3588_decode_stack'
     staged = fixture + '/modules_update/rk3588_decode_stack'
     keys = 'mpp rga codec2 libyuv software hdr_static hdr10plus codec2_sdk codec2_buffer p010_fast codec2_sdk_next av1_native av1_grain av1_afbc'.split()
@@ -56,7 +55,7 @@ def main():
         temp = type('Temp', (), {'name': directory})()
         try:
             shell('mkdir -p ' + current + '/components/codec2_sdk/system/vendor/lib/hw ' + current + '/components/codec2_sdk_next/system/vendor/lib/hw')
-            for name in ['common.sh', 'mode-control.sh', 'action.sh', 'webui.sh', 'module.prop']:
+            for name in ['common.sh', 'mode-control.sh', 'selection.sh', 'action.sh', 'webui.sh', 'module.prop']:
                 data = (source / name).read_text(encoding='utf-8')
                 data = data.replace('/data/adb/modules_update', fixture + '/modules_update').replace('/data/adb/modules', fixture + '/modules')
                 put(current + '/' + name, data)
@@ -66,7 +65,8 @@ def main():
             unknown = status()
             expect(not unknown['activeKnown'] and unknown['pendingReboot'], 'legacy/first install never claims active')
             put(current + '/active-config', config())
-            put(current + '/active-version', '0.6.4\n')
+            version = next(line.split('=', 1)[1] for line in (source / 'module.prop').read_text(encoding='utf-8').splitlines() if line.startswith('version='))
+            put(current + '/active-version', version + '\n')
             shell('cat /proc/sys/kernel/random/boot_id > ' + current + '/active-boot-id')
             put(current + '/status.txt', 'PASS unified decode stack, fixture only\n')
             ready = status()
@@ -89,6 +89,18 @@ def main():
             off = set_flag('codec2_sdk_next', False)
             expect(off['components']['codec2_sdk']['effective'] == 1 and off['components']['av1_native']['effective'] == 0 and off['components']['av1_afbc']['effective'] == 0, 'new core independent rollback')
             set_flag('codec2_sdk_next', True)
+            for name, sdk, latest in [('legacy', 0, 0), ('simd', 1, 0), ('latest', 1, 1)]:
+                selected = json.loads(call('backend', name).stdout)
+                expect(selected['components']['codec2_sdk']['requested'] == sdk and selected['components']['codec2_sdk_next']['requested'] == latest, name + ' backend committed as a pair')
+                expect(selected['components']['av1_afbc']['requested'] == 1, name + ' retains dependent choice')
+                expect(selected['components']['av1_afbc']['effective'] == latest, name + ' gates AV1 native route')
+            put(current + '/config', config(mpp=0, rga=0, codec2=0, codec2_sdk=0, codec2_sdk_next=0, av1_native=0, av1_afbc=0))
+            linked = set_flag('av1_afbc', True)
+            for key in ['mpp', 'rga', 'codec2', 'codec2_sdk', 'codec2_sdk_next', 'av1_native', 'av1_afbc']:
+                expect(linked['components'][key]['requested'] == linked['components'][key]['effective'] == 1, 'enable AV1 AFBC recursively enables ' + key)
+            expect(not linked['pendingReboot'], 'restoring full dependency plan cancels pending changes')
+            set_flag('mpp', False)
+            expect(set_flag('av1_grain', True)['components']['mpp']['requested'] == 1, 'enable grain restores MPP')
             off = set_flag('all', False)
             expect(all(v['effective'] == 0 and v['requested'] == 1 for v in off['components'].values()), 'whole rollback retains all selections')
             expect(off['activeEnabled'] and off['pendingReboot'], 'whole disable never claims immediate rollback')
@@ -108,7 +120,7 @@ def main():
             expect(not set_flag('all', False)['enabled'], 'whole rollback works with invalid config')
             put(current + '/config', config())
             set_flag('all', True)
-            for parts in [('set', 'unknown', 'on'), ('set', 'mpp; touch ' + fixture + '/injected', 'on'), ('set', 'mpp', '2'), ('set', 'mpp', 'on', 'extra'), ('status', 'extra')]:
+            for parts in [('set', 'unknown', 'on'), ('set', 'mpp; touch ' + fixture + '/injected', 'on'), ('set', 'mpp', '2'), ('set', 'mpp', 'on', 'extra'), ('status', 'extra'), ('backend', 'bad'), ('backend', 'latest', 'extra')]:
                 expect(call(*parts, check=False).returncode != 0, 'reject arbitrary input ' + parts[0])
             expect(shell('test ! -e ' + fixture + '/injected', check=False).returncode == 0, 'no command injection')
             shell('mkdir -p ' + fixture + '/modules_update; cp -R ' + current + ' ' + staged)
@@ -118,6 +130,10 @@ def main():
             expect(off['components']['av1_afbc']['requested'] == 0, 'writes staged selection')
             expect('av1_afbc=0' in shell('cat ' + current + '/config').stdout, 'pending selection synchronized to current config')
             set_flag('av1_afbc', True)
+            selected = json.loads(call('backend', 'simd').stdout)
+            expect(selected['components']['codec2_sdk_next']['requested'] == 0, 'backend saved to pending update')
+            expect('codec2_sdk_next=0' in shell('cat ' + current + '/config').stdout, 'backend synchronized to current config')
+            call('backend', 'latest')
             set_flag('all', False)
             expect(shell('test -f ' + staged + '/disable -a -f ' + current + '/disable', check=False).returncode == 0, 'whole rollback synchronized across pending update')
             set_flag('all', True)
@@ -126,7 +142,7 @@ def main():
             expect(shell('cat ' + current + '/active-config').stdout == original_active, 'no test mutation touches active config')
         finally:
             # Fixed absolute disposable root; never a computed user path.
-            shell('rm -rf /data/local/tmp/rk-webui-test064')
+            shell('rm -rf /data/local/tmp/rk-webui-test065')
     print(json.dumps({'android_shell_assertions': assertions, 'live_module_modified': False, 'passed': True}))
 
 

@@ -1,0 +1,61 @@
+{
+  "version": "0.6.5",
+  "publication": {
+    "tag": "v0.6.5",
+    "kind": "complete_project_release"
+  },
+  "scope": "single Codec2 backend selector, nested dependency controls, retained gray inactive choices and atomic linked selection writes",
+  "tests": {
+    "android_shell_isolated": {
+      "passed": true,
+      "assertions": 100,
+      "live_module_modified": false,
+      "covers": [
+        "three backend flag pairs",
+        "recursive enable",
+        "retained child selection",
+        "whole/Action rollback controls",
+        "pending update synchronization",
+        "invalid arguments and uninstall marker"
+      ]
+    },
+    "browser_mock_bridge": {
+      "passed": true,
+      "assertions": 28,
+      "covers": [
+        "one selector replacing two toggles",
+        "dependency DOM hierarchy",
+        "gray retained selections",
+        "automatic backend dependency",
+        "keyboard and mobile layout",
+        "failure handling"
+      ]
+    },
+    "actual_android_webview": {
+      "host": "standalone KsuWebUI 1.0 / versionCode 34 on Magisk",
+      "three_native_dropdown_choices_saved": true,
+      "gray_checked_child_when_parent_off": true,
+      "parent_on_restores_child": true,
+      "child_enable_selects_required_1_14_16": true,
+      "no_pending_reboot_after_restoring_original_choices": true,
+      "legacy_and_simd_choices_saved_without_rebooting_into_them": true
+    },
+    "boot": {
+      "candidate_0_6_5_healthy": true,
+      "active_latest_core_hash_verified": true
+    }
+  },
+  "preservation": {
+    "preserved_component_boot_and_rollback_files": 188,
+    "identical_elf_files": 26,
+    "passed": true
+  },
+  "quality": "All 26 ELF files are byte-identical to 0.6.4; no decoder setting, bit-depth, resolution, bitrate or frame-rate reduction.",
+  "previous_validation": "https://github.com/sw1313/rk3588-playback-fix/blob/main/docs/validation/decode-0.6.4.json",
+  "limits": [
+    "No new full playback/precision matrix; decoder payload unchanged.",
+    "Three backend choices were tested for configuration and dependency updates, not a new playback run on each backend.",
+    "The 31-file original-stack reboot rollback and 3597-frame AV1 playback evidence belong to 0.6.4; not recounted as new 0.6.5 measurements.",
+    "Firmware contracts, existing AnTuTu limitations and KernelSU mounting scope unchanged."
+  ]
+}

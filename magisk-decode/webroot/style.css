@@ -9,6 +9,15 @@ p { margin: 5px 0; line-height: 1.6; color: var(--muted); }
 button { font: inherit; color: inherit; background: var(--panel); border: 1px solid var(--line); padding: 10px 16px; border-radius: 12px; min-height: 46px; cursor: pointer; }
 button:focus-visible { outline: 3px solid #f3ce88; outline-offset: 4px; }
 button:disabled { opacity: .45; cursor: default; }
+select { font: inherit; color: inherit; background: #263139; border: 1px solid var(--line); border-radius: 10px; min-height: 48px; padding: 10px 12px; width: 100%; }
+select:disabled { opacity: .45; }
+select:focus-visible { outline: 3px solid #f3ce88; outline-offset: 4px; }
+.component.backend { flex-direction: column; align-items: stretch; }
+.children:not(:empty) { margin-left: 14px; padding-left: 12px; border-left: 2px solid #42565f; }
+.component.inactive { border-color: #30393f; background: #181e22; }
+.component.inactive h3, .component.inactive p, .component.inactive select { color: #9aa6ac; }
+.component.inactive button[role=switch][aria-checked=true] { background: #4b565d; border-color: #6c797f; }
+.component.inactive .blocked { color: #c5bca8; }
 .notice { border: 1px solid var(--line); border-radius: 12px; padding: 15px 18px; margin-bottom: 18px; line-height: 1.65; overflow-wrap: anywhere; }
 .notice.pending { border-color: #b7965f; background: #322a1e; color: #f4d7a2; }
 .notice.error { border-color: #bf7c7c; background: #352323; color: #ffcece; }
@@ -27,5 +36,5 @@ button[role=switch] span { display: block; width: 26px; height: 26px; border-rad
 button[role=switch][aria-checked=true] { background: #45876f; border-color: #79c3a7; }
 button[role=switch][aria-checked=true] span { transform: translateX(18px); }
 footer { margin-top: 26px; padding-top: 16px; border-top: 1px solid var(--line); font-size: 13px; }
-@media (max-width: 520px) { main { padding-left: 16px; padding-right: 16px; } header { align-items: flex-start; gap: 12px; } h1 { font-size: 28px; } .component, .summary { padding: 16px; gap: 12px; } }
+@media (max-width: 520px) { main { padding-left: 14px; padding-right: 14px; } header { align-items: flex-start; gap: 12px; } h1 { font-size: 28px; } .component, .summary { padding: 12px; gap: 10px; } .children:not(:empty) { margin-left: 6px; padding-left: 7px; } }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
