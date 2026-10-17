@@ -1,3 +1,18 @@
+# v0.6.9 optional 应用内 PanVK driver / 可选 应用内驱动
+
+Checkout `v0.6.9` for `panvk/` and `tools/build_panvk.py`. The new driver is
+RC3 Test8.1, a documentation/metadata packaging revision of tested Test8.
+Its complete original adapter source, strict address-width binary patcher,
+one-line Mesa source fix and compiled-engine offline tests are included.
+It is **not a complete Mesa rebuild**. Public upstream pins, toolchain,
+requirements and exact reproduction commands: [panvk/README.md](panvk/README.md).
+
+四个原安装包沿用原字节和原源码标签：Mali 0.3.0 对应 v0.6.8，其余三包对应 v0.6.7。
+重建历史安装包请使用其各自标签，勿把文档变化冒充运行组件升级。新增 PanVK 的运行库
+与本地 Test8 一致，构建器校验哈希；无原版应用 APK、私人固件输入、游戏配置或日志。
+
+---
+
 # v0.6.8 Mali kernel / CSF integration
 
 Mali Global is now 0.3.0. Decode Stack 0.6.7, plugin 0.3.5 and Frame Guard 0.1.1

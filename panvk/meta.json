@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "name": "PanVK RC3 RK3588 A12 Test8.1 (Address64 + CSF group)",
+  "author": "Mesa / zenithblue-oss; RK3588 compatibility packaging",
+  "packageVersion": "0.1.0-rc3-rk3588-a12-test8.1",
+  "vendor": "Mesa",
+  "driverVersion": "PanVK RC3 / Mesa 26.3.0-devel",
+  "minApi": 32,
+  "libraryName": "libvulkan_eden_rc3.so",
+  "description": "Experimental application-imported Vulkan compatibility driver for tested RK3588 Android12/Mali g18 setup. Runtime identical to local Test8; Test8.1 adds documentation, licensing and build tools. Address64 fix and single-CSG topology; no application APK/system/boot changes. Long-run stability unproven."
+}

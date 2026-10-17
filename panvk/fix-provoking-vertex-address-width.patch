@@ -1,0 +1,20 @@
+From: RK3588 compatibility investigation
+Subject: [PATCH] panvk/csf: preserve 64-bit provoking-vertex helper addresses
+
+The function table is a normal private BO and kbase maps it above 4 GiB.
+Storing its GPU address in uint32_t truncates the address before cs_move64_to.
+On G610, an Eden run attempted a CALL at 0xfd9e2100 while the live mapping
+was 0x5ffd9e2000 (helper offset 0x100). The lifetime audit found no free.
+Use the complete address without changing helper selection or rendering.
+
+--- a/src/panfrost/vulkan/csf/panvk_vX_cmd_draw.c
++++ b/src/panfrost/vulkan/csf/panvk_vX_cmd_draw.c
+@@ -2234,7 +2234,7 @@
+          uint32_t fn_idx = calc_fn_set_fbds_provoking_vertex_idx(cmdbuf);
+          uint32_t fn_stride =
+             dev->draw_ctx->fn_set_fbds_provoking_vertex_stride;
+-         uint32_t fn_addr =
++         uint64_t fn_addr =
+             dev->draw_ctx->fns_bo->addr.dev + fn_idx * fn_stride;
+          cs_move64_to(b, addr_reg, fn_addr);
+          cs_move32_to(b, length_reg, fn_stride);

@@ -53,3 +53,20 @@ relicensed or redistributed here. The boot image and original firmware are not b
 
 Unchanged installers in the complete v0.6.8 snapshot retain their v0.6.7 source
 metadata and exact bytes. Their historical licenses/build notices remain inside.
+
+
+PanVK optional in-app Vulkan driver / 可选 应用内驱动 · v0.6.9
+
+PanVK RC3 Test8.1 additionally carries the open Mesa/kbase driver core and the
+original API32 loader, mapper/fence bridge and single-CSG adapter. Original
+project adapters/build tools are MIT. Upstream Mesa/Khronos notices, the
+zenithblue-oss patch stack, AOSP Apache-2.0 headers, kbase UAPI GPL-2.0 WITH
+Linux-syscall-note and NDK/LLVM runtime notices retain their original terms.
+The UAPI exception does not relicense the headers. This open PanVK component
+is distinct from proprietary Mali userspace/CSF blobs, which remain excluded.
+See panvk/LICENSES/, panvk/PROVENANCE.txt and panvk/README.md for exact pins,
+source, binary-counterpart scope, build and validation limits. No application code,
+game material, user configuration, keys, raw logs or device identifiers ship.
+Test8.1 runtime matches local Test8; documentation/metadata only changed.
+Unchanged installers carry the original v0.6.7 or v0.6.8 source/license metadata
+as identified by release-manifest.json; they are not silently repackaged.

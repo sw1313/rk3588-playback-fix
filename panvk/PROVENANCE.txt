@@ -1,0 +1,40 @@
+{
+  "upstreamRelease": "https://github.com/zenithblue-oss/panvk-kbase-android/releases/tag/panvk-kbase-v0.1.0-rc3",
+  "payloadOriginalSha256": "b46b9f0416f207a05482349dffb37b6f3d84c20762151c623774831ce3939445",
+  "payloadSha256": "a819b7ea1a078d2ef6a4812462cc5f352b8a81c25cfd8aaaf181ac41c4ffa45f",
+  "loaderTargetApi": 32,
+  "payloadRecompiled": false,
+  "payloadOriginalPackageMinApi": 35,
+  "scope": "Local experimental compatibility validation on Android API32, not a general Android32 support claim",
+  "localChanges": [
+    "Android HAL forwarding loader compiled for API32",
+    "PANVK_BC_AFRC=0 before loading the upstream driver",
+    "application-driver-loader-compatible ZIP metadata targeting the tested API32 system",
+    "Android12 libui mapper adapter through libnativewindow dependency scope, one RGB plane only; no guessed modifiers",
+    "Android ANB DMA-BUF import/bind with real plane offset, stride and modifier",
+    "Android release uses a real GPU completion fence before returning fd=-1; binary waits consumed exactly once",
+    "G610 PAN_ARCH10: two AArch64 instructions reproduce the included uint32_t to uint64_t source fix for the provoking-vertex helper address. SHA256 and instruction guarded, no full Mesa rebuild.",
+    "Test8 experimental payload-scoped ioctl/close adapter: three RC3 subqueues share one CSG at CSI0/1/2, cs_min=3. Full reference-counted group teardown; real bind/create errors propagate. Fd-close cleanup prevents stale handle reuse. No system hooks. PANVK_DEBUG=sync is not enabled."
+  ],
+  "validation": {
+    "addressWidthOfflineCases": 4480,
+    "addressWidthFailures": 0,
+    "gameValidation": "User reports normal characters/scene and no crash during short title/start/touch-overlay retest. Long-running/all-game stability unproven.",
+    "geometryCases": 23,
+    "geometryFailures": 0,
+    "xfbCases": 17,
+    "xfbFailures": 0,
+    "NativeBufferAFBC": "Exact render/readback and real release fence PASS",
+    "groupEngineOfflineOperations": 9000,
+    "groupEngineOfflineFailures": 0,
+    "provokingVertexRegression": "PASS"
+  },
+  "upstreamCommit": "fd6ed91eff1c8d3a83307a2348b959bb93797011",
+  "mesaBaseCommit": "5a07217f034b3e50d8c7c7794f97a2df1742613b",
+  "packagingRevision": "Test8.1; documentation/metadata only, loader and core identical to local Test8",
+  "testedRuntimeSha256": {
+    "panvk_rc3_payload.so": "a819b7ea1a078d2ef6a4812462cc5f352b8a81c25cfd8aaaf181ac41c4ffa45f",
+    "libvulkan_eden_rc3.so": "e5e7a4b5eb093161801c2b135c8b6f062bffb9635dcca82d8395b8897752c74a"
+  },
+  "originalLocalTest8ArchiveSha256": "2c28dd0e12bb3ec2ba8777d9662c529683aa3365b7dc81b50993a8749a84d494"
+}

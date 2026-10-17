@@ -8,12 +8,13 @@ ROOT = Path(__file__).resolve().parents[1]
 DOCUMENTS = ('LICENSE', 'NOTICE', 'OPEN_SOURCE.md', 'THIRD_PARTY_NOTICES.md',
              'SOURCE_CODE.md', 'SOURCE_CODE.zh-CN.md')
 COMPONENTS = {
+    'panvk-app': ('panvk', '0.1.0-rc3-rk3588-a12-test8.1'),
     'decode-stack': ('magisk-decode', None),
     'mali-global': ('magisk-mali-global', None),
     'frameguard': ('magisk', None),
     'yamby-mpv-plugin': ('lsposed', '0.3.5'),
 }
-RELEASE_TAG = 'v0.6.8'
+RELEASE_TAG = 'v0.6.9'
 URL = 'https://github.com/sw1313/rk3588-playback-fix'
 
 

@@ -1,0 +1,49 @@
+{
+  "component": "panvk-app",
+  "package_version": "0.1.0-rc3-rk3588-a12-test8.1",
+  "date": "2026-10-17",
+  "status": "experimental_short_test_only",
+  "runtime_identical_to_local_test8": true,
+  "tested_setup": {
+    "soc": "RK3588",
+    "gpu": "Mali-G610",
+    "android_api": 32,
+    "kernel_release": "5.10.66",
+    "existing_gpu_kernel_and_csf": "matched g18p0 pair, unchanged by PanVK tests"
+  },
+  "offline": {
+    "address_cases": 4480,
+    "address_failures": 0,
+    "compiled_group_engine_cycles": 1000,
+    "group_lifecycle_operations": 9000,
+    "group_failures": 0,
+    "failure_retry_capacity_fd_thread_close_checks": "PASS",
+    "kernel_calls_mocked_in_group_engine_test": true
+  },
+  "device": {
+    "geometry_cases": 23,
+    "xfb_cases": 17,
+    "failures": 0,
+    "multi_stream_exact_readback": "PASS",
+    "afbc_import_render_readback_release": "PASS",
+    "address_regression_original": "DEVICE_LOST",
+    "address_regression_fixed": "PASS",
+    "additional_context_lifecycles_alongside_game": 10,
+    "user_result": "Characters and scenes render; no crash reported during short title/start/touch-overlay retest",
+    "gpu_fatal_markers_in_captured_test8_interval": 0,
+    "protected_file_hashes_unchanged": 30
+  },
+  "known_limits": [
+    "Long-running stability not established",
+    "Other games, factory KMD/CSF and other devices not established",
+    "Per-game JIT was used for CPU comparison; ZIP does not set CPU backend",
+    "No final performance claim; presentation bridge still waits for GPU completion",
+    "CSF cross-group dependency diagnosis remains provisional",
+    "No complete Mesa rebuild"
+  ],
+  "runtime_sha256": {
+    "panvk_rc3_payload.so": "a819b7ea1a078d2ef6a4812462cc5f352b8a81c25cfd8aaaf181ac41c4ffa45f",
+    "libvulkan_eden_rc3.so": "e5e7a4b5eb093161801c2b135c8b6f062bffb9635dcca82d8395b8897752c74a"
+  },
+  "raw_logs_or_device_identifiers_included": false
+}

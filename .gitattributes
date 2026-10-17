@@ -18,3 +18,8 @@ mali-kernel/driver/** -whitespace
 mali-kernel/compat/drivers-base/** -whitespace
 mali-kernel/prepared/** -whitespace
 mali-kernel/image.Module.symvers -whitespace
+
+# Preserve upstream PanVK/Mesa notices and unified diff context.
+panvk/LICENSES/** -whitespace
+panvk/*.patch -whitespace
+panvk/include/** -whitespace

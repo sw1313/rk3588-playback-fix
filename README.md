@@ -1,19 +1,19 @@
 # RK3588 Playback Fix
 
-**v0.6.8 / Mali Global 0.3.0** adds a paired g18p0 kernel/CSF option and a separate
-English / 中文 WebUI. The kernel upgrade defaults off, applies after reboot, and
-falls back after an incomplete startup. Boot is never flashed. Original user-space,
-kernel and CSF rollback remain. [Mali controls, scope and source](magisk-mali-global/README.md).
+**v0.6.9** adds the optional **PanVK RC3 Test8.1** driver for import in the tested application's driver manager. All four existing installers retain their exact bytes. The G610 address
+fix and single-CSG scheduling workaround improved the reported short game
+retest; long-run stability remains unproven. Runtime libraries match local
+Test8. [Scope, install, rollback and build](panvk/README.md).
 
-新增配套 Mali 内核／CSF 与中英文 WebUI，默认关闭内核升级。保存后重启生效，
-失败启动自动选择原内核；不刷 boot。其余三个安装包和 Yamby 保持原样。
-
+新增原版应用可导入的 PanVK Test8.1 驱动包，修正地址截断并调整 CSF 队列调度。
+四个原有安装包原样携带；系统驱动、boot、Yamby 和 LSPosed 不因本次更新而改变。
+人物／画面和标题短测改善，尚未证明长期稳定；[中文验证说明](docs/panvk-test8.zh-CN.md)。
 
 [**Current downloads / 当前下载**](DOWNLOADS.md) · [Download table](https://github.com/sw1313/rk3588-playback-fix/blob/main/DOWNLOADS.md) · [中文说明](README.zh-CN.md)
 
-**[Project release v0.6.8 — all four installers](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.8)**
+**[Project release v0.6.9 — four installers + optional in-app Vulkan driver](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.9)**
 
-Every public Release is a complete project snapshot with Decode Stack, Native
+An optional in-app Vulkan driver may accompany the four installers. Every public Release is a complete project snapshot with Decode Stack, Native
 Mali Global, the Yamby/mpv plugin and Frame Guard attached together. The project
 version identifies the snapshot; each package retains its own component version.
 GitHub **Latest** points to the newest complete project release. System components
@@ -21,10 +21,11 @@ remain experimental and restricted to the firmware hashes in their contracts.
 
 | Component | Current version | Purpose |
 | --- | --- | --- |
-| [Decode Stack](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.8) | **0.6.7 — experimental** | English/Chinese WebUI with remembered language choice; backend selector, dependencies and rollback retained |
+| [Decode Stack](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.9) | **0.6.7 — experimental** | English/Chinese WebUI with remembered language choice; backend selector, dependencies and rollback retained |
 | [Native Mali Global](magisk-mali-global/README.md) | **0.3.0 — experimental** | Global g18p0 userspace; optional matched kernel/CSF, reboot controls and rollback |
-| [Yamby/mpv LSPosed plugin](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.8) | **0.3.5** | Default HW+ setting and optional RK3588 edge correction; this is the plugin version, not the LSPosed framework version |
-| [Frame Guard](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.8) | **0.1.1** | Optional fixed-refresh workaround for the reproduced HDMI blackouts |
+| [Yamby/mpv LSPosed plugin](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.9) | **0.3.5** | Default HW+ setting and optional RK3588 edge correction; this is the plugin version, not the LSPosed framework version |
+| [Frame Guard](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.9) | **0.1.1** | Optional fixed-refresh workaround for the reproduced HDMI blackouts |
+| [PanVK in-app driver](panvk/README.md) | **RC3 Test8.1 — experimental, optional** | Address64 + single-CSG workaround; imported per app, no system driver replacement |
 
 ## Licensing and source · v0.6.7
 
@@ -61,7 +62,7 @@ See [actual playback, exact pixels and limits](docs/decode-av1-063.zh-CN.md).
 
 ## Choose and install
 
-Use the exact filenames and links in [DOWNLOADS.md](DOWNLOADS.md). This snapshot upgrades Mali Global; the other three installers retain their
+Use the exact filenames and links in [DOWNLOADS.md](DOWNLOADS.md). This snapshot adds the optional in-app Vulkan driver; the four existing installers retain their
 previous versions and exact bytes. Old releases remain available for rollback
 and source history. The old system collection contains Decode Stack **0.3.2**,
 not the current decoder package.

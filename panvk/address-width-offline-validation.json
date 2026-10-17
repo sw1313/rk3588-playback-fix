@@ -1,0 +1,14 @@
+{
+  "original_sha256": "b46b9f0416f207a05482349dffb37b6f3d84c20762151c623774831ce3939445",
+  "patched_sha256": "a819b7ea1a078d2ef6a4812462cc5f352b8a81c25cfd8aaaf181ac41c4ffa45f",
+  "mesa_rebuilt": false,
+  "scope": "RC3 PAN_ARCH10 only, two AArch64 instructions",
+  "site_va": "0xe6e148",
+  "file_offset": "0xe6a148",
+  "old_bytes": "082940b90320141b",
+  "new_bytes": "081540f90320149b",
+  "cases": 4480,
+  "original_truncation_reproduced": 4360,
+  "patched_failures": 0,
+  "source_patch": "fix-provoking-vertex-address-width.patch"
+}

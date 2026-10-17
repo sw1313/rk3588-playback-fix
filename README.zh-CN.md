@@ -1,17 +1,17 @@
 # RK3588 播放兼容修复
 
-**v0.6.8 / Mali Global 0.3.0** adds a paired g18p0 kernel/CSF option and a separate
-English / 中文 WebUI. The kernel upgrade defaults off, applies after reboot, and
-falls back after an incomplete startup. Boot is never flashed. Original user-space,
-kernel and CSF rollback remain. [Mali controls, scope and source](magisk-mali-global/README.md).
+**v0.6.9** adds the optional **PanVK RC3 Test8.1** driver for import in the tested application's driver manager. All four existing installers retain their exact bytes. The G610 address
+fix and single-CSG scheduling workaround improved the reported short game
+retest; long-run stability remains unproven. Runtime libraries match local
+Test8. [Scope, install, rollback and build](panvk/README.md).
 
-新增配套 Mali 内核／CSF 与中英文 WebUI，默认关闭内核升级。保存后重启生效，
-失败启动自动选择原内核；不刷 boot。其余三个安装包和 Yamby 保持原样。
-
+新增原版应用可导入的 PanVK Test8.1 驱动包，修正地址截断并调整 CSF 队列调度。
+四个原有安装包原样携带；系统驱动、boot、Yamby 和 LSPosed 不因本次更新而改变。
+人物／画面和标题短测改善，尚未证明长期稳定；[中文验证说明](docs/panvk-test8.zh-CN.md)。
 
 [**当前下载与版本表**](DOWNLOADS.md) · [GitHub 下载导航](https://github.com/sw1313/rk3588-playback-fix/blob/main/DOWNLOADS.md) · [English](README.md)
 
-**[项目整套版本 v0.6.8 — 四个安装包齐全](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.8)**
+**[项目整套版本 v0.6.9 — 四包齐全，另附可选 应用内驱动](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.9)**
 
 每个公开 Release 都是完整项目快照，附齐 Decode Stack、全局 Mali、Yamby/mpv 插件
 和 Frame Guard。项目版本标识这次整套发布，包内继续保留各组件真实版本号。
@@ -19,10 +19,11 @@ GitHub **Latest** 指向最近更新的整套版本。系统组件仍为实验�
 
 | 组件 | 当前版本 | 用途 |
 | --- | --- | --- |
-| [Decode Stack 解码合并模块](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.8) | **0.6.7，实验组件** | 中英切换并记忆语言；版本单选、依赖联动与回退保持 |
+| [Decode Stack 解码合并模块](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.9) | **0.6.7，实验组件** | 中英切换并记忆语言；版本单选、依赖联动与回退保持 |
 | [原厂 Mali 全局模块](magisk-mali-global/README.md) | **0.3.0，实验组件** | 全局 g18p0 用户态；可选配套内核／CSF、重启开关与回退 |
-| [Yamby／mpv LSPosed 插件](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.8) | **0.3.5** | 默认 HW+ 设置与可选灰白边修正；这是插件版本，不是 LSPosed 框架版本 |
-| [Frame Guard 刷新率模块](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.8) | **0.1.1** | 可选的固定刷新率黑屏规避 |
+| [Yamby／mpv LSPosed 插件](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.9) | **0.3.5** | 默认 HW+ 设置与可选灰白边修正；这是插件版本，不是 LSPosed 框架版本 |
+| [Frame Guard 刷新率模块](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.6.9) | **0.1.1** | 可选的固定刷新率黑屏规避 |
+| [原版应用可选 PanVK 驱动](panvk/README.md) | **RC3 Test8.1，实验组件** | 地址修正、CSF 同组调度；应用内导入，不替换系统驱动 |
 
 ## 开源许可与构建说明 · v0.6.7
 
@@ -53,7 +54,7 @@ HDR 和胶片颗粒，保留分项开关和整包回退。最终二进制在同�
 ## 安装与历史版本
 
 安装包文件名、直接下载链接和校验值统一见 [DOWNLOADS.md](DOWNLOADS.md)。
-本次更新 Mali Global；另外三个安装包沿用原版本与原字节，继续附齐四包。
+本次新增可选 应用内 PanVK 驱动；四个原有安装包沿用原版本与原字节，继续附齐四包。
 旧系统合集包含的解码模块是 **0.3.2**，已不是当前版本。
 旧版保留用于回退和核对历史，不再作为当前安装入口。
 

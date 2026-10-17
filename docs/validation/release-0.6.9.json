@@ -1,0 +1,52 @@
+{
+  "project_release": "v0.6.9",
+  "date": "2026-10-17",
+  "all_installer_checks_passed": true,
+  "installers": [
+    {
+      "component": "decode-stack",
+      "version": "0.6.7",
+      "documents": 7,
+      "license_texts_checked": 17,
+      "checksum_entries_checked": 401,
+      "passed": true
+    },
+    {
+      "component": "mali-global",
+      "version": "0.3.0",
+      "documents": 7,
+      "license_texts_checked": 1,
+      "checksum_entries_checked": 100,
+      "passed": true
+    },
+    {
+      "component": "yamby-mpv-plugin",
+      "version": "0.3.5",
+      "documents": 7,
+      "license_texts_checked": 1,
+      "checksum_entries_checked": 0,
+      "passed": true
+    },
+    {
+      "component": "frameguard",
+      "version": "0.1.1",
+      "documents": 7,
+      "license_texts_checked": 1,
+      "checksum_entries_checked": 0,
+      "passed": true
+    },
+    {
+      "component": "panvk-app",
+      "version": "0.1.0-rc3-rk3588-a12-test8.1",
+      "documents": 7,
+      "license_texts_checked": 1,
+      "checksum_entries_checked": 50,
+      "passed": true
+    }
+  ],
+  "panvk_runtime_matches_tested_test8": true,
+  "public_source_privacy_scan": "passed: no private host paths, device IPs, raw logs/configs or keys in staged additions",
+  "prior_four_installers": "exact prior-release SHA256 digests retained",
+  "scope": "Publication/source/packaging validation; no new on-device changes performed for this upload",
+  "public_facing_wording": "Neutral application-imported Vulkan compatibility package; no console-platform or specific-game promotion"
+}

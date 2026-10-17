@@ -8,7 +8,7 @@ from package_licenses import ROOT, DOCUMENTS, metadata
 
 def verify():
     manifest = json.loads((ROOT / 'release-manifest.json').read_text(encoding='utf-8'))
-    assert len(manifest['components']) == 4
+    assert {i['id'] for i in manifest['components']} == {'decode-stack','mali-global','yamby-mpv-plugin','frameguard','panvk-app'}
     results = []
     for item in manifest['components']:
         path = ROOT / 'dist' / item['filename']
@@ -61,6 +61,19 @@ def verify():
                     assert archive.read('LICENSES/GPL-2.0-only.txt') == (ROOT / 'LICENSES/GPL-2.0-only.txt').read_bytes().replace(b'\r\n', b'\n')
                     assert not any(n.endswith(('mali_csffw.bin','rk_next_csffw.bin')) for n in names)
                     assert {'kernel/rk_mali_next.ko','kernel/rk_mali_resource_guard.ko'} <= set(names)
+            if item['id'] == 'panvk-app':
+                meta = json.loads(archive.read('meta.json'))
+                assert names[0] == 'meta.json' and meta['packageVersion'] == item['version']
+                prov = json.loads(archive.read('PROVENANCE.txt'))
+                assert prov['payloadRecompiled'] is False
+                for filename, expected in prov['testedRuntimeSha256'].items():
+                    assert hashlib.sha256(archive.read(filename)).hexdigest() == expected, filename
+                assert {'csf_group_core.c','csf_group_adapter.c','eden_rc3_loader.c',
+                        'patch_payload.py','verify_group_offline.py',
+                        'LICENSES/Apache-2.0.txt','LICENSES/MIT.txt',
+                        'LICENSES/GPL-2.0.txt','LICENSES/Linux-syscall-note.txt'} <= set(names)
+                assert not any(n.endswith(('.apk','.ko','.bin','.elf','.o')) for n in names)
+                assert b'setenv("PANVK_DEBUG", "sync"' not in archive.read('eden_rc3_loader.c')
             if prefix:
                 assert not any(n.startswith('lib/') for n in names), 'Unexpected player/framework native library'
             results.append({'component': item['id'], 'version': item['version'],
