@@ -1,0 +1,159 @@
+{
+  "component": "mali-global",
+  "version": "0.4.2-test1",
+  "date": "2026-10-18",
+  "status": "EXPERIMENTAL_BOUNDED_CSF_FENCE_TRACE_HDR_AND_REBOOT_ROLLBACK_VERIFIED",
+  "public_release": false,
+  "source_ref": "working-tree",
+  "unchanged_companion": "Decode Stack 0.7.4-test1",
+  "installer": {
+    "filename": "rk3588-mali-global-0.4.2-test1.zip",
+    "sha256": "5e91a0a549a4b635357c2f4d05cf609c0a0ff25c0ed4df75fae7810d7e205925",
+    "bytes_preserved": true,
+    "embedded_validation_is_pre_device_snapshot": true,
+    "validation_addendum": "docs/mali-csf-fence-042.zh-CN.md"
+  },
+  "upstream": {
+    "repository": "https://github.com/rockchip-linux/kernel",
+    "base_revision": "7a76350c1e0df810d8c11eb0d18285da4e79e6ed",
+    "selective_commit": "194a7d5a7567395d37e11ffa9014589b83ba8aad",
+    "scope": "Initialize and retain KCPU fence metadata before dma_fence_init trace callbacks; error cleanup, signaling, waiting and release remain intact.",
+    "local_changes": [
+      "Default-off read-only csf_fence_safe KMD parameter",
+      "Root-private independent fence selection latched by first-bind keeper",
+      "WebUI dependencies, requested/effective/actual and reboot state",
+      "First-binding qualification checks actual parameter against selection"
+    ]
+  },
+  "device_scope": {
+    "board": "H96 Max V58 / RK3588",
+    "kernel": "5.10.66",
+    "android_sdk": 32,
+    "magisk_api": 30700,
+    "Mali_pair": "g18p0 userspace/KMD/CSF",
+    "zygisk_next": "1.5.2",
+    "LSPosed": "2.2.1"
+  },
+  "build": {
+    "candidate_sha256": "c2eedfc82e5bd7e11e832f69e92bc7fb4bfb4a6197731e78921bea791bb65dcd",
+    "canonical_import_versions": 394,
+    "guard_import_versions": 34,
+    "kernel_image_unchanged": true,
+    "original_root_cpio_records_preserved": 22,
+    "graphics_and_original_Zygote_dispatch_recipe_unchanged": true,
+    "private_first_bind_profile_reprepared": true
+  },
+  "controls": {
+    "native_startup_fixture_cases": 37,
+    "Android_shell_checks": 59,
+    "browser_checks": 39,
+    "default": "off",
+    "reboot_only": true,
+    "requires_matched_first_binding": true
+  },
+  "new_path_validation": {
+    "both_ABIs": true,
+    "successful_fences": 1024,
+    "fd_allocation_error_cleanup": 128,
+    "traced_native_init_callbacks": 1152,
+    "all_timeline_metadata_present": true,
+    "global_trace_setting_preserved": true,
+    "unpatched_traced_path_intentionally_not_executed": true
+  },
+  "off_path_validation": {
+    "successful_fences": 512,
+    "fd_allocation_failure_paths": 64,
+    "tracing_disabled": true,
+    "metadata_queried_after_queue_deletion": true
+  },
+  "pixel_precision": {
+    "hdr2": {
+      "samples": 24883200,
+      "bits": 10,
+      "frames": 2,
+      "exact": true
+    },
+    "eight1": {
+      "samples": 13271040,
+      "bits": 8,
+      "frames": 1,
+      "exact": true
+    }
+  },
+  "HDR": {
+    "on_phases": [
+      "PQ",
+      "HLG",
+      "SDR"
+    ],
+    "on_reported_frames": 390,
+    "off_phases": [
+      "PQ",
+      "SDR"
+    ],
+    "off_reported_frames": 200,
+    "PQ_static_metadata_matched": true,
+    "HLG_static_fields_zero": true,
+    "HDMI_driver_ten_bit_BT2020_for_HDR": true,
+    "DRM_blob_and_packet_registers_checked": true,
+    "pause_seek_EOS_and_exit_SDR": true,
+    "optical_HDMI_measurement": false
+  },
+  "graphics": {
+    "new_boot_ARM32_ARM64_GLES_exact_RGBA": true,
+    "new_boot_ARM32_ARM64_Vulkan_exact_4096_byte_fill": true,
+    "fixed_resolution_OPP_thermal_and_fence_waits_retained": true,
+    "measured_FPS_uplift": false
+  },
+  "rollback": {
+    "independent_off_N_and_reenable_Y": true,
+    "whole_module_disable_original_root_boot_restored": true,
+    "original_builtin_GPU_and_two_userspace_hashes_restored": true,
+    "twelve_original_platform_hashes_matched": true,
+    "polling_restored_to_100ms_with_module_disabled": true,
+    "external_Zygisk_LSPosed_retained": true,
+    "Decode_Stack_unchanged_and_healthy": true,
+    "final_reenable_cold_first_binding_passed": true
+  },
+  "integrity": {
+    "installer_manifest_entries": 117,
+    "retained_installed_entries": 115,
+    "Magisk_deleted_install_only_files": [
+      "customize.sh",
+      "README.md"
+    ],
+    "deletion_verified_against_Magisk_util_functions": true,
+    "kernel_manifest_entries": 16,
+    "active_mounts_verified": true,
+    "current_boot_cold_receipt_qualified": true,
+    "three_initial_graphics_service_PIDs_retained": true,
+    "relevant_final_boot_kernel_fault_scan_hits": 0,
+    "private_boot_device_logs_media_and_keys_excluded": true
+  },
+  "final_state": {
+    "version": "0.4.2-test1",
+    "fence": "on",
+    "cold": "on",
+    "kernel": "next",
+    "health": "active",
+    "DVFS_polling_ms": 20,
+    "pending_reboot": false,
+    "external_injection": "passed",
+    "Decode_Stack": "0.7.4-test1 healthy"
+  },
+  "limitations": [
+    "Bounded exact-firmware experimental acceptance; not a general RK3588 binary replacement",
+    "No game FPS or lower latency measurement; existing 20ms policy is historical",
+    "Unpatched traced path was not deliberately executed to crash the device",
+    "FD-exhaustion failure cleanup exercised; no forced kernel allocation OOM or long-duration leak qualification",
+    "Prior original-player UHD pacing and historical HEVC HLG queue timeout remain unresolved",
+    "No whole newer CSF or Mali release, CTS/VTS, long-duration stress or optical HDMI acceptance"
+  ],
+  "verification_correction": "Initial final-manifest attempt included two files Magisk intentionally removes. A fresh complete retained-file check passed after confirming that behavior in the installed util_functions.sh; installer ZIP manifest still validates all 117 entries.",
+  "recommendation_progress": {
+    "classification": "ancillary CSF event-tracing stability fix",
+    "counts_as_new_priority_4_DVFS_or_scheduling_performance_progress": false,
+    "priority_4_complete": false,
+    "correction": "The original sequence targets GPU DVFS and scheduling performance. This fence-initialization fix does not change either and must not be counted as completing that item."
+  }
+}

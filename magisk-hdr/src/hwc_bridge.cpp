@@ -8,6 +8,7 @@
 #include <android/log.h>
 #include <dlfcn.h>
 #include <elf.h>
+#include <link.h>
 #include <sys/mman.h>
 #include <sys/ioctl.h>
 #include <unistd.h>
@@ -19,10 +20,18 @@
 #include <mutex>
 #include <optional>
 #include <vector>
+#include <algorithm>
 #include "drm.h"
 #include "drm_mode.h"
 #include "transfer_policy.h"
 #include "client_policy.h"
+#include "mode_cache.h"
+#ifdef RKQMS_HWC_CANDIDATE
+#include <fcntl.h>
+#include <sys/stat.h>
+#include <sys/sysmacros.h>
+#include "qms_client.h"
+#endif
 
 namespace {
 struct Hdr {
@@ -35,7 +44,7 @@ static_assert(sizeof(Hdr)==32,"original firmware HDR blob ABI");
 struct Layer {Hdr hdr{};int32_t space=0,requested=HWC2_COMPOSITION_INVALID,composition=HWC2_COMPOSITION_INVALID;int64_t area=0;bool metadata=false;};
 std::mutex mutex;
 std::map<std::pair<uint64_t,uint64_t>,Layer> layers;
-struct ClientTarget {bool nativeSdr=false;};
+struct ClientTarget {bool nativeSdr=false;int hdrEotf=-1;};
 std::map<uint64_t,ClientTarget> clientTargets;
 struct Transaction {int connectorEotf=-1;std::map<uint32_t,rk_hdr::Plane> planes;};
 std::map<void*,Transaction> pending;
@@ -46,6 +55,7 @@ hwc2_function_pointer_t (*originalGet)(hwc2_device_t*,int32_t)=nullptr;
 struct Validation {hwc2_device_t *device=nullptr;hwc2_display_t display=0;};
 thread_local Validation validation;
 thread_local bool clientOutputSdr=false;
+thread_local bool importingHdrTarget=false;
 int (*realSwitchHdr)(void*)=nullptr;
 int (*realPropertyGet)(const char*,char*,const char*)=nullptr;
 using Add=int(*)(void*,uint32_t,uint32_t,uint64_t);
@@ -55,6 +65,68 @@ Add realAdd=nullptr;Commit realCommit=nullptr;Create realCreate=nullptr;
 void *(*duplicate)(const void*)=nullptr;void (*freeReq)(void*)=nullptr;
 int (*destroyBlob)(int,uint32_t)=nullptr;
 int targetFd=-1;uint32_t connector=0,hdrProperty=0;
+bool clientHdr10=false;
+int clientColorMode=HAL_COLOR_MODE_NATIVE;
+bool realSfTargetReady() {
+    char ready[PROPERTY_VALUE_MAX]{};property_get("vendor.rkhdr.sf_target10",ready,"");
+    if(strcmp(ready,"active"))return false;
+    property_get("vendor.rkhdr.alloc10",ready,"");return !strcmp(ready,"active");
+}
+bool (*sfTargetReady)()=realSfTargetReady;
+bool clientHdrActive(){return clientHdr10 && sfTargetReady();}
+bool targetPlanFailed=false;
+bool primaryHdrPlan(hwc2_display_t display){
+    int mode=__atomic_load_n(&clientColorMode,__ATOMIC_ACQUIRE);
+    return display==0 && clientHdrActive() &&
+        (mode==HAL_COLOR_MODE_BT2100_PQ || mode==HAL_COLOR_MODE_BT2100_HLG);
+}
+void reportTargetPlanFailure(){property_set("vendor.rkhdr.target_plan_error","1");}
+void (*targetPlanFailure)()=reportTargetPlanFailure;
+
+std::vector<int32_t> clientColorModes(hwc2_device_t *d,hwc2_display_t display) {
+    std::vector<int32_t> modes{HAL_COLOR_MODE_NATIVE,HAL_COLOR_MODE_SRGB};
+    auto fn=reinterpret_cast<HWC2_PFN_GET_HDR_CAPABILITIES>(originalGet(d,HWC2_FUNCTION_GET_HDR_CAPABILITIES));
+    if(!fn)return {HAL_COLOR_MODE_NATIVE};
+    uint32_t n=0;float max=0,average=0,min=0;
+    if(fn(d,display,&n,nullptr,&max,&average,&min)!=HWC2_ERROR_NONE || n>32)return {HAL_COLOR_MODE_NATIVE};
+    std::vector<int32_t> types(n);uint32_t capacity=n;
+    if(n && (fn(d,display,&n,types.data(),&max,&average,&min)!=HWC2_ERROR_NONE || n>capacity))return {HAL_COLOR_MODE_NATIVE};
+    bool pq=false,hlg=false;for(uint32_t i=0;i<n;i++){pq|=types[i]==2;hlg|=types[i]==3;}
+    if(pq)modes.push_back(HAL_COLOR_MODE_BT2100_PQ);
+    if(hlg)modes.push_back(HAL_COLOR_MODE_BT2100_HLG);
+    return modes;
+}
+int32_t colorModes(hwc2_device_t *d,hwc2_display_t display,uint32_t *count,int32_t *out) {
+    auto original=reinterpret_cast<HWC2_PFN_GET_COLOR_MODES>(originalGet(d,HWC2_FUNCTION_GET_COLOR_MODES));
+    if(!clientHdrActive() || display!=0)return original(d,display,count,out);
+    if(!count)return HWC2_ERROR_BAD_PARAMETER;
+    auto modes=clientColorModes(d,display);
+    uint32_t written=out?std::min(*count,uint32_t(modes.size())):uint32_t(modes.size());
+    if(out)for(uint32_t i=0;i<written;i++)out[i]=modes[i];*count=written;return HWC2_ERROR_NONE;
+}
+int32_t colorMode(hwc2_device_t *d,hwc2_display_t display,int32_t mode) {
+    auto original=reinterpret_cast<HWC2_PFN_SET_COLOR_MODE>(originalGet(d,HWC2_FUNCTION_SET_COLOR_MODE));
+    if(!clientHdrActive() || display!=0)return original(d,display,mode);
+    auto modes=clientColorModes(d,display);bool supported=false;for(auto m:modes)supported|=m==mode;
+    if(!supported)return HWC2_ERROR_BAD_PARAMETER;
+    // The factory's SetColorMode only stores NATIVE. Its actual plane color
+    // conversion and transfer selection use SetClientTarget's real dataspace.
+    // Do not modify source-layer metadata or pretend an SDR target is HDR.
+    int32_t rc=original(d,display,HAL_COLOR_MODE_NATIVE);
+    if(rc==HWC2_ERROR_NONE)__atomic_store_n(&clientColorMode,mode,__ATOMIC_RELEASE);
+    __android_log_print(ANDROID_LOG_INFO,"RKClientHdr","mode=%d result=%d",mode,rc);return rc;
+}
+int32_t clientSupport(hwc2_device_t *d,hwc2_display_t display,uint32_t width,uint32_t height,int32_t format,int32_t space) {
+    auto original=reinterpret_cast<HWC2_PFN_GET_CLIENT_TARGET_SUPPORT>(originalGet(d,HWC2_FUNCTION_GET_CLIENT_TARGET_SUPPORT));
+    if(!clientHdrActive() || display!=0)return original(d,display,width,height,format,space);
+    int mode=space==HAL_DATASPACE_BT2020_PQ?HAL_COLOR_MODE_BT2100_PQ:space==HAL_DATASPACE_BT2020_HLG?HAL_COLOR_MODE_BT2100_HLG:space==HAL_DATASPACE_V0_SRGB?HAL_COLOR_MODE_SRGB:-1;
+    if(mode<0)return original(d,display,width,height,format,space);
+    // Standard RGBA_1010102 only for HDR. No P010-as-RGB alias, eight-bit HDR,
+    // DISPLAY_P3 or opaque vendor layout is advertised by this candidate.
+    if(format!=43 && !(mode==HAL_COLOR_MODE_SRGB && format==1))return HWC2_ERROR_UNSUPPORTED;
+    auto modes=clientColorModes(d,display);bool supported=false;for(auto m:modes)supported|=m==mode;
+    return supported?original(d,display,width,height,format,HAL_DATASPACE_UNKNOWN):HWC2_ERROR_UNSUPPORTED;
+}
 
 uint16_t quantize(float value,double scale) {
     if(!std::isfinite(value) || value<=0)return 0;
@@ -142,12 +214,13 @@ void hookedFree(void *req) {
     freeReq(req);
 }
 int hookedCommit(int fd,void *req,uint32_t flags,void *data) {
-    Hdr h{};bool inject=false;uint32_t obj=0,prop=0;
+    Hdr h{};bool inject=false;uint32_t obj=0,prop=0,reuseBlob=0;
     {
         std::lock_guard<std::mutex> lock(mutex);uint32_t blob=0;
         auto transition=pending.find(req);
         if(property_get_bool("debug.rkhdr.static",false) && !(flags & DRM_MODE_ATOMIC_TEST_ONLY)
                 && target(fd,&blob) && hdrBlob(fd,blob,&h)) {
+            const Hdr live=h;
             if(transition!=pending.end() && transition->second.connectorEotf>=0)
                 h.eotf=transition->second.connectorEotf;
             // The stock display/compositor cache only HDR enabled/disabled,
@@ -170,6 +243,14 @@ int hookedCommit(int fd,void *req,uint32_t flags,void *data) {
                 uint8_t eotf=h.eotf;h={};h.eotf=eotf;
                 if(eotf==2 && havePresented){h=presented;h.eotf=eotf;}
                 inject=true;obj=connector;prop=hdrProperty;
+                // Borrow only the freshly read live blob. Never retain a blob
+                // ID, connector or fd across commits: hotplug, SDR transitions
+                // and other writers must be observed again on the next frame.
+                // Still override the property in the duplicate request, since
+                // the original request may itself contain different metadata.
+                if(property_get_bool("debug.rkhdr.metadata_reuse",false)) {
+                    if(!memcmp(&live,&h,sizeof(h)))reuseBlob=blob;
+                }
             }
         }
         // A successful TEST_ONLY request may be committed again unchanged.
@@ -177,13 +258,25 @@ int hookedCommit(int fd,void *req,uint32_t flags,void *data) {
         if(!(flags & DRM_MODE_ATOMIC_TEST_ONLY) && transition!=pending.end())pending.erase(transition);
     }
     if(!inject)return realCommit(fd,req,flags,data);
-    uint32_t blob=0;
+    uint32_t blob=reuseBlob;
     void *copy=duplicate(req);
     if(!copy)return realCommit(fd,req,flags,data);
     int rc=-1;
-    if(!realCreate(fd,&h,sizeof(h),&blob) && realAdd(copy,obj,prop,blob)>=0)
+    if((reuseBlob || !realCreate(fd,&h,sizeof(h),&blob)) && realAdd(copy,obj,prop,blob)>=0)
         rc=realCommit(fd,copy,flags,data);
-    if(blob)destroyBlob(fd,blob);freeReq(copy);
+    // A live blob is owned by the original creator/kernel state, not by us.
+    if(blob && !reuseBlob)destroyBlob(fd,blob);freeReq(copy);
+    if(property_get_bool("debug.rkhdr.trace",false)) {
+        static unsigned commits=0,reused=0,created=0,failed=0;
+        unsigned n=__atomic_add_fetch(&commits,1,__ATOMIC_RELAXED);
+        if(reuseBlob)__atomic_add_fetch(&reused,1,__ATOMIC_RELAXED);
+        else if(blob)__atomic_add_fetch(&created,1,__ATOMIC_RELAXED);
+        if(rc)__atomic_add_fetch(&failed,1,__ATOMIC_RELAXED);
+        if(n%120==0)__android_log_print(ANDROID_LOG_INFO,"RKHdrHwc",
+            "metadata commits=%u reused=%u created=%u rejected=%u",n,
+            __atomic_load_n(&reused,__ATOMIC_RELAXED),__atomic_load_n(&created,__ATOMIC_RELAXED),
+            __atomic_load_n(&failed,__ATOMIC_RELAXED));
+    }
     // A rejected atomic transaction made no display change. Retry the untouched
     // original request to preserve playback even if metadata injection fails.
     if(rc){static unsigned rejected=0;
@@ -277,6 +370,9 @@ int32_t setClientTarget(hwc2_device_t *d,hwc2_display_t display,buffer_handle_t 
                     (unsigned long long)display,space,fourcc,nativeSdr);}
     }
     clientTargets[display].nativeSdr=nativeSdr;
+    if(b)clientTargets[display].hdrEotf=clientHdrActive() && known &&
+        (fourcc==0x30334241 || fourcc==0x30335241 || fourcc==0x30334258 || fourcc==0x30335258)?
+        (space==HAL_DATASPACE_BT2020_PQ?2:space==HAL_DATASPACE_BT2020_HLG?3:-1):-1;
     return rc;
 }
 int32_t accept(hwc2_device_t *d,hwc2_display_t display) {
@@ -329,9 +425,17 @@ int32_t validate(hwc2_device_t *d,hwc2_display_t display,uint32_t *types,uint32_
     auto fn=reinterpret_cast<HWC2_PFN_VALIDATE_DISPLAY>(originalGet(d,HWC2_FUNCTION_VALIDATE_DISPLAY));
     auto saved=validation;validation={d,display};
     int32_t rc=fn(d,display,types,requests);validation=saved;
+    if(primaryHdrPlan(display) && rc!=HWC2_ERROR_NONE && rc!=HWC2_ERROR_HAS_CHANGES){
+        __atomic_store_n(&targetPlanFailed,true,__ATOMIC_RELEASE);targetPlanFailure();
+    }
     readComposition(d,display,rc);return rc;
 }
 int32_t present(hwc2_device_t *d,hwc2_display_t display,int32_t *fence) {
+    // A failed HDR validation has no plane plan or release-fence set. Enforce
+    // HWC2's NOT_VALIDATED error instead of entering the factory's null fence
+    // path. Do not claim a present, fabricate a fence or report success; the
+    // boot service removes the paired candidate by reboot rollback.
+    if(display==0 && __atomic_load_n(&targetPlanFailed,__ATOMIC_ACQUIRE))return HWC2_ERROR_NOT_VALIDATED;
     if(display==0) {
         std::lock_guard<std::mutex> lock(mutex);havePresented=false;presented={};presentedEotf=-1;int64_t area=-1;bool mixed=false;
         for(auto &item:layers){const auto &layer=item.second;
@@ -346,12 +450,30 @@ int32_t present(hwc2_device_t *d,hwc2_display_t display,int32_t *fence) {
             }
         }
         if(mixed)presentedEotf=-1;
+        if(!mixed && clientHdrActive() && clientTargets[display].hdrEotf>=0) {
+            int client=clientTargets[display].hdrEotf;
+            if(presentedEotf<0 || presentedEotf==client)presentedEotf=client;
+            else presentedEotf=-1;
+        }
     }
-    auto fn=reinterpret_cast<HWC2_PFN_PRESENT_DISPLAY>(originalGet(d,HWC2_FUNCTION_PRESENT_DISPLAY));return fn(d,display,fence);
+    auto fn=reinterpret_cast<HWC2_PFN_PRESENT_DISPLAY>(originalGet(d,HWC2_FUNCTION_PRESENT_DISPLAY));
+    bool savedImport=importingHdrTarget;importingHdrTarget=primaryHdrPlan(display);
+    int32_t rc=fn(d,display,fence);importingHdrTarget=savedImport;return rc;
 }
+#ifdef RKQMS_HWC_CANDIDATE
+#include "qms_frontend.h"
+#endif
 hwc2_function_pointer_t getFunction(hwc2_device_t *d,int32_t descriptor) {
     auto original=originalGet(d,descriptor);if(!original)return nullptr;
     switch(descriptor){
+#ifdef RKQMS_HWC_CANDIDATE
+    case HWC2_FUNCTION_SET_ACTIVE_CONFIG:return reinterpret_cast<hwc2_function_pointer_t>(qmsSetConfig);
+    case HWC2_FUNCTION_GET_ACTIVE_CONFIG:return reinterpret_cast<hwc2_function_pointer_t>(qmsGetConfig);
+    case HWC2_FUNCTION_SET_POWER_MODE:return reinterpret_cast<hwc2_function_pointer_t>(qmsPower);
+#endif
+    case HWC2_FUNCTION_GET_COLOR_MODES:return reinterpret_cast<hwc2_function_pointer_t>(colorModes);
+    case HWC2_FUNCTION_SET_COLOR_MODE:return reinterpret_cast<hwc2_function_pointer_t>(colorMode);
+    case HWC2_FUNCTION_GET_CLIENT_TARGET_SUPPORT:return reinterpret_cast<hwc2_function_pointer_t>(clientSupport);
     case HWC2_FUNCTION_SET_LAYER_BUFFER:return reinterpret_cast<hwc2_function_pointer_t>(setBuffer);
     case HWC2_FUNCTION_SET_LAYER_DATASPACE:return reinterpret_cast<hwc2_function_pointer_t>(setSpace);
     case HWC2_FUNCTION_SET_LAYER_DISPLAY_FRAME:return reinterpret_cast<hwc2_function_pointer_t>(setFrame);
@@ -366,6 +488,94 @@ hwc2_function_pointer_t getFunction(hwc2_device_t *d,int32_t descriptor) {
 }
 
 struct Slot {void **pointer;void *saved;int protection;};
+bool writeSlot(const Slot&,void*);
+int protections(void*);
+using PopulateFb=void(*)(void*,uint64_t,void*,void*,uint32_t,bool);
+using MapperSelect=uint64_t(*)(uint64_t,int,uint64_t,int);
+PopulateFb originalPopulateFb=nullptr;
+MapperSelect originalMapperSelect=nullptr;
+int (*originalLayerInit)(void*)=nullptr;
+void* primaryFbSelf=nullptr;
+template<class T> void fbStore(void* layer,size_t offset,T value){memcpy(static_cast<char*>(layer)+offset,&value,sizeof(value));}
+template<class T> T fbLoad(void* layer,size_t offset){T value;memcpy(&value,static_cast<char*>(layer)+offset,sizeof(value));return value;}
+void populateFb(void* self,uint64_t id,void* layer,void* ctx,uint32_t frame,bool preview){
+    originalPopulateFb(self,id,layer,ctx,frame,preview);
+    if(preview && validation.device && validation.display==0)__atomic_store_n(&primaryFbSelf,self,__ATOMIC_RELEASE);
+    if(!clientHdrActive() || self!=__atomic_load_n(&primaryFbSelf,__ATOMIC_ACQUIRE))return;
+    int mode=__atomic_load_n(&clientColorMode,__ATOMIC_ACQUIRE);
+    if(mode!=HAL_COLOR_MODE_BT2100_PQ && mode!=HAL_COLOR_MODE_BT2100_HLG)return;
+    // Validation precedes the next client buffer. Its factory placeholder is
+    // AB24/AFBC. Predict the paired allocator's real AB30/AFBC instead.
+    // Predict only this paired physical HDR target, and verify real metadata
+    // again at present. Other targets and all original fences remain intact.
+    if(!preview && (fbLoad<int32_t>(layer,0x124)!=43 || fbLoad<uint32_t>(layer,0x140)!=0x30334241U || fbLoad<uint64_t>(layer,0x148)!=0x0800000000000001ULL))return;
+    fbStore<int32_t>(layer,0x124,43);
+    fbStore<uint32_t>(layer,0x140,0x30334241U);
+    fbStore<uint64_t>(layer,0x148,0x0800000000000001ULL);
+    fbStore<int32_t>(layer,0x17c,mode==HAL_COLOR_MODE_BT2100_PQ?HAL_DATASPACE_BT2020_PQ:HAL_DATASPACE_BT2020_HLG);
+    originalLayerInit(layer);
+    // Keep factory AFBC planning and fences. RGB PQ additionally needs the
+    // actual input EOTF; factory Init only marks PQ for YUV formats.
+    fbStore<uint16_t>(layer,0x184,mode==HAL_COLOR_MODE_BT2100_PQ?2:0);
+}
+bool prepareTargetPlan(void* module,Slot* slot){
+    Dl_info info{};if(!dladdr(module,&info))return false;
+    uintptr_t base=uintptr_t(info.dli_fbase);
+    void* lib=dlopen(info.dli_fname,RTLD_NOW|RTLD_LOCAL|RTLD_NOLOAD);if(!lib)return false;
+    auto populate=reinterpret_cast<PopulateFb>(dlsym(lib,"_ZN7android9DrmHwcTwo8HwcLayer10PopulateFBEmPNS_11DrmHwcLayerEP16hwc2_drm_displayjb"));
+    auto init=reinterpret_cast<int(*)(void*)>(dlsym(lib,"_ZN7android11DrmHwcLayer4InitEv"));dlclose(lib);
+    if(uintptr_t(populate)!=base+0x3bffc || uintptr_t(init)!=base+0x6abac)return false;
+    slot->pointer=reinterpret_cast<void**>(base+0x93748);slot->saved=*slot->pointer;slot->protection=protections(slot->pointer);
+    if(slot->saved!=reinterpret_cast<void*>(populate) || slot->protection<0)return false;
+    originalPopulateFb=populate;originalLayerInit=init;return true;
+}
+uint64_t mapperSelect(uint64_t format,int type,uint64_t usage,int area){
+    uint64_t result=originalMapperSelect(format,type,usage,area);
+    // Mapper recomputes allocation layout while validateBufferSize imports
+    // the real FB. Match the paired allocator's format choice only during the
+    // primary HDR present. Keep the full original size/stride/plane checks.
+    if(importingHdrTarget && format==43 && (usage&0x1000) &&
+       (result==1 || result==0x100000001ULL))return (result&0xffffffff00000000ULL)|43;
+    return result;
+}
+struct MapperImage {uintptr_t base=0;unsigned count=0;};
+int findMapperImage(dl_phdr_info* image,size_t,void* opaque){
+    if(image->dlpi_name && !strcmp(image->dlpi_name,"/vendor/lib64/hw/android.hardware.graphics.mapper@4.0-impl-bifrost.so")){
+        auto found=static_cast<MapperImage*>(opaque);found->base=image->dlpi_addr;++found->count;
+    }
+    return 0;
+}
+bool prepareMapperSelect(Slot* slot){
+    // Use libui's already-loaded SP-HAL image. A direct dlopen can create a
+    // separate mapper in the caller namespace and leave validation untouched.
+    if(android::GraphicBufferMapper::get().getMapperVersion()!=android::GraphicBufferMapper::GRALLOC_4)return false;
+    MapperImage found{};dl_iterate_phdr(findMapperImage,&found);
+    if(found.count!=1)return false;
+    uintptr_t base=found.base;void* select=reinterpret_cast<void*>(base+0x1b568);
+    slot->pointer=reinterpret_cast<void**>(base+0x1fc58);slot->saved=*slot->pointer;slot->protection=protections(slot->pointer);
+    if(slot->saved!=select || slot->protection<0)return false;
+    originalMapperSelect=reinterpret_cast<MapperSelect>(select);return true;
+}
+bool installTargetPlan(void* module){
+    Slot slot{},mapper{};if(!prepareTargetPlan(module,&slot) || !prepareMapperSelect(&mapper))return false;
+    if(writeSlot(slot,reinterpret_cast<void*>(populateFb)) && writeSlot(mapper,reinterpret_cast<void*>(mapperSelect)))return true;
+    writeSlot(slot,slot.saved);writeSlot(mapper,mapper.saved);return false;
+}
+rk_mode_cache_ops modeOps{};
+int hookedModeAttribute(void *d,uint32_t id,int attr,int *value) {
+    return rk_mode_attribute(&modeOps,d,id,attr,value);
+}
+int hookedModeActive(void *d,uint32_t id) {
+    // Record only configuration IDs and membership, never media or buffers.
+    void *c=rk_mode_ptr(d,0x1f8);
+    bool reported=rk_mode_find(&modeOps,d,id)!=nullptr,raw=false;
+    uintptr_t b=(uintptr_t)rk_mode_ptr(c,0x158),e=(uintptr_t)rk_mode_ptr(c,0x160);
+    if(e>=b && (e-b)%0x60==0 && (e-b)/0x60<=4096)
+        for(uintptr_t p=b;p<e;p+=0x60)if(modeOps.id((void*)p)==id){raw=true;break;}
+    int result=rk_mode_active(&modeOps,d,id);
+    __android_log_print(ANDROID_LOG_INFO,"RKModeCache","config=%u reported=%d raw=%d result=%d",id,reported,raw,result);
+    return result;
+}
 bool writeSlot(const Slot &slot,void *value) {
     long size=sysconf(_SC_PAGESIZE);uintptr_t page=(uintptr_t)slot.pointer & ~(uintptr_t(size)-1);
     if(mprotect((void*)page,size,slot.protection|PROT_WRITE))return false;
@@ -379,6 +589,63 @@ int protections(void *p) {
         result=(perms[0]=='r'?PROT_READ:0)|(perms[1]=='w'?PROT_WRITE:0)|(perms[2]=='x'?PROT_EXEC:0);break;
     }
     fclose(file);return result;
+}
+bool prepareModeCache(void *module,Slot *attribute,Slot *active,rk_mode_cache_ops *ops) {
+    Dl_info info{};if(!dladdr(module,&info))return false;
+    uintptr_t base=(uintptr_t)info.dli_fbase;auto elf=(Elf64_Ehdr*)base;
+    if(memcmp(elf->e_ident,ELFMAG,SELFMAG) || elf->e_machine!=EM_AARCH64)return false;
+    void *lib=dlopen(info.dli_fname,RTLD_NOW|RTLD_LOCAL|RTLD_NOLOAD);if(!lib)return false;
+    const char *attributeName="_ZN7android9DrmHwcTwo10HwcDisplay19GetDisplayAttributeEjiPi";
+    const char *activeName="_ZN7android9DrmHwcTwo10HwcDisplay15SetActiveConfigEj";
+    ops->original_attribute=(decltype(ops->original_attribute))dlsym(lib,attributeName);
+    ops->original_active=(decltype(ops->original_active))dlsym(lib,activeName);
+    bool ok=(uintptr_t)ops->original_attribute==base+0x3a4c4 && (uintptr_t)ops->original_active==base+0x39904;
+#define MODE_SYM(field,name) ops->field=(decltype(ops->field))dlsym(lib,name);ok=ok&&ops->field
+    MODE_SYM(id,"_ZNK7android7DrmMode2idEv");
+    MODE_SYM(width,"_ZNK7android7DrmMode9h_displayEv");
+    MODE_SYM(height,"_ZNK7android7DrmMode9v_displayEv");
+    MODE_SYM(refresh,"_ZNK7android7DrmMode9v_refreshEv");
+    MODE_SYM(mm_width,"_ZNK7android12DrmConnector8mm_widthEv");
+    MODE_SYM(mm_height,"_ZNK7android12DrmConnector9mm_heightEv");
+    MODE_SYM(best,"_ZN7android12DrmConnector13set_best_modeERKNS_7DrmModeE");
+    MODE_SYM(current,"_ZN7android12DrmConnector16set_current_modeERKNS_7DrmModeE");
+    MODE_SYM(update,"_ZN7android9DrmDevice17UpdateDisplayModeEi");
+    MODE_SYM(display_info,"_ZN7android12DrmConnector18SetDisplayModeInfoEi");
+#undef MODE_SYM
+    dlclose(lib);if(!ok)return false;
+    auto ph=(Elf64_Phdr*)(base+elf->e_phoff);Elf64_Dyn *dyn=nullptr;
+    for(unsigned i=0;i<elf->e_phnum;++i)if(ph[i].p_type==PT_DYNAMIC)dyn=(Elf64_Dyn*)(base+ph[i].p_vaddr);
+    if(!dyn)return false;
+    auto address=[&](uintptr_t v){return v<base?base+v:v;};
+    Elf64_Sym *sym=nullptr;const char *str=nullptr;Elf64_Rela *rela=nullptr;size_t bytes=0;
+    for(auto d=dyn;d->d_tag!=DT_NULL;++d){
+        if(d->d_tag==DT_SYMTAB)sym=(Elf64_Sym*)address(d->d_un.d_ptr);
+        if(d->d_tag==DT_STRTAB)str=(const char*)address(d->d_un.d_ptr);
+        if(d->d_tag==DT_JMPREL)rela=(Elf64_Rela*)address(d->d_un.d_ptr);
+        if(d->d_tag==DT_PLTRELSZ)bytes=d->d_un.d_val;
+    }
+    if(!sym || !str || !rela || bytes>1024*1024)return false;
+    unsigned count=0;
+    for(size_t i=0;i<bytes/sizeof(*rela);++i){
+        const char *name=str+sym[ELF64_R_SYM(rela[i].r_info)].st_name;Slot *slot=nullptr;
+        if(!strcmp(name,attributeName))slot=attribute;
+        if(!strcmp(name,activeName))slot=active;
+        if(slot && ELF64_R_TYPE(rela[i].r_info)==R_AARCH64_JUMP_SLOT){
+            if(slot->pointer)return false;
+            slot->pointer=(void**)(base+rela[i].r_offset);slot->saved=*slot->pointer;slot->protection=protections(slot->pointer);
+            if(slot->protection<0)return false;++count;
+        }
+    }
+    return count==2 && attribute->saved==(void*)ops->original_attribute && active->saved==(void*)ops->original_active;
+}
+bool installModeCache(void *module) {
+    Slot attribute{},active{};rk_mode_cache_ops ops{};
+    if(!prepareModeCache(module,&attribute,&active,&ops))return false;
+    modeOps=ops;
+    if(!writeSlot(attribute,(void*)hookedModeAttribute) || !writeSlot(active,(void*)hookedModeActive)){
+        writeSlot(attribute,attribute.saved);writeSlot(active,active.saved);return false;
+    }
+    return true;
 }
 bool slots(void *module,Slot *add,Slot *commit,Slot *release,Slot *hdrSwitch,Slot *propertyGet) {
     Dl_info info{};if(!dladdr(module,&info))return false;
@@ -438,10 +705,23 @@ hw_module_t *loadOriginal(const char *path) {
     return (hw_module_t*)dlsym(lib,HAL_MODULE_INFO_SYM_AS_STR);
 }
 int openModule(const hw_module_t*,const char *id,hw_device_t **device) {
+#ifdef RKQMS_HWC_CANDIDATE
+    if(qmsBootRequested() && !qmsStart())return -ENODEV;
+#endif
     auto module=loadOriginal("/vendor/lib64/hw/hwcomposer.rk30board.rkhdr.so");if(!module || !module->methods)return -ENODEV;
     int result=module->methods->open(module,id,device);if(result || !*device)return result;
     auto hwc=(hwc2_device_t*)*device;
     if(install(module)){originalGet=hwc->getFunction;hwc->getFunction=getFunction;
+        clientHdr10=property_get_bool("debug.rkhdr.client_hdr10",false);
+        if(clientHdr10){
+            bool ok=installTargetPlan(module);property_set("vendor.rkhdr.target_plan",ok?"active":"failed");
+            if(!ok)clientHdr10=false;
+        } else property_set("vendor.rkhdr.target_plan","off");
+        if(property_get_bool("debug.rkhdr.mode_cache",false)) {
+            bool ok=installModeCache(module);
+            property_set("vendor.rkhdr.mode_cache",ok?"active":"failed");
+            __android_log_print(ok?ANDROID_LOG_INFO:ANDROID_LOG_ERROR,"RKModeCache","mode cache adapter %s",ok?"active":"failed");
+        } else property_set("vendor.rkhdr.mode_cache","off");
         int propertyResult=property_set("vendor.rkhdr.adapter","active");
         __android_log_print(ANDROID_LOG_INFO,"RKHdrHwc","metadata adapter active; original compositor retained, property=%d",propertyResult);}
     else __android_log_print(ANDROID_LOG_ERROR,"RKHdrHwc","metadata adapter unavailable; original compositor retained");
@@ -450,6 +730,17 @@ int openModule(const hw_module_t*,const char *id,hw_device_t **device) {
 hw_module_methods_t methods={.open=openModule};
 }
 extern "C" {
+__attribute__((visibility("default"))) int rk_hdr_target_plan_check(const char* path){
+    auto module=loadOriginal(path);Slot slot{},mapper{};return module && prepareTargetPlan(module,&slot) && prepareMapperSelect(&mapper)?0:1;
+}
+__attribute__((visibility("default"))) int rk_hdr_mode_cache_check(const char *path) {
+    auto module=loadOriginal(path);Slot a{},b{};rk_mode_cache_ops ops{};
+    if(!module || !prepareModeCache(module,&a,&b,&ops))return 1;
+    if(!writeSlot(a,(void*)hookedModeAttribute) || !writeSlot(b,(void*)hookedModeActive)){
+        writeSlot(a,a.saved);writeSlot(b,b.saved);return 2;
+    }
+    return writeSlot(a,a.saved)&&writeSlot(b,b.saved)?0:3;
+}
 __attribute__((visibility("default"))) hw_module_t HAL_MODULE_INFO_SYM={
     .tag=HARDWARE_MODULE_TAG,.module_api_version=HWC_MODULE_API_VERSION_0_1,
     .hal_api_version=HARDWARE_HAL_API_VERSION,.id=HWC_HARDWARE_MODULE_ID,

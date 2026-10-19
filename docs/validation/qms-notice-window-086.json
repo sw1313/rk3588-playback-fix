@@ -1,0 +1,84 @@
+{
+  "date": "2026-10-19",
+  "version": "0.8.6-qms-test15",
+  "status": "TEST15_NO_PHYSICAL_IMPROVEMENT_WITHDRAWN_TEST14_ACTUAL_BOOT_RESTORED",
+  "physical_HDMI_blackout_fixed": false,
+  "release_accepted": false,
+  "source": "https://github.com/CoreELEC/common_drivers/blob/8a89a9aae1cb7c7993cc20b943491af435b31801/drivers/media/vout/hdmitx21/hdmi_tx_vrr.c",
+  "source_scope": "vrr_init_para fapa_early_cnt=4 and hdmitx_vrr_vsync_handler holding M_CONST=0 before target timing",
+  "port_scope": "Target-rate notice held for four real completed native frame actions instead of one; retain local latch-before-stable semantics. No Amlogic register programming, packet flag changes, MDelta ramp or gaming VRR enable.",
+  "hypothesis": "Receiver may need a longer wire-visible preparation interval than local one-frame notice. This is a compatibility experiment, not a demonstrated HDMI violation or confirmed LG requirement.",
+  "preceding_test14": {
+    "user_physical_result": "Playback, pause and stepping all still black",
+    "local_requests_completed": 8,
+    "QMS_frame_faults": 0,
+    "boundary_records": 34,
+    "GCP_control": "0 before and after every observed transition",
+    "HDCP2_bypass": "1 before and after every observed transition",
+    "HDCP2_GPIO": "0 before and after every observed transition",
+    "VOP_PHY_rebuild_observed": false,
+    "connection_events": 0,
+    "evidence": "docs/validation/qms-scheduler-boundary-086.json"
+  },
+  "checks": {
+    "rational_cycles": 66,
+    "switch_restore_scenarios": 738,
+    "stable_frames": 94464,
+    "transaction_failure_cases": 11,
+    "session_policy_cases": 90,
+    "native_engine_publication_cases": 33,
+    "controller_cases_on_Android": 19,
+    "endpoint_cases_on_Android": 11,
+    "exact_pair_cases_on_Android": 15,
+    "actual_boot_passed": true,
+    "physical_playback_passed": false
+  },
+  "pairing": {
+    "profile_id": "4a52158b8d183d5ba39864b6f5e5165c99f3be8700b9f8cb417cf43a591e0823",
+    "module_sha256": "f566d4af04d63f7f80148e239bb98340490ba8b9d60e7f36a2d50bb1e7a04f85",
+    "helper_sha256": "d9b93b23e0bad96f23fc615b350f29e0156cfb572bacf997e83c598218f5668d",
+    "hwc_sha256": "b34b647f6664de292c5f10d3d75b1a0bb5ae69c33960e088530ecb8ad96102e9",
+    "Mali_version": "0.4.2-qms-test17; exact tuple only, g18 retained"
+  },
+  "tradeoff": "Three additional old-rate real frames: about 50ms at 60Hz or 125ms at 24Hz. Must withdraw if no physical benefit; not a default performance upgrade.",
+  "preserved": [
+    "Auto and HDR",
+    "Frame Guard disabled and paused",
+    "all fences/native commit/latch checks",
+    "ten-bit path",
+    "Mali g18/KMD/DVFS",
+    "Zygisk Next and LSPosed",
+    "ART settings repair",
+    "unchanged boot"
+  ],
+  "reboot_authorization": "User explicitly requested no per-reboot question; assistant may reboot trials directly, no player input or screenshots.",
+  "rollback": "Restore complete test14 Decode backup and reboot, retaining paired Mali tuple support; existing per-item and whole-module reboot rollback retained",
+  "user_physical_result": "No improvement",
+  "observed_execution": {
+    "local_requests_completed": 6,
+    "frame_errors": 0,
+    "actual_four_notice_frames_exercised": true,
+    "kernel_boundary_records_retained": 61,
+    "native_generation_unchanged": true,
+    "HDCP2_bypass_unchanged": true,
+    "GCP_control_unchanged": true,
+    "capture_limit": "Six transitions completed before fresh logcat/netlink capture start; full retained kernel boundary history proves four notice frames, not a timestamp match for the later reply. No new QMS request occurred during the fresh capture."
+  },
+  "withdrawal": {
+    "source_reverted_to_exact_test14_hashes": true,
+    "complete_previous_Decode_backup_staged": true,
+    "Mali_previous_pair_metadata_restored": true,
+    "reboot_requested": true,
+    "actual_restored_boot_qualified": true,
+    "restored_versions": [
+      "Decode 0.8.6-qms-test14",
+      "Mali 0.4.2-qms-test16"
+    ]
+  },
+  "topology_correction": {
+    "previous_trials": "HDMI matrix between box and LG C5, clarified by user after trials",
+    "current_connection": "Direct HDMI1; currently no signal",
+    "direct_C5_interoperability_accepted": false,
+    "matrix_is_proven_root_cause": false
+  }
+}

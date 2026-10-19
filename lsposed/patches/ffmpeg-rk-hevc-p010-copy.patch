@@ -1,0 +1,100 @@
+--- a/libavcodec/mediacodecdec.c
++++ b/libavcodec/mediacodecdec.c
+@@ -245,6 +245,7 @@
+ 
+         avctx->profile = sps->ptl.general_ptl.profile_idc;
+         avctx->level   = sps->ptl.general_ptl.level_idc;
++        ff_AMediaFormat_setInt32(format, "rk-hevc-bit-depth", sps->bit_depth);
+ 
+         if ((ret = h2645_ps_to_nalu(vps->data, vps->data_size, &vps_data, &vps_data_size)) < 0 ||
+             (ret = h2645_ps_to_nalu(sps->data, sps->data_size, &sps_data, &sps_data_size)) < 0 ||
+--- a/libavcodec/mediacodecdec_common.c
++++ b/libavcodec/mediacodecdec_common.c
+@@ -191,6 +191,7 @@
+ enum {
+     COLOR_FormatYUV420Planar                              = 0x13,
+     COLOR_FormatYUV420SemiPlanar                          = 0x15,
++    COLOR_FormatYUVP010                                   = 0x36,
+     COLOR_FormatYCbYCr                                    = 0x19,
+     COLOR_FormatAndroidOpaque                             = 0x7F000789,
+     COLOR_QCOM_FormatYUV420SemiPlanar                     = 0x7fa30c00,
+@@ -209,6 +210,7 @@
+ 
+     { COLOR_FormatYUV420Planar,                              AV_PIX_FMT_YUV420P },
+     { COLOR_FormatYUV420SemiPlanar,                          AV_PIX_FMT_NV12    },
++    { COLOR_FormatYUVP010,                                   AV_PIX_FMT_P010LE  },
+     { COLOR_QCOM_FormatYUV420SemiPlanar,                     AV_PIX_FMT_NV12    },
+     { COLOR_QCOM_FormatYUV420SemiPlanar32m,                  AV_PIX_FMT_NV12    },
+     { COLOR_QCOM_FormatYUV420PackedSemiPlanar64x32Tile2m8ka, AV_PIX_FMT_NV12    },
+@@ -441,6 +443,45 @@
+     return ret;
+ }
+ 
++/* Standard Android P010: 16-bit little-endian samples, 10 significant bits.
++ * stride is the Y plane row increment in bytes, as reported by CCodec.
++ * Copy full samples; no quantization, color conversion or tone mapping. */
++static int mediacodec_copy_p010(AVCodecContext *avctx, MediaCodecDecContext *s,
++                               uint8_t *data, size_t capacity,
++                               FFAMediaCodecBufferInfo *info, AVFrame *frame)
++{
++    uint64_t yoff, uvoff, yend, uvend, end;
++    int width = avctx->width, height = avctx->height;
++    int uvbytes;
++    if (!data || !frame->data[0] || !frame->data[1] || width <= 0 || height <= 0 ||
++        width > 8192 || height > 8192 || s->stride <= 0 || s->slice_height <= 0 ||
++        s->crop_left < 0 || s->crop_top < 0 ||
++        (s->crop_left & 1) || (s->crop_top & 1) ||
++        info->offset < 0 || info->size < 0 ||
++        (uint64_t)info->offset + info->size > capacity ||
++        (uint64_t)s->crop_left + width > s->width ||
++        (uint64_t)s->crop_top + height > s->slice_height)
++        return AVERROR(EINVAL);
++    uvbytes = FFALIGN(width, 2) * 2;
++    if ((uint64_t)s->crop_left * 2 + uvbytes > s->stride ||
++        frame->linesize[0] < width * 2 || frame->linesize[1] < uvbytes)
++        return AVERROR(EINVAL);
++    yoff = (uint64_t)info->offset + (uint64_t)s->crop_top * s->stride + s->crop_left * 2;
++    uvoff = (uint64_t)info->offset + (uint64_t)s->slice_height * s->stride +
++        (uint64_t)(s->crop_top / 2) * s->stride + s->crop_left * 2;
++    yend = yoff + (uint64_t)(height - 1) * s->stride + width * 2;
++    uvend = uvoff + (uint64_t)((height + 1) / 2 - 1) * s->stride + uvbytes;
++    end = (uint64_t)info->offset + info->size;
++    if (yend > end || uvend > end) return AVERROR(EINVAL);
++    for (int y=0; y<height; ++y)
++        memcpy(frame->data[0] + (size_t)y*frame->linesize[0],
++               data + yoff + (size_t)y*s->stride, width*2);
++    for (int y=0; y<(height+1)/2; ++y)
++        memcpy(frame->data[1] + (size_t)y*frame->linesize[1],
++               data + uvoff + (size_t)y*s->stride, uvbytes);
++    return 0;
++}
++
+ static int mediacodec_wrap_sw_video_buffer(AVCodecContext *avctx,
+                                            MediaCodecDecContext *s,
+                                            uint8_t *data,
+@@ -486,6 +527,10 @@
+             frame->linesize[0], frame->linesize[1], frame->linesize[2]);
+ 
+     switch (s->color_format) {
++    case COLOR_FormatYUVP010:
++        ret = mediacodec_copy_p010(avctx, s, data, size, info, frame);
++        if (ret < 0) goto done;
++        break;
+     case COLOR_FormatYUV420Planar:
+         ff_mediacodec_sw_buffer_copy_yuv420_planar(avctx, s, data, size, info, frame);
+         break;
+@@ -845,6 +890,14 @@
+     if (ret < 0)
+         goto fail;
+ 
++    /* Pinned RK3588 HEVC Main10 copy-back only. Surface and other codecs
++     * retain their original negotiation. No 10-to-8-bit conversion. */
++    if (!s->surface && s->codec_name && strstr(s->codec_name, ".rk.") &&
++        avctx->codec_id == AV_CODEC_ID_HEVC) {
++        int32_t bits = 0;
++        ff_AMediaFormat_getInt32(format, "rk-hevc-bit-depth", &bits);
++        if (bits == 10) ff_AMediaFormat_setInt32(format, "color-format", COLOR_FormatYUVP010);
++    }
+     status = ff_AMediaCodec_configure(s->codec, format, s->surface, NULL, 0);
+     if (status < 0) {
+         char *desc = ff_AMediaFormat_toString(format);

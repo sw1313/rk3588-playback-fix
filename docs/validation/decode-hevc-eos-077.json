@@ -1,0 +1,159 @@
+{
+  "component": "decode-stack",
+  "version": "0.7.7-test1",
+  "date": "2026-10-18",
+  "source_ref": "working-tree",
+  "status": "EXPERIMENTAL_BOUNDED_HEVC_EOS_INPUT_OWNERSHIP_AND_REBOOT_ROLLBACK_VERIFIED",
+  "public_release": false,
+  "goal": "P3 Codec2 queue/lifecycle: return consumed non-picture HEVC input work after actual decoder EOS",
+  "switch": {
+    "name": "hevc_eos_pending",
+    "default": 0,
+    "dependencies": [
+      "codec2_sdk_next"
+    ],
+    "constructor_latched": true,
+    "reboot_required": true,
+    "device_final_active": true
+  },
+  "installer": {
+    "filename": "rk3588-decode-stack-0.7.7-test1.zip",
+    "sha256": "50a56590ddca3c413ed426faab0855be3c024e1f3de6d6eedecdc537eeae3ec5",
+    "tested_bytes_preserved": true,
+    "embedded_validation_is_pre_device_snapshot": true,
+    "addendum": "docs/decode-hevc-eos-077.zh-CN.md"
+  },
+  "core_sha256": "a1245ac47d1e00a2d4fc2884b254a94876785182e1db924e8f1bac5feafff774",
+  "provenance": {
+    "base_repository": "https://github.com/khadas/android_vendor_rockchip_hardware_interfaces_codec2",
+    "base_commit": "e3c30156793f778541b6eaec54ac2a1ac0f6a70c",
+    "upstream_fix": "https://github.com/Lineage-Rockchip/android_hardware_rockchip_codec2/commit/e577f69d04d7435a8e4a1088337ff2ed92a3a7e1",
+    "selective_range": "Only pending-input completion after actual decoder EOS; ordinary empty-input handling was already in 0.7.1, other process/init/stop changes excluded",
+    "local_changes": [
+      "HEVC-only default-off constructor-latched property",
+      "batch completions outside queue/state locks",
+      "flush-in-progress guard",
+      "existing API32 firmware/ABI and dependency/reboot contracts"
+    ],
+    "patch": "magisk-codec2-sdk-next/patches/hevc-eos-pending.patch",
+    "upstream_license": "Apache-2.0; existing notices retained"
+  },
+  "reproduction": {
+    "baseline": "installed Decode Stack 0.7.6-test1",
+    "source_packets_unchanged": true,
+    "legal_non_picture_HEVC_AUD_inputs": 8,
+    "real_picture_packets": 60,
+    "real_output_frames": 60,
+    "EOS_received": true,
+    "pending_inputs_before_stop_without_AUD": 0,
+    "pending_inputs_before_stop_with_AUD": 8
+  },
+  "installed_new_core": {
+    "on_runs": 8,
+    "off_runs": 6,
+    "reenabled_runs": 6,
+    "real_frames_each": 60,
+    "real_frames_total": 1200,
+    "on_and_reenabled_pending": 0,
+    "off_AUD_pending": 8,
+    "ordinary_no_AUD_pending": 0,
+    "PTS_multiset_exact_each": true,
+    "duplicate_input_completions": 0,
+    "callback_errors": 0,
+    "all_stop_release_C2_OK": true,
+    "reentrant_queue_callbacks": 56,
+    "AUD_ordinal_retained": true,
+    "no_image_buffers_in_pending_completion": true,
+    "census_before_stop": true
+  },
+  "benefit": "Deterministically eliminates eight outstanding consumed non-picture inputs at EOS in the reproducer; no generic FPS/seek-latency gain claimed",
+  "pixel_precision": {
+    "groups": {
+      "gradient-native": {
+        "frames": 3,
+        "samples": 37324800,
+        "low_two_bits_nonzero": 27993600,
+        "exact": true,
+        "expected_HAL_format": 23,
+        "consumer": 0
+      },
+      "uhd-native": {
+        "frames": 3,
+        "samples": 37324800,
+        "low_two_bits_nonzero": 21252105,
+        "exact": true,
+        "expected_HAL_format": 23,
+        "consumer": 0
+      },
+      "texture": {
+        "frames": 3,
+        "samples": 37324800,
+        "low_two_bits_nonzero": 21252105,
+        "exact": true,
+        "expected_HAL_format": 54,
+        "consumer": 1
+      },
+      "explicit": {
+        "frames": 3,
+        "samples": 37324800,
+        "low_two_bits_nonzero": 21252105,
+        "exact": true,
+        "expected_HAL_format": 54,
+        "consumer": 2
+      }
+    },
+    "frames_total": 12,
+    "samples_total": 149299200,
+    "low_two_bits_nonzero_total": 91749915,
+    "exact_against_independent_software_reference": true,
+    "acquire_fence_and_DMA_BUF_read_sync_retained": true,
+    "optical_HDMI_precision": false
+  },
+  "HDR": {
+    "PQ_frames": 100,
+    "HLG_frames": 190,
+    "SDR_frames": 100,
+    "pause_resume_flush_seek_EOS": true,
+    "DRM_blob_HDMI_register_packet_and_checksum": true,
+    "HDR_HDMI_10bit_BT2020": true,
+    "exit_SDR": true
+  },
+  "rollback": {
+    "independent_off_restores_previous_EOS_behavior": true,
+    "other_requested_options_retained": true,
+    "whole_module_original_HWC_and_six_platform_hashes_restored": true,
+    "injected_HWC_companion_and_Codec2_plugin_absent": true,
+    "new_property_cleared": true,
+    "reenable_fix_restored": true,
+    "Mali_042_boot_and_external_Zygisk_Next_LSPosed_retained": true
+  },
+  "controls": {
+    "browser_assertions": 61,
+    "Android_isolated_assertions": 15,
+    "default_off_dependency_reboot_receipts_and_injection_rejection": true
+  },
+  "integrity": {
+    "installer_sha256": "50a56590ddca3c413ed426faab0855be3c024e1f3de6d6eedecdc537eeae3ec5",
+    "manifests": {
+      "checksums.sha256": 248,
+      "components/codec2/checksums.sha256": 44,
+      "components/codec2_sdk/checksums.sha256": 6,
+      "components/codec2_sdk_next/checksums.sha256": 16,
+      "components/hdr/checksums.sha256": 21,
+      "components/libyuv/checksums.sha256": 17,
+      "components/mpp/checksums.sha256": 43,
+      "components/rga/checksums.sha256": 20,
+      "components/software/checksums.sha256": 18
+    },
+    "factory_binaries_excluded": true
+  },
+  "frame_bitdepth_resolution_FPS_reference_slots_and_fences_unchanged": true,
+  "limitations": [
+    "Bounded experimental HEVC-only qualification, not a stable public release",
+    "No new game/FPS/display-latency or generic seek benefit measurement",
+    "Historical original-player UHD acquisition and other-path HLG seek/EOS timeouts not claimed fixed",
+    "No complete Codec2 SDK/HWC/VOP2/VPU kernel or Mali upgrade",
+    "Long-duration and arbitrary codec/container compatibility remains unqualified"
+  ],
+  "privacy": "No device addresses, raw logs, media, APKs, private keys, boot or original firmware binaries in public artifacts"
+}

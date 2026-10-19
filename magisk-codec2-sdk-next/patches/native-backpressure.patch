@@ -1,0 +1,316 @@
+--- a/component/base/C2RKComponent.cpp
++++ b/component/base/C2RKComponent.cpp
+@@ -178,11 +178,30 @@
+                 [&] { auto owner = mOwner.lock(); return !owner || owner->isPendingFlushing(); });
+     }
+ 
++    c2_status_t fetchGraphicBlockOnce(
++            uint32_t width, uint32_t height, uint32_t format,
++            C2MemoryUsage usage, std::shared_ptr<C2GraphicBlock>* block) {
++        auto owner = mOwner.lock();
++        if (!owner || owner->isPendingFlushing()) return C2_BAD_STATE;
++        // The platform pool still owns dequeue and acquire-fence waiting.
++        // Only omit this wrapper's unbounded C2_BLOCKING retry loop.
++        return mBase->fetchGraphicBlock(width, height, format, usage, block);
++    }
++
+ private:
+     std::shared_ptr<C2BlockPool> mBase;
+     std::weak_ptr<C2RKComponent> mOwner;
+     const bool mCancelable;
+ };
++
++c2_status_t C2RKComponent::fetchGraphicBlockOnce(
++        const std::shared_ptr<C2BlockPool>& pool,
++        uint32_t width, uint32_t height, uint32_t format,
++        C2MemoryUsage usage, std::shared_ptr<C2GraphicBlock>* block) {
++    // Do not unwrap an arbitrary pool or bypass its synchronization contract.
++    if (!mOutputBlockPool || pool != mOutputBlockPool) return C2_BAD_VALUE;
++    return mOutputBlockPool->fetchGraphicBlockOnce(width, height, format, usage, block);
++}
+ 
+ ////////////////////////////////////////////////////////////////////////////////
+ 
+--- a/component/base/include/C2RKComponent.h
++++ b/component/base/include/C2RKComponent.h
+@@ -115,6 +115,9 @@
+     void stopFlushingState();
+     bool isPendingFlushing();
+     bool lifecycleFixEnabled() const { return mLifecycleFix; }
++    c2_status_t fetchGraphicBlockOnce(const std::shared_ptr<C2BlockPool>& pool,
++            uint32_t width, uint32_t height, uint32_t format,
++            C2MemoryUsage usage, std::shared_ptr<C2GraphicBlock>* block);
+ 
+     /**
+      * check is pending work with frameIndex exits
+--- a/component/video/C2RKMpiDec.cpp
++++ b/component/video/C2RKMpiDec.cpp
+@@ -800,6 +800,7 @@
+ 
+ void C2RKMpiDec::WorkHandler::flushAllMessages() {
+     mRunning = false;
++    ++mGeneration;
+ 
+     sp<AMessage> msg = new AMessage(WorkHandler::kWhatFlushMessage, this);
+     sp<AMessage> response;
+@@ -813,20 +814,44 @@
+     // the caller starts synchronous EOS drain. Wait for the handler barrier
+     // while leaving it disabled, so only one thread owns output and mOutBlock.
+     mRunning = false;
++    ++mGeneration;
+     sp<AMessage> msg = new AMessage(WorkHandler::kWhatFlushMessage, this);
+     sp<AMessage> response;
+     msg->postAndAwaitResponse(&response);
+ }
+ 
++void C2RKMpiDec::WorkHandler::postFrameReady(C2RKMpiDec *decoder) {
++    sp<AMessage> msg = new AMessage(kWhatFrameReady, this);
++    msg->setPointer("thiz", decoder);
++    msg->setInt64("generation", mGeneration.load());
++    msg->post();
++}
++
++void C2RKMpiDec::WorkHandler::schedulePoolRetry(C2RKMpiDec *decoder) {
++    const int64_t generation = mGeneration.load();
++    if (!mRunning || mRetryPending) return;
++    mRetryPending = true;
++    sp<AMessage> msg = new AMessage(kWhatPoolRetry, this);
++    msg->setPointer("thiz", decoder);
++    msg->setInt64("generation", generation);
++    msg->post(10000); // delayed, one outstanding retry; no busy polling
++}
++
+ void C2RKMpiDec::WorkHandler::onMessageReceived(const sp<AMessage> &msg) {
+     switch (msg->what()) {
+-        case kWhatFrameReady: {
++        case kWhatFrameReady:
++        case kWhatPoolRetry: {
++            int64_t generation = -1;
++            if (!msg->findInt64("generation", &generation) ||
++                    (mUseGeneration && generation != mGeneration.load()) || !mRunning) break;
++            if (msg->what() == kWhatPoolRetry) mRetryPending = false;
+             C2RKMpiDec *thiz = nullptr;
+-            if (mRunning && msg->findPointer("thiz", (void **)(&thiz)) && thiz) {
++            if (msg->findPointer("thiz", (void **)(&thiz)) && thiz) {
+                 thiz->drainWork();
+             }
+         } break;
+         case kWhatFlushMessage: {
++            mRetryPending = false;
+             sp<AReplyToken> replyID;
+             msg->senderAwaitsResponse(&replyID);
+ 
+@@ -928,6 +953,9 @@
+       mStandardWorkFlow(true) {
+     c2_info("[%s] version %s", name, C2_COMPONENT_FULL_VERSION);
+     mCodingType = (MppCodingType)GetMppCodingFromComponentName(name);
++    mNativeBackpressure = mCodingType == MPP_VIDEO_CodingHEVC &&
++            lifecycleFixEnabled() && property_get_bool("debug.rkcodec2.native_backpressure", false);
++    c2_info("NATIVE_BACKPRESSURE candidate=%d", mNativeBackpressure);
+     mP010Pairs = property_get_bool("debug.rkcodec2.p010_pairs", false);
+     mHevcEosPending = mCodingType == MPP_VIDEO_CodingHEVC &&
+             property_get_bool("debug.rkcodec2.hevc_eos_pending", false);
+@@ -1135,6 +1163,7 @@
+             mHandler->flushAllMessages();
+         }
+ 
++        mNativePoolBlocked = false;
+         Mutex::Autolock autoLock(mBufferLock);
+ 
+         releaseAllBuffers();
+@@ -1153,7 +1182,7 @@
+ 
+     if (mLooper == nullptr) {
+         mLooper = new ALooper;
+-        mHandler = new WorkHandler;
++        mHandler = new WorkHandler(mNativeBackpressure);
+ 
+         mLooper->setName("C2DecLooper");
+         err = mLooper->start(false, false, ANDROID_PRIORITY_VIDEO);
+@@ -2465,7 +2494,11 @@
+     return err;
+ }
+ 
+-c2_status_t C2RKMpiDec::ensureDecoderState() {
++bool C2RKMpiDec::nativeBackpressureEnabled() const {
++    return mNativeBackpressure && !mBufferMode && !mTunneled;
++}
++
++c2_status_t C2RKMpiDec::ensureDecoderState(bool nativeOnce) {
+     c2_status_t err = C2_OK;
+ 
+     if (isPendingFlushing()) {
+@@ -2533,7 +2566,8 @@
+     };
+ 
+     std::shared_ptr<C2GraphicBlock> outblock;
+-    uint32_t count = mNumOutputSlots - getCountOwnedByDecoder() + 1;
++    const int32_t needed = mNumOutputSlots - getCountOwnedByDecoder() + 1;
++    uint32_t count = nativeOnce && needed <= 0 ? 0 : needed;
+ 
+     if (mTunneled) {
+         count += mTunneledSession->getSmoothnessFactor();
+@@ -2541,9 +2575,18 @@
+ 
+     uint32_t i = 0;
+     for (i = 0; i < count; i++) {
+-        err = mBlockPool->fetchGraphicBlock(width, height, format,
+-                                            C2AndroidMemoryUsage::FromGrallocUsage(usage),
+-                                            &outblock);
++        err = nativeOnce
++                ? fetchGraphicBlockOnce(mBlockPool, width, height, format,
++                        C2AndroidMemoryUsage::FromGrallocUsage(usage), &outblock)
++                : mBlockPool->fetchGraphicBlock(width, height, format,
++                        C2AndroidMemoryUsage::FromGrallocUsage(usage), &outblock);
++        if (nativeOnce) mNativePoolBlocked = (err == C2_BLOCKING);
++        if (nativeOnce && err == C2_BLOCKING) {
++            if (++mNativePoolWaits == 1)
++                c2_info("NATIVE_BACKPRESSURE deferred native_pool=1, decoder_owned=%d target=%d",
++                        getCountOwnedByDecoder(), mNumOutputSlots + 1);
++            return C2_BLOCKING;
++        }
+         if (err != C2_OK) {
+             c2_err("failed to fetchGraphicBlock, err %d", err);
+             break;
+@@ -2566,9 +2609,7 @@
+ 
+ void C2RKMpiDec::postFrameReady() {
+     if (mHandler) {
+-        sp<AMessage> msg = new AMessage(WorkHandler::kWhatFrameReady, mHandler);
+-        msg->setPointer("thiz", this);
+-        msg->post();
++        mHandler->postFrameReady(this);
+     }
+ }
+ 
+@@ -2582,8 +2623,13 @@
+     if (err == C2_OK) {
+         finishWork(work, entry);
+ 
+-        err = ensureDecoderState();
+-        if (err != C2_OK) {
++        // Return every genuinely decoded frame before replenishing the pool.
++        // A paused client may hold all buffers: never stall this output looper
++        // waiting for an extra block while ready decoder outputs are pending.
++        err = ensureDecoderState(nativeBackpressureEnabled());
++        if (err == C2_BLOCKING && nativeBackpressureEnabled()) {
++            if (!work && !mOutputEOS && mHandler) mHandler->schedulePoolRetry(this);
++        } else if (err != C2_OK) {
+             goto error;
+         }
+     } else if (err == C2_NO_MEMORY) {
+@@ -2597,6 +2643,14 @@
+         }
+     } else if (err == C2_CORRUPTED) {
+         goto error;
++    } else if (err == C2_NOT_FOUND && nativeBackpressureEnabled() && !mOutputEOS) {
++        // Returned Surface buffers need not generate a new MPP frame callback.
++        err = ensureDecoderState(true);
++        if (err == C2_BLOCKING) {
++            if (!work && !mOutputEOS && mHandler) mHandler->schedulePoolRetry(this);
++        } else if (err != C2_OK) {
++            goto error;
++        }
+     }
+ 
+     return C2_OK;
+@@ -2643,6 +2697,7 @@
+ 
+     static uint32_t kMaxRetryCnt = 1000;
+     uint32_t retry = 0;
++    bool waitingForSurface = false;
+ 
+     while (true) {
+         if (lifecycleFixEnabled() && isPendingFlushing()) {
+@@ -2656,6 +2711,32 @@
+             bool skipStats = (flags & C2FrameData::FLAG_CODEC_CONFIG);
+             mDumpService->recordFrame(this, data, size, skipStats);
+             break;
++        }
++
++        if (nativeBackpressureEnabled()) {
++            // MPP's pinned mpp_put_packet returns BUFFER_FULL when no input
++            // task is available. This is flow control, not decoder corruption.
++            // The old implementation inferred pause from mBufferLock contention;
++            // nonblocking output prefetch must use the actual BQ state instead.
++            if (err != MPP_ERR_BUFFER_FULL) {
++                c2_err("native input rejected, mpp=%d", err);
++                ret = C2_CORRUPTED;
++                break;
++            }
++            if (!mSignalledError && mNativePoolBlocked.load()) {
++                if (!waitingForSurface) {
++                    c2_info("NATIVE_INPUT_BACKPRESSURE mpp=%d waiting_for_surface=1", err);
++                    waitingForSurface = true;
++                }
++                // Keep this real input and its ordinal owned until MPP accepts
++                // it or flush cancels it. No completion or watchdog is faked.
++                usleep(3 * 1000);
++                continue;
++            }
++            if (waitingForSurface) {
++                c2_info("NATIVE_INPUT_BACKPRESSURE surface_available=1");
++                waitingForSurface = false;
++            }
+         }
+ 
+         if (mSignalledError || ((++retry) > kMaxRetryCnt)) {
+@@ -2736,6 +2817,7 @@
+             goto cleanUp;
+         }
+ 
++        mNativePoolBlocked = false;
+         Mutex::Autolock autoLock(mBufferLock);
+ 
+         releaseAllBuffers();
+--- a/component/video/C2RKMpiDec.h
++++ b/component/video/C2RKMpiDec.h
+@@ -67,19 +67,27 @@
+         enum {
+             kWhatFrameReady,
+             kWhatFlushMessage,
++            kWhatPoolRetry,
+         };
+ 
+-        WorkHandler() : mRunning(true) {}
++        explicit WorkHandler(bool useGeneration)
++            : mRunning(true), mGeneration(0), mRetryPending(false),
++              mUseGeneration(useGeneration) {}
+         ~WorkHandler() override = default;
+ 
+         void flushAllMessages();
+         void stop();
++        void postFrameReady(C2RKMpiDec *decoder);
++        void schedulePoolRetry(C2RKMpiDec *decoder);
+ 
+     protected:
+         void onMessageReceived(const sp<AMessage> &msg) override;
+ 
+     private:
+         std::atomic<bool> mRunning;
++        std::atomic<int64_t> mGeneration;
++        bool mRetryPending; // handler thread only; cleared by the flush barrier
++        const bool mUseGeneration;
+     };
+ 
+     // Output buffer structure
+@@ -203,6 +211,9 @@
+     bool mHevcNativeSurface = false;
+     bool mHevcEosPending = false;
+     bool mP010Pairs = false;
++    bool mNativeBackpressure = false;
++    uint64_t mNativePoolWaits = 0;
++    std::atomic<bool> mNativePoolBlocked{false};
+     bool mStandardWorkFlow;
+ 
+     std::shared_ptr<C2GraphicBlock> mOutBlock;
+@@ -256,7 +267,8 @@
+     c2_status_t updateFbcModeIfNeeded();
+     c2_status_t importBufferToDecoder(std::shared_ptr<C2GraphicBlock> block);
+     c2_status_t ensureTunneledState();
+-    c2_status_t ensureDecoderState();
++    c2_status_t ensureDecoderState(bool nativeOnce = false);
++    bool nativeBackpressureEnabled() const;
+     c2_status_t sendpacket(
+             uint8_t *data, size_t size, uint64_t pts,
+             uint64_t frameIndex, uint32_t flags);

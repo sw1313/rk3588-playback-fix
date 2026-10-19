@@ -9,7 +9,7 @@ def run(*args):subprocess.run([str(x) for x in args],check=True)
 def q(p):return '"'+Path(p).as_posix()+'"'
 def sha(p):return hashlib.sha256(p.read_bytes()).hexdigest()
 def main():
- parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--ndk',type=Path,required=True);parser.add_argument('--prepared-root',type=Path,required=True);parser.add_argument('--vndk-headers',type=Path,required=True);parser.add_argument('--rga-source',type=Path,required=True);parser.add_argument('--work',type=Path,default=ROOT/'build/codec2-module');a=parser.parse_args()
+ parser=argparse.ArgumentParser(description=__doc__);parser.add_argument('--ndk',type=Path,required=True);parser.add_argument('--prepared-root',type=Path,required=True);parser.add_argument('--vndk-headers',type=Path,required=True);parser.add_argument('--rga-source',type=Path,required=True);parser.add_argument('--work',type=Path,default=ROOT/'build/codec2-module');parser.add_argument('--service-only',action='store_true',help='Build only the firmware-pinned router service; no module ZIP or replacement core');a=parser.parse_args()
  sdk=a.prepared_root.resolve();headers=a.vndk_headers.resolve();work=a.work.resolve();work.mkdir(parents=True,exist_ok=True)
  stock=sdk/'vendor32/libcodec2_rk_component.so'
  if not stock.is_file() or sha(stock)!='22ce9ddbfc80d72b06ac1d330eed7a11f90575d8b56dc2e0358ed7b75c62a4bb':raise SystemExit('Missing or unknown stock Codec2 registry input')
@@ -56,7 +56,9 @@ def main():
   cmake+='target_link_options('+target+' PRIVATE -nostdlib++ -Wl,--no-undefined '+('-Wl,--export-dynamic' if target.endswith('service') else '-Wl,-Bsymbolic')+')\n'
   cmake+='target_link_libraries('+target+' PRIVATE dl m '+' '.join(q(vendor/x) for x in libs)+')\n'
  project=work/'project';project.mkdir();(project/'CMakeLists.txt').write_text(cmake)
- build=work/'arm';run('cmake','-S',project,'-B',build,'-G','Ninja','-DCMAKE_TOOLCHAIN_FILE='+str(a.ndk.resolve()/'build/cmake/android.toolchain.cmake'),'-DANDROID_ABI=armeabi-v7a','-DANDROID_PLATFORM=android-32','-DCMAKE_BUILD_TYPE=Release','-DCMAKE_SKIP_RPATH=ON');run('cmake','--build',build,'--parallel','8')
+ build=work/'arm';run('cmake','-S',project,'-B',build,'-G','Ninja','-DCMAKE_TOOLCHAIN_FILE='+str(a.ndk.resolve()/'build/cmake/android.toolchain.cmake'),'-DANDROID_ABI=armeabi-v7a','-DANDROID_PLATFORM=android-32','-DCMAKE_BUILD_TYPE=Release','-DCMAKE_SKIP_RPATH=ON');run('cmake','--build',build,'--parallel','8',*(['--target','codec2_compat_service'] if a.service_only else []))
+ if a.service_only:
+  binary=work/'android.hardware.media.c2@1.1-service';shutil.copyfile(build/'codec2_compat_service',binary);run(llvm/('llvm-strip'+ext),'--strip-unneeded',binary);print('SERVICE',binary,'SHA256',sha(binary));return
  payload=work/'package';shutil.copytree(MODULE,payload,ignore=shutil.ignore_patterns('system','bin'))
  binary=payload/'system/vendor/bin/hw/android.hardware.media.c2@1.1-service';binary.parent.mkdir(parents=True);shutil.copyfile(build/'codec2_compat_service',binary)
  library=payload/'system/vendor/lib/hw/libcodec2_rx_component.so';library.parent.mkdir(parents=True);shutil.copyfile(build/'libcodec2_rx_component.so',library)

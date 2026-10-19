@@ -15,8 +15,18 @@ fi
 destination=system/vendor/lib64/hw/hwcomposer.rk30board.rkhdr.so
 cp "$original" "$destination" || abort "Cannot retain original HWC companion."
 [ "$(sha "$destination")" = "$original_hash" ] || abort "Original HWC companion hash differs."
+sh "$MODPATH/overlay-scale.sh" || abort "Scaled-overlay factory ABI/backport preflight failed."
 set_perm_recursive "$MODPATH" 0 0 0755 0644
 set_perm "$MODPATH/bin/check64" 0 0 0755
 set_perm "$MODPATH/bin/packet_probe64" 0 0 0755
+set_perm "$MODPATH/bin/plane_probe64" 0 0 0755
+set_perm "$MODPATH/bin/byte_patch64" 0 0 0755
+set_perm "$MODPATH/bin/hwui_probe64" 0 0 0755
+set_perm "$MODPATH/bin/hwui_probe32" 0 0 0755
+set_perm "$MODPATH/bin/sf-target-test64" 0 0 0755
+set_perm "$MODPATH/bin/alloc-target-test64" 0 0 0755
+sh "$MODPATH/hwui-rgb10.sh" || abort "HWUI RGB10 exact ABI and isolated preflight failed."
+sh "$MODPATH/sf-target10.sh" || abort "SF physical HDR target exact ABI and isolated preflight failed."
+sh "$MODPATH/alloc-target10.sh" || abort "Physical RGB10 allocator exact ABI and isolated preflight failed."
 timeout 10 /system/bin/env LD_LIBRARY_PATH=/vendor/lib64:/system/lib64:/apex/com.android.vndk.v32/lib64 "$MODPATH/bin/check64" "$MODPATH/system/vendor/lib64/hw/hwcomposer.rk30board.so" "$MODPATH/$destination" || abort "Original HWC adapter preflight failed."
 ui_print "HDR10 metadata adapter verified. Original compositor, pixel buffers and HDR enable policy retained; guarded PQ/HLG and native client output repairs included."

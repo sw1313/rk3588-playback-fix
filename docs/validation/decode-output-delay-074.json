@@ -1,0 +1,299 @@
+{
+  "component": "decode-stack",
+  "version": "0.7.4-test1",
+  "date": "2026-10-18",
+  "status": "EXPERIMENTAL_BOUNDED_CALLBACK_RESIZE_ASYNC_PRECISION_AND_REBOOT_ROLLBACK_VERIFIED",
+  "public_release": false,
+  "source_ref": "working-tree",
+  "switch": {
+    "name": "codec2_delay_notify",
+    "default": 0,
+    "dependency": "codec2_sdk_next",
+    "reboot_required": true
+  },
+  "installer": {
+    "filename": "rk3588-decode-stack-0.7.4-test1.zip",
+    "sha256": "6a0a73af4806289cd7f8316f2872139c26dc74ccc6490708abb5a05c6751a1ca",
+    "tested_bytes_preserved": true,
+    "embedded_validation_is_pre_device_snapshot": true,
+    "addendum": "docs/decode-output-delay-074.zh-CN.md"
+  },
+  "native_core_sha256": "1968de8c2ce595d47e7f0d6e12f627fd090e811d41b1916506a6bba70f6da842",
+  "scope": "Paired independent config-only notification plus reserved-index/FLAG_INCOMPLETE; existing buffer-count and low-memory tuning retained",
+  "provenance": "magisk-codec2-sdk-next/UPSTREAM.json#output_delay_notification",
+  "pre_input_callbacks": {
+    "initial_candidate_off": {
+      "avc": {
+        "pass": 1,
+        "enabled": 0,
+        "queried_delay": 21,
+        "updates": 0,
+        "notified_delay": 0,
+        "frames": 0,
+        "input_completions": 0,
+        "errors": 0
+      },
+      "hevc": {
+        "pass": 1,
+        "enabled": 0,
+        "queried_delay": 16,
+        "updates": 0,
+        "notified_delay": 0,
+        "frames": 0,
+        "input_completions": 0,
+        "errors": 0
+      },
+      "vp9": {
+        "pass": 1,
+        "enabled": 0,
+        "queried_delay": 16,
+        "updates": 0,
+        "notified_delay": 0,
+        "frames": 0,
+        "input_completions": 0,
+        "errors": 0
+      },
+      "av1": {
+        "pass": 1,
+        "enabled": 0,
+        "queried_delay": 10,
+        "updates": 0,
+        "notified_delay": 0,
+        "frames": 0,
+        "input_completions": 0,
+        "errors": 0
+      }
+    },
+    "installed_on": {
+      "avc": {
+        "pass": 1,
+        "enabled": 1,
+        "queried_delay": 21,
+        "updates": 1,
+        "notified_delay": 21,
+        "frames": 0,
+        "input_completions": 0,
+        "errors": 0
+      },
+      "hevc": {
+        "pass": 1,
+        "enabled": 1,
+        "queried_delay": 16,
+        "updates": 1,
+        "notified_delay": 16,
+        "frames": 0,
+        "input_completions": 0,
+        "errors": 0
+      },
+      "vp9": {
+        "pass": 1,
+        "enabled": 1,
+        "queried_delay": 16,
+        "updates": 1,
+        "notified_delay": 16,
+        "frames": 0,
+        "input_completions": 0,
+        "errors": 0
+      },
+      "av1": {
+        "pass": 1,
+        "enabled": 1,
+        "queried_delay": 10,
+        "updates": 1,
+        "notified_delay": 10,
+        "frames": 0,
+        "input_completions": 0,
+        "errors": 0
+      }
+    },
+    "rebooted_off": {
+      "avc": {
+        "pass": 1,
+        "enabled": 0,
+        "queried_delay": 21,
+        "updates": 0,
+        "notified_delay": 0,
+        "frames": 0,
+        "input_completions": 0,
+        "errors": 0
+      },
+      "hevc": {
+        "pass": 1,
+        "enabled": 0,
+        "queried_delay": 16,
+        "updates": 0,
+        "notified_delay": 0,
+        "frames": 0,
+        "input_completions": 0,
+        "errors": 0
+      },
+      "vp9": {
+        "pass": 1,
+        "enabled": 0,
+        "queried_delay": 16,
+        "updates": 0,
+        "notified_delay": 0,
+        "frames": 0,
+        "input_completions": 0,
+        "errors": 0
+      },
+      "av1": {
+        "pass": 1,
+        "enabled": 0,
+        "queried_delay": 10,
+        "updates": 0,
+        "notified_delay": 0,
+        "frames": 0,
+        "input_completions": 0,
+        "errors": 0
+      }
+    },
+    "reenabled": {
+      "avc": {
+        "pass": 1,
+        "enabled": 1,
+        "queried_delay": 21,
+        "updates": 1,
+        "notified_delay": 21,
+        "frames": 0,
+        "input_completions": 0,
+        "errors": 0
+      },
+      "hevc": {
+        "pass": 1,
+        "enabled": 1,
+        "queried_delay": 16,
+        "updates": 1,
+        "notified_delay": 16,
+        "frames": 0,
+        "input_completions": 0,
+        "errors": 0
+      },
+      "vp9": {
+        "pass": 1,
+        "enabled": 1,
+        "queried_delay": 16,
+        "updates": 1,
+        "notified_delay": 16,
+        "frames": 0,
+        "input_completions": 0,
+        "errors": 0
+      },
+      "av1": {
+        "pass": 1,
+        "enabled": 1,
+        "queried_delay": 10,
+        "updates": 1,
+        "notified_delay": 10,
+        "frames": 0,
+        "input_completions": 0,
+        "errors": 0
+      }
+    }
+  },
+  "adaptive_and_flush": {
+    "configured_dimensions": [
+      4096,
+      2160
+    ],
+    "actual_source_dimensions": [
+      1280,
+      720
+    ],
+    "observed_null_work_slot_increase_on": [
+      6,
+      16
+    ],
+    "source_not_resized": true,
+    "pre_flush_outputs": 12,
+    "post_flush_real_packets": 60,
+    "post_flush_unique_output_PTS": 60,
+    "EOS_stop_on_and_off": true
+  },
+  "asynchronous_TextureView": {
+    "independent_ffprobe_video_packets": 3597,
+    "independent_source_duration_seconds": 60.01,
+    "device_file_identity_verified": true,
+    "timestamps_or_frame_rate_overridden": false,
+    "off": {
+      "complete": true,
+      "queued": 3597,
+      "decoded": 3597,
+      "eos": true,
+      "stop_ok": true,
+      "elapsed_seconds": 60.794799609
+    },
+    "reenabled": {
+      "complete": true,
+      "queued": 3597,
+      "decoded": 3597,
+      "eos": true,
+      "stop_ok": true,
+      "elapsed_seconds": 60.870853158
+    },
+    "HAL_process_survived_each": true,
+    "invalid_initial_attempts": "Initial on attempt used 25s deadline and expected 60 frames; first off report decoded all 3597 frames but correctly marked complete=false against wrong expectation. Neither counted as passing. Corrected fresh runs use independently counted 3597 without editing previous reports."
+  },
+  "HDR": {
+    "on_cases": 6,
+    "on_reported_frames": 690,
+    "on_PQ1000_PQ4000_PQ_no_master_HLG_SDR_PQ_reentry": true,
+    "off_cases": 2,
+    "off_reported_frames": 200,
+    "off_PQ_to_SDR": true,
+    "pause_seek_EOS": true,
+    "HDR_10bit_BT2020_and_InfoFrame_fields_retained": true,
+    "external_optical_or_wire_measurement": false
+  },
+  "precision": {
+    "hdr6": {
+      "samples": 74649600,
+      "bits": 10,
+      "exact": true
+    },
+    "eight3": {
+      "samples": 39813120,
+      "bits": 8,
+      "exact": true
+    }
+  },
+  "controls": {
+    "Android_shell_assertions": 15,
+    "browser_assertions": 55,
+    "fixtures_isolated": true,
+    "live_bridge_and_selection_reboots_verified": true
+  },
+  "rollback": {
+    "independent_off_and_reenable": true,
+    "original_buffer_requirements_retained": true,
+    "whole_module_disable": true,
+    "original_HWC_and_six_platform_hashes_restored": true,
+    "injected_codec_plugin_and_HDR_companion_absent": true,
+    "new_property_cleared": true,
+    "boot_bytes_unchanged": true,
+    "Mali_cold_and_external_Zygisk_LSPosed_retained": true
+  },
+  "integrity": {
+    "installer_and_nested_manifests_verified": true,
+    "installed_immutable_files_and_active_mounts_verified": true,
+    "normalized_applied_source_matches_public_patch": true,
+    "private_inputs_excluded": true
+  },
+  "final_state": {
+    "version": "0.7.4-test1",
+    "codec2_delay_notify": 1,
+    "health": "passed",
+    "pending_reboot": false,
+    "gralloc_hdr_lease": 1,
+    "Mali_cold": "on",
+    "GPU_DVFS_polling_ms": 20,
+    "external_injection": "passed"
+  },
+  "limitations": [
+    "Experimental exact-firmware and installed graphics combination only",
+    "No measured seek-time, FPS, buffer-count-reduction or bandwidth uplift",
+    "Historical original-player UHD acquisition and HEVC HLG seek/EOS queue timeout remain unresolved",
+    "Not a whole newer Codec2 SDK or low-memory-policy update",
+    "No full CTS/VTS, long-duration memory or optical HDMI acceptance"
+  ]
+}

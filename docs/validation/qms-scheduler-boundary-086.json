@@ -1,0 +1,104 @@
+{
+  "date": "2026-10-19",
+  "version": "0.8.6-qms-test14",
+  "status": "TEST14_REAL_BOOT_HEALTHY_USER_REPORTS_PLAY_PAUSE_STEP_BLACKOUT",
+  "physical_HDMI_blackout_fixed": false,
+  "release_accepted": false,
+  "changes": [
+    "Withdraw rejected test13 END=0 trial; restore vendor END=1 packet and exact verifier together",
+    "Read-only stable/notice validation no longer treats other native packet-owner enable changes between transactions as QMS corruption",
+    "Retain full packet, timing/shadow, power, epoch, VTEM ownership and actual commit preservation guards",
+    "At most 96 real transition records per boot; pre/post GCP control, HDCP2 bypass/GPIO and VTEM mode/rate with actual frame/timing evidence",
+    "No additional stable-frame sampling, thread, ioctl polling, HDR reduction or frame-rate lock"
+  ],
+  "root_cause_boundary": "test13 diagnostic103 conflated missing VTEM with unrelated scheduler changes; narrowing fixes the invalid lifetime invariant but which condition occurred remains unproven. No-rebuild blackout has no confirmed root fix yet.",
+  "ordering_audit": {
+    "upstream": "https://github.com/rockchip-linux/kernel/tree/77168c8d5ab82399f65a80e9f807b50ba37cf483",
+    "result": "Vendor target announcement then VOP update then stable M_CONST broadly matches local plan/complete order; no justified extra delay or arbitrary forced VRR change identified",
+    "connector_VFP": "rockchip_connector_update_vfp_for_vrr dispatches optional sub-device callback; pinned HDMI QP host does not install an update_vfp_for_vrr callback",
+    "wire_level_proof": false
+  },
+  "diagnostics": {
+    "offsets": [
+      "0xaac",
+      "0x8e0",
+      "0x8e8",
+      "0xd08",
+      "0xd0c"
+    ],
+    "qualification": "Exact original Image QP register-dump table identifies readable ordinary registers; full selected table included in runtime fingerprint contract",
+    "reads_per_sampled_transition": 10,
+    "maximum_records_per_boot": 96,
+    "sample_failure_changes_commit_result": false,
+    "HDCP_disabled_by_candidate": false,
+    "sink_acknowledgement": false,
+    "limitations": "Boundary samples may miss transient events between observations and cannot certify HDMI wire-level packet delivery or absence of sink muting"
+  },
+  "pairing": {
+    "profile_id": "a800329a8c6acbeca5e1ba9e97c91ed77b3dcd566051cc35d054e9ef82a83b97",
+    "module_sha256": "54344c90c5bc292e6c305371de967d6ae5576913d24dcf18e234927c53e3d468",
+    "helper_sha256": "09ce63946356f78e9acdfb52f8a9b26201d8a5edcbf863885f8e69fddef9e865",
+    "hwc_sha256": "b34b647f6664de292c5f10d3d75b1a0bb5ae69c33960e088530ecb8ad96102e9",
+    "Mali_version": "0.4.2-qms-test16; tuple registration only, GPU remains g18"
+  },
+  "tests": {
+    "native_register_lifecycle_injected_Android_cases": 50,
+    "exact_pair_isolated_Android_cases": 15,
+    "exact_Image_import_CRCs": 74,
+    "actual_candidate_boot_passed": true,
+    "actual_candidate_playback_passed": false
+  },
+  "preserve": [
+    "Auto",
+    "test11 ART/settings repair",
+    "HDR",
+    "Frame Guard disabled and paused",
+    "Mali g18/KMD/DVFS",
+    "Zygisk Next and both ABI LSPosed",
+    "seek repair",
+    "unchanged boot partition"
+  ],
+  "rollback": "Previous complete Decode/Mali backups before staging, existing per-item and whole-module disable plus reboot; no candidate-specific actual rollback acceptance claimed",
+  "startup": {
+    "QMS_active": true,
+    "Mali_g18_KMD_DVFS_active": true,
+    "Zygisk_Next_LSPosed_both_ABIs": true,
+    "Auto_saved": true,
+    "HDR_menu_enabled": true,
+    "module_flags_unchanged": true,
+    "component_choices_unchanged": true,
+    "boot_unchanged": true,
+    "frame_errors": 0,
+    "physical_HDMI_acceptance": false
+  },
+  "user_physical_result": "Playback, pause and frame stepping all still black",
+  "playback": {
+    "requests_completed": 8,
+    "frame_errors": 0,
+    "native_generation_unchanged": true,
+    "observed_boundary_records": 34,
+    "boundary_sample_errors": 0,
+    "GCP_control_before_after": [
+      0,
+      0
+    ],
+    "HDCP2_bypass_before_after": [
+      1,
+      1
+    ],
+    "HDCP2_GPIO_before_after": [
+      0,
+      0
+    ],
+    "connection_events": 0,
+    "VOP_PHY_rebuild_observed": false,
+    "physical_HDMI_blackout_fixed": false,
+    "causal_limit": "Boundary snapshots cannot exclude every inter-sample transient or sink-internal blanking; scheduler narrowing not proven responsible for main blackout."
+  },
+  "topology_correction": {
+    "previous_trials": "HDMI matrix between box and LG C5, clarified by user after trials",
+    "current_connection": "Direct HDMI1; currently no signal",
+    "direct_C5_interoperability_accepted": false,
+    "matrix_is_proven_root_cause": false
+  }
+}

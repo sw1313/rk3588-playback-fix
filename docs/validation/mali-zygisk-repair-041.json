@@ -1,0 +1,294 @@
+{
+  "component": "mali-global",
+  "version": "0.4.1-test2",
+  "date": "2026-10-18",
+  "status": "EXPERIMENTAL_BOUNDED_ZYGISK_COLD_START_AND_DISABLE_ROLLBACK_VERIFIED",
+  "public_release": false,
+  "source_ref": "working-tree",
+  "supersedes_withdrawn": "0.4.0-cold1",
+  "unchanged_companion": "Decode Stack 0.7.2-cold2",
+  "installer": {
+    "filename": "rk3588-mali-global-0.4.1-test2.zip",
+    "sha256": "2c910b965e386989501ead2e3d8d07578a187a5f9f488f75e3dc36ae86af3faf",
+    "bytes_preserved": true,
+    "embedded_validation_is_pre_device_snapshot": true,
+    "validation_addendum": "docs/mali-zygisk-repair-041.zh-CN.md"
+  },
+  "device_scope": {
+    "board": "H96 Max V58 / RK3588",
+    "kernel": "5.10.66",
+    "android_sdk": 32,
+    "magisk_api": 30700,
+    "magisk_variant": ":R",
+    "zygisk_next": "1.5.2 (864-a4a72ce-release)",
+    "LSPosed": "2.2.1 (7925)"
+  },
+  "startup": {
+    "graphics_gates": 3,
+    "Zygote_overrides": 0,
+    "Zygote_SIGSTOP_or_restart": false,
+    "barrier_boottime_ms": 7757,
+    "Zygote_start_boottime_ns": [
+      7916184359,
+      7919666568
+    ],
+    "original_graphics_PIDs_preserved": true,
+    "qualified_final_candidate_cold_boots": 2
+  },
+  "injection": {
+    "inject_state": 1,
+    "modules_with_issue": 0,
+    "both_current_Zygotes_state": 3,
+    "LSPosed_modules64_and_modules32": true,
+    "lspd_alive": true,
+    "Yamby_real_RKPlaybackFix_hook": true,
+    "Magisk_builtin_zygisk_setting": 0,
+    "denylist_setting": 0,
+    "external_selection_modified": false,
+    "database_modified": false
+  },
+  "rollback": {
+    "whole_module_disable_tested": true,
+    "original_root_boot_verified": true,
+    "original_GPU_userspace_verified": true,
+    "both_ABI_injection_survived": true,
+    "LSPosed_survived": true,
+    "reenable_verified": true
+  },
+  "integrity": {
+    "installed_runtime_matches_tested_installer": true,
+    "Magisk_pruned_installer_only_files": [
+      "customize.sh",
+      "README.md"
+    ],
+    "ZIP_manifests_verified": true,
+    "independent_MagiskBoot_kernel_second_DTB_equal": true,
+    "builder_original_cpio_records_preserved": 22,
+    "private_inputs_excluded": true
+  },
+  "fixtures": {
+    "native": [
+      {
+        "name": "apply verifies write",
+        "exit": 0,
+        "passed": true
+      },
+      {
+        "name": "failed partial candidate write restores original",
+        "exit": 70,
+        "passed": true
+      },
+      {
+        "name": "restore verifies original",
+        "exit": 0,
+        "passed": true
+      },
+      {
+        "name": "missing candidate still restores",
+        "exit": 0,
+        "passed": true
+      },
+      {
+        "name": "corrupt candidate still restores",
+        "exit": 0,
+        "passed": true
+      },
+      {
+        "name": "foreign boot never overwritten",
+        "exit": 70,
+        "passed": true
+      },
+      {
+        "name": "corrupt backup refuses write",
+        "exit": 70,
+        "passed": true
+      },
+      {
+        "name": "incomplete profile rejects",
+        "exit": 65,
+        "passed": true
+      },
+      {
+        "name": "extra profile tokens reject",
+        "exit": 65,
+        "passed": true
+      },
+      {
+        "name": "verified first bind releases without restarts",
+        "exit": 0,
+        "passed": true
+      },
+      {
+        "name": "normal Zygote process is never paused or required",
+        "exit": 0,
+        "passed": true
+      },
+      {
+        "name": "init barrier passes current first release",
+        "exit": 0,
+        "passed": true
+      },
+      {
+        "name": "init barrier stale release restores original",
+        "exit": 30,
+        "passed": true
+      },
+      {
+        "name": "preflight permits matching enabled payload before injector starts",
+        "exit": 0,
+        "passed": true
+      },
+      {
+        "name": "preflight disabled restores before injector starts",
+        "exit": 30,
+        "passed": true
+      },
+      {
+        "name": "preflight old failed trial restores before injector starts",
+        "exit": 30,
+        "passed": true
+      },
+      {
+        "name": "preflight bad payload restores before injector starts",
+        "exit": 30,
+        "passed": true
+      },
+      {
+        "name": "manager disabled restores boot",
+        "exit": 30,
+        "passed": true
+      },
+      {
+        "name": "manager removed restores boot",
+        "exit": 30,
+        "passed": true
+      },
+      {
+        "name": "parent off restores boot",
+        "exit": 30,
+        "passed": true
+      },
+      {
+        "name": "previous incomplete boot restores",
+        "exit": 30,
+        "passed": true
+      },
+      {
+        "name": "stale overlay plan rejected",
+        "exit": 30,
+        "passed": true
+      },
+      {
+        "name": "wrong firmware restores",
+        "exit": 30,
+        "passed": true
+      },
+      {
+        "name": "wrong ARM32 restores",
+        "exit": 30,
+        "passed": true
+      },
+      {
+        "name": "wrong ARM64 restores",
+        "exit": 30,
+        "passed": true
+      },
+      {
+        "name": "wrong KMD restores",
+        "exit": 30,
+        "passed": true
+      },
+      {
+        "name": "graphics already executing refuses load",
+        "exit": 30,
+        "passed": true
+      },
+      {
+        "name": "non-init parent refuses release",
+        "exit": 30,
+        "passed": true
+      },
+      {
+        "name": "stopped executed graphics process refuses release",
+        "exit": 30,
+        "passed": true
+      },
+      {
+        "name": "already bound GPU refuses load",
+        "exit": 30,
+        "passed": true
+      },
+      {
+        "name": "failed module first bind restores",
+        "exit": 30,
+        "passed": true
+      },
+      {
+        "name": "qualification without release refuses",
+        "exit": 67,
+        "passed": true
+      },
+      {
+        "name": "current release and health qualifies",
+        "exit": 0,
+        "passed": true
+      },
+      {
+        "name": "stale release cannot qualify",
+        "exit": 67,
+        "passed": true
+      }
+    ],
+    "zygisk_policy": [
+      {
+        "name": "both ABIs and LSPosed active",
+        "passed": true
+      },
+      {
+        "name": "failed injection refuses qualification",
+        "passed": true
+      },
+      {
+        "name": "stale primary PID refuses",
+        "passed": true
+      },
+      {
+        "name": "secondary injection pending refuses",
+        "passed": true
+      },
+      {
+        "name": "missing 32-bit LSPosed refuses",
+        "passed": true
+      },
+      {
+        "name": "missing lspd refuses",
+        "passed": true
+      },
+      {
+        "name": "explicit external Zygisk disable respected",
+        "passed": true
+      },
+      {
+        "name": "boot-required injector cannot bypass health by auto-disabling",
+        "passed": true
+      }
+    ],
+    "Android_WebUI_state_cases_passed": 48
+  },
+  "final_state": {
+    "cold": "on",
+    "userspace": "on",
+    "kernel_CSF": "next",
+    "dvfs_polling_ms": 20,
+    "pending_reboot": false,
+    "root_available": true
+  },
+  "limitations": [
+    "Experimental exact-firmware validation only; not a stable release",
+    "No new HDR, bit-depth, performance or long-duration acceptance; historical checks are not reused as new acceptance",
+    "Not every third-party Zygisk hook was tested; App Settings Computer class error remains",
+    "Historical HEVC HLG seek/EOS Codec2 queue timeout unresolved",
+    "Kernel hard hang and interrupted boot-write recovery not physically fault-injected"
+  ],
+  "provenance": "magisk-mali-global/ZYGISK_REPAIR_UPSTREAM.json"
+}

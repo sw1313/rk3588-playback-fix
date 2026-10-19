@@ -13,17 +13,37 @@
     ["mpp", "group.hardware", t("name.mpp"), t("desc.mpp"), []],
     ["av1_grain", "group.hardware", t("name.av1_grain"), t("desc.av1_grain"), ["mpp"]],
     ["codec2", "group.hardware", t("name.codec2"), t("desc.codec2"), ["mpp", "rga"]],
+    ["codec2_surface", "group.hardware", t("name.codec2_surface"), t("desc.codec2_surface"), ["codec2"]],
+    ["codec2_native_backpressure", "group.hardware", t("name.codec2_native_backpressure"), t("desc.codec2_native_backpressure"), ["codec2_sdk_next", "codec2_surface", "codec2_lifecycle"]],
     ["codec2_backend", "group.hardware", t("name.codec2_backend"), t("desc.codec2_backend"), ["codec2"]],
     ["codec2_buffer", "group.hardware", t("name.codec2_buffer"), t("desc.codec2_buffer"), ["codec2_sdk"]],
-    ["av1_native", "group.hardware", t("name.av1_native"), t("desc.av1_native"), ["codec2_sdk_next"]],
+    ["hevc_eos_pending", "group.hardware", t("name.hevc_eos_pending"), t("desc.hevc_eos_pending"), ["codec2_sdk_next"]],
+    ["hevc_native_surface", "group.hardware", t("name.hevc_native_surface"), t("desc.hevc_native_surface"), ["codec2_sdk_next", "hdr_static", "codec2_surface"]],
+    ["codec2_delay_notify", "group.hardware", t("name.codec2_delay_notify"), t("desc.codec2_delay_notify"), ["codec2_sdk_next"]],
+    ["codec2_lifecycle", "group.hardware", t("name.codec2_lifecycle"), t("desc.codec2_lifecycle"), ["codec2_sdk_next"]],
+    ["av1_native", "group.hardware", t("name.av1_native"), t("desc.av1_native"), ["codec2_sdk_next", "codec2_surface"]],
     ["av1_afbc", "group.hardware", t("name.av1_afbc"), t("desc.av1_afbc"), ["av1_native"]],
+    ["av1_texture_afbc", "group.hardware", t("name.av1_texture_afbc"), t("desc.av1_texture_afbc"), ["av1_afbc"]],
     ["software", "group.hardware", t("name.software"), t("desc.software"), ["codec2"]],
     ["p010_fast", "group.hardware", t("name.p010_fast"), t("desc.p010_fast"), ["codec2"]],
+    ["p010_copy_pool", "group.hardware", t("name.p010_copy_pool"), t("desc.p010_copy_pool"), ["codec2_sdk_next", "codec2_buffer"]],
+    ["p010_pairs", "group.hardware", t("name.p010_pairs"), t("desc.p010_pairs"), ["codec2_sdk_next", "p010_fast"]],
     ["hdr_static", "group.hardware", t("name.hdr_static"), t("desc.hdr_static"), ["codec2"]],
+    ["gralloc_hdr_lease", "group.hardware", t("name.gralloc_hdr_lease"), t("desc.gralloc_hdr_lease"), ["hdr_static", "codec2_sdk_next"]],
+    ["hwui_rgb10", "group.hardware", t("name.hwui_rgb10"), t("desc.hwui_rgb10"), ["hdr_static"]],
+    ["hwc_client_hdr10", "group.hardware", t("name.hwc_client_hdr10"), t("desc.hwc_client_hdr10"), ["hdr_static", "hwui_rgb10"]],
+    ["hwc_mode_cache", "group.hardware", t("name.hwc_mode_cache"), t("desc.hwc_mode_cache"), ["hdr_static"]],
+    ["display_policy", "group.hardware", t("name.display_policy"), t("desc.display_policy"), []],
+    ["display_session", "group.hardware", t("name.display_session"), t("desc.display_session"), ["hwc_client_hdr10"]],
+    ["display_qms", "group.hardware", t("name.display_qms"), t("desc.display_qms"), ["hdr_static"]],
+    ["hdmi_audio_guard", "group.hardware", t("name.hdmi_audio_guard"), t("desc.hdmi_audio_guard"), []],
+    ["hwc_scaled_overlay", "group.hardware", t("name.hwc_scaled_overlay"), t("desc.hwc_scaled_overlay"), ["hdr_static"]],
+    ["hwc_metadata_reuse", "group.hardware", t("name.hwc_metadata_reuse"), t("desc.hwc_metadata_reuse"), ["hdr_static"]],
     ["hdr10plus", "group.hardware", t("name.hdr10plus"), t("desc.hdr10plus"), ["codec2"]],
     ["libyuv", "group.pixels", t("name.libyuv"), t("desc.libyuv"), []]
   ];
-  const parents = { av1_grain: "mpp", codec2: "mpp", codec2_backend: "codec2", codec2_buffer: "codec2_backend", av1_native: "codec2_backend", av1_afbc: "av1_native", software: "codec2", p010_fast: "codec2", hdr_static: "codec2", hdr10plus: "codec2" };
+  const bundles = {"core": ["mpp", "rga", "codec2", "libyuv", "software"], "native": ["codec2_surface", "codec2_native_backpressure", "codec2_lifecycle", "codec2_delay_notify", "hevc_eos_pending", "codec2_buffer"], "av1": ["av1_native", "av1_grain", "av1_afbc", "av1_texture_afbc"], "hdr": ["hdr_static", "hdr10plus", "hwui_rgb10", "hwc_client_hdr10", "gralloc_hdr_lease", "hevc_native_surface", "p010_fast", "p010_pairs", "p010_copy_pool"], "display": ["hwc_mode_cache", "hwc_metadata_reuse", "hwc_scaled_overlay", "hdmi_audio_guard", "display_policy", "display_session"]};
+  const bundleRows = new Map();
   const names = Object.fromEntries(definitions.map(([key, , title]) => [key, title]));
   names.codec2_sdk = t("name.codec2_sdk");
   names.codec2_sdk_next = t("name.codec2_sdk_next");
@@ -47,6 +67,7 @@
     const blocked = busy || !state || !state.valid || state.removing;
     $("whole").disabled = busy || !state || state.removing;
     for (const row of rows.values()) row.toggle.disabled = blocked;
+    for (const row of bundleRows.values()) row.toggle.disabled = blocked;
     $("refresh").disabled = busy;
   }
   function exec(command) {
@@ -93,6 +114,14 @@
       row.reason.textContent = reason;
       row.reason.hidden = !reason;
     }
+    for (const [id, keys] of Object.entries(bundles)) {
+      const row = bundleRows.get(id);
+      const count = field => keys.some(k => next.components[k][field] === null) ? t("unknown") : keys.filter(k => next.components[k][field] === 1).length;
+      const selected = count("requested");
+      row.toggle.setAttribute("aria-checked", selected === keys.length ? "true" : selected ? "mixed" : "false");
+      row.status.textContent = t("bundleState", { selected, total: keys.length,
+        current: next.activeKnown ? count("active") : t("unknown"), next: count("effective") });
+    }
     if (next.removing) notice(t("removing"), "pending");
     else if (!next.valid) notice(t("invalid"), "error");
     else if (next.health === "failed") notice(t("failed"), "error");
@@ -100,18 +129,19 @@
     else notice(t("ready"), "ready");
     $("health").textContent = t("health", { value: t("health." + (["passed", "checking", "failed"].includes(next.health) ? next.health : "unknown")) });
   }
-  async function update(key, value) {
+  async function update(key, value, bundle = false) {
     if (busy) return;
-    if (key && key !== "all" && !names[key]) return;
+    if (bundle ? !bundles[key] : key && key !== "all" && !names[key]) return;
     if (key === "codec2_backend" && !backendNames[value]) return;
     busy = true; controls();
     try {
-      const command = key === "codec2_backend" ? bridge + " backend " + value : key ? bridge + " set " + key + " " + (value ? "on" : "off") : bridge + " status";
+      const command = bundle ? bridge + " bundle " + key + " " + (value ? "on" : "off") : key === "codec2_backend" ? bridge + " backend " + value : key ? bridge + " set " + key + " " + (value ? "on" : "off") : bridge + " status";
       lastError = null;
       const before = state;
       const result = await exec(command);
       render(result);
-      const linked = before && key ? definitions.filter(([k]) => k !== key && k !== "codec2_backend" && before.components[k].requested === 0 && result.components[k].requested === 1).map(([k]) => k) : [];
+      const selectedKeys = bundle ? bundles[key] : [key];
+      const linked = before && key ? definitions.filter(([k]) => !selectedKeys.includes(k) && k !== "codec2_backend" && before.components[k].requested === 0 && result.components[k].requested === 1).map(([k]) => k) : [];
       const changedBackend = before && key !== "codec2_backend" && backend(before.components, "requested") !== backend(result.components, "requested") ? backend(result.components, "requested") : null;
       lastChange = key ? { linked, backend: changedBackend } : null;
       paintChanges();
@@ -121,9 +151,30 @@
       applyLanguage();
     } finally { busy = false; controls(); }
   }
-  let group = "";
-  for (const [key, category, title, description, deps] of definitions) {
-    if (!parents[key] && category !== group) { const heading = element("h2", category, "group-title"); heading.dataset.i18n = key === "libyuv" ? "group.pixels" : "group.hardware"; $("components").append(heading); group = category; }
+  const containers = new Map();
+  for (const id of [...Object.keys(bundles), "qms"]) {
+    const card = element("section", "", "bundle"); card.dataset.bundle = id;
+    const title = element("h2"), description = element("p"), scope = element("p", "", "detail");
+    title.dataset.i18n = "bundle." + id;
+    description.dataset.i18n = "bundleDesc." + id;
+    scope.dataset.i18n = "bundleScope." + id;
+    const intro = element("div"); intro.append(title, description, scope);
+    const header = element("div", "", "bundle-header"); header.append(intro); card.append(header);
+    if (id === "qms") containers.set(id, card);
+    else {
+      const toggle = element("button"); toggle.type = "button"; toggle.id = "bundle-" + id;
+      // A mixed group is a tri-state checkbox; activation selects the whole group.
+      toggle.setAttribute("role", "checkbox"); toggle.setAttribute("aria-checked", "false");
+      toggle.disabled = true; toggle.append(element("span")); header.append(toggle);
+      toggle.addEventListener("click", () => update(id, !bundles[id].every(k => state.components[k].requested === 1), true));
+      const status = element("p", "", "bundle-status"); card.append(status);
+      const detail = element("details"), summary = element("summary"); summary.dataset.i18n = "details";
+      detail.append(summary); card.append(detail); containers.set(id, detail);
+      bundleRows.set(id, { toggle, status });
+    }
+    $("components").append(card);
+  }
+  for (const [key, , title, , deps] of definitions) {
     const section = element("section", "", "component"), content = element("div");
     const heading = element("h3"), descriptionNode = element("p", "", "detail"), dependency = element("p", "", "depends");
     content.append(heading, descriptionNode, dependency);
@@ -143,7 +194,8 @@
     section.append(content, toggle);
     const wrapper = element("div", "", "tree-node"), children = element("div", "", "children");
     wrapper.dataset.component = key; wrapper.append(section, children);
-    (parents[key] ? rows.get(parents[key]).children : $("components")).append(wrapper);
+    const group = key === "display_qms" ? "qms" : key === "codec2_backend" ? "native" : Object.keys(bundles).find(id => bundles[id].includes(key));
+    containers.get(group).append(wrapper);
     rows.set(key, { toggle, current, effective, reason, section, children, heading, description: descriptionNode, dependency, deps });
   }
   function paintChanges() {
@@ -167,6 +219,10 @@
       row.toggle.setAttribute("aria-label", names[key]);
       if (key === "codec2_backend") for (const option of row.toggle.options) option.textContent = backendNames[option.value];
       if (!state) { row.current.textContent = t("current", { value: t("unknown") }); row.effective.textContent = t("next", { value: t("unknown") }); row.reason.hidden = true; }
+    }
+    for (const [id, row] of bundleRows) {
+      row.toggle.setAttribute("aria-label", t("bundle." + id));
+      if (!state) row.status.textContent = t("unknown");
     }
     if (state) render(state);
     else {

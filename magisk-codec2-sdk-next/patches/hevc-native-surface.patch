@@ -1,0 +1,73 @@
+--- a/component/video/C2RKMpiDec.cpp
++++ b/component/video/C2RKMpiDec.cpp
+@@ -1469,11 +1469,15 @@
+             C2RKChipCapDef::get()->getChipType() == RK_CHIP_3588 &&
+             pool->getLocalId() > C2BlockPool::PLATFORM_START &&
+             property_get_bool("debug.rkcodec2.av1_direct", false);
+-    if (av1Native) {
++    const bool hevcNative = mCodingType == MPP_VIDEO_CodingHEVC &&
++            C2RKChipCapDef::get()->getChipType() == RK_CHIP_3588 &&
++            pool->getLocalId() > C2BlockPool::PLATFORM_START &&
++            property_get_bool("debug.rkcodec2.hevc_native_surface", false);
++    if (av1Native || hevcNative) {
+         std::shared_ptr<C2GraphicBlock> probe;
+         buffer_handle_t handle = nullptr;
+         if (pool->fetchGraphicBlock(176, 144, HAL_PIXEL_FORMAT_YCrCb_NV12,
+-                (textureAfbcEnabled ? C2MemoryUsage(0, 0) :
++                ((textureAfbcEnabled || hevcNative) ? C2MemoryUsage(0, 0) :
+                     C2MemoryUsage(C2MemoryUsage::CPU_READ, C2MemoryUsage::CPU_WRITE)), &probe) == C2_OK &&
+                 C2RKMediaUtils::importGraphicBuffer(probe->handle(), &handle) == C2_OK) {
+             const uint64_t consumerUsage = C2RKGrallocOps::get()->getUsage(handle);
+@@ -1484,6 +1488,8 @@
+                                       GRALLOC_USAGE_SW_READ_MASK | GRALLOC_USAGE_SW_WRITE_MASK));
+             c2_info("AV1 surface consumer usage 0x%llx composer %d",
+                     (unsigned long long)consumerUsage, composerSurface);
++            if (hevcNative && (consumerUsage & (GRALLOC_USAGE_SW_READ_MASK | GRALLOC_USAGE_SW_WRITE_MASK)))
++                composerSurface = false;
+             C2RKMediaUtils::freeGraphicBuffer(handle);
+         }
+     }
+@@ -1502,6 +1508,14 @@
+                 !mIntf->getFbcDisable() && width > 0 && (width % 64) == 0 &&
+                 uint64_t(width) * height > 176u * 144u;
+         c2_info("AV1 texture AFBC eligible %d requested %d", textureAfbc, textureAfbcEnabled);
++        // The existing upstream native NV15 route is already valid when the
++        // initial profile is ten-bit. Preserve it when SPS/info-change first
++        // discovers ten-bit, only for an actual RK3588 composer consumer.
++        mHevcNativeSurface = hevcNative && composerSurface && !tunneled &&
++                !mIntf->getOutputCropEnable() && pixelFormat != HAL_PIXEL_FORMAT_YCBCR_P010;
++        if (hevcNative) c2_info("HEVC_NATIVE_SURFACE eligible=%d composer=%d explicit_p010=%d crop=%d tunnel=%d",
++                mHevcNativeSurface, composerSurface, pixelFormat == HAL_PIXEL_FORMAT_YCBCR_P010,
++                mIntf->getOutputCropEnable(), tunneled);
+         mAv1TextureAfbc = av1Native && textureAfbc && !tunneled &&
+                 !mIntf->getOutputCropEnable() && pixelFormat != HAL_PIXEL_FORMAT_YCBCR_P010;
+         mAv1VendorSurface = mCodingType == MPP_VIDEO_CodingAV1 && !tunneled &&
+@@ -2738,7 +2752,7 @@
+             mSurfaceP010Copy = true; mBufferMode = true;
+             c2_info("AV1 texture AFBC leaving width/layout contract; use full-precision copy");
+         }
+-        if (!mBufferMode && !mAv1VendorSurface && !MPP_FRAME_FMT_IS_FBC(format) &&
++        if (!mBufferMode && !mAv1VendorSurface && !mHevcNativeSurface && !MPP_FRAME_FMT_IS_FBC(format) &&
+                 ((!(format & 0x10000000u) && (format & MPP_FRAME_FMT_MASK) == MPP_FMT_YUV420SP_10BIT) ||
+                  (mAv1PpDirect && (format & MPP_FRAME_FMT_MASK) == MPP_FMT_YUV420SP))) {
+             MppBufferGroup internal = nullptr;
+@@ -2829,6 +2843,9 @@
+         goto cleanUp;
+     }
+ 
++    if (mCodingType == MPP_VIDEO_CodingHEVC && property_get_bool("debug.rkcodec2.surface_trace", false))
++        c2_info("HEVC_SURFACE_TRANSFER pts=%lld copy=%d width=%d height=%d format=0x%x",
++                (long long)pts, mBufferMode, width, height, format);
+     c2_trace("get one frame [%d:%d] stride [%d:%d] pts %lld err %d bufferId %d",
+              width, height, hstride, vstride, pts, error, bufferId);
+ 
+--- a/component/video/C2RKMpiDec.h
++++ b/component/video/C2RKMpiDec.h
+@@ -200,6 +200,7 @@
+     bool mAv1PpDirect = false;
+     bool mAv1VendorSurface = false;
+     bool mAv1TextureAfbc = false;
++    bool mHevcNativeSurface = false;
+     bool mStandardWorkFlow;
+ 
+     std::shared_ptr<C2GraphicBlock> mOutBlock;

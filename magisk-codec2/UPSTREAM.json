@@ -5,5 +5,14 @@
   "vndk_revision": "e1ba8043f8368220b412c18ee8392850ab009aae",
   "service_abi": "ARM32 installed vendor HIDL ComponentStore constructor, exactly 100 bytes; hash-pinned; interface-chain checked",
   "player_components": "original",
-  "lsposed_changes": "none"
+  "lsposed_changes": "none",
+  "local_native_surface_selection": {
+    "decode_stack": "0.8.3-test2",
+    "property": "debug.rkcodec2.native_surface_upgrade",
+    "default_when_property_absent": true,
+    "scope": "Only non-explicit-P010 Surface quality selection; preserve original explicit-P010 and buffer routes and shared P010 capability gate",
+    "new_upstream_backport": false,
+    "source": "service-src/CompatRouter.cpp",
+    "validation": "docs/validation/decode-surface-route-083.json"
+  }
 }

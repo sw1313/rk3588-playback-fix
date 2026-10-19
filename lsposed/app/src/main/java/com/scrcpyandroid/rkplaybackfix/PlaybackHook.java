@@ -6,13 +6,16 @@ import java.util.Set;
 import java.util.Enumeration;
 import java.lang.reflect.Method;
 import de.robv.android.xposed.IXposedHookLoadPackage;
+import de.robv.android.xposed.IXposedHookZygoteInit;
 import de.robv.android.xposed.XC_MethodHook;
 import de.robv.android.xposed.XSharedPreferences;
 import de.robv.android.xposed.XposedBridge;
 import de.robv.android.xposed.XposedHelpers;
 import de.robv.android.xposed.callbacks.XC_LoadPackage;
 
-public final class PlaybackHook implements IXposedHookLoadPackage {
+public final class PlaybackHook implements IXposedHookLoadPackage, IXposedHookZygoteInit {
+    private static String modulePath;
+    @Override public void initZygote(StartupParam startup) { modulePath = startup.modulePath; }
     private static final String TAG = "RKPlaybackFix";
     private static final String MODULE = "com.scrcpyandroid.rkplaybackfix";
     private final Set<String> reported = new HashSet<>();
@@ -47,6 +50,10 @@ public final class PlaybackHook implements IXposedHookLoadPackage {
         prefs = new XSharedPreferences(MODULE, "fixes");
         refresh();
         if (isYamby) {
+            YambySeekHeadFix.install(app.appInfo, app.classLoader,
+                prefs.getFile().canRead() && prefs.getBoolean("exo_seekhead", false), this::report);
+            YambyP010CopyFix.install(app.appInfo, app.classLoader, modulePath,
+                prefs.getFile().canRead() && prefs.getBoolean("hw_main10_copy", false), this::report);
             YambyCropFix.install(app.classLoader, app.appInfo != null ? app.appInfo.dataDir : null, this::report,
                 () -> { refresh(); return prefs.getFile().canRead() && prefs.getBoolean("cropfix", false); });
             boolean installed = YambySettingsPatch.install(app.classLoader, this::report,

@@ -1,0 +1,71 @@
+{
+  "date": "2026-10-19",
+  "scope": "actual QMS source-side caller, HDMI signaling, VOP timing and known fixes across other systems",
+  "status": "SOURCE_AUDIT_COMPLETE_NO_NEW_RUNTIME_CANDIDATE",
+  "report": "docs/system-hdmi-blackout-086.zh-CN.md",
+  "runtime_changed": false,
+  "physical_HDMI_blackout_fixed": false,
+  "Frame_Guard": "disabled and paused",
+  "sources": [
+    {
+      "local": "rockchip-qphost.c",
+      "url": "https://raw.githubusercontent.com/rockchip-linux/kernel/77168c8d5ab82399f65a80e9f807b50ba37cf483/drivers/gpu/drm/rockchip/dw_hdmi_qp-rockchip.c",
+      "sha256": "45ce4a6f1b699b017cddd85b7a643777f22adb72f61f6bfa24bf49af26c75203",
+      "branch_snapshot_matched": true
+    },
+    {
+      "local": "rockchip-vop2.c",
+      "url": "https://raw.githubusercontent.com/rockchip-linux/kernel/77168c8d5ab82399f65a80e9f807b50ba37cf483/drivers/gpu/drm/rockchip/rockchip_drm_vop2.c",
+      "sha256": "72968a38295f348eb9c34f7adf843a7790c3f2e9d71fe19718bf565c5955a82a",
+      "branch_snapshot_matched": true
+    },
+    {
+      "local": "rockchip-bridge.c",
+      "url": "https://raw.githubusercontent.com/rockchip-linux/kernel/77168c8d5ab82399f65a80e9f807b50ba37cf483/drivers/gpu/drm/bridge/synopsys/dw-hdmi-qp.c",
+      "sha256": "2698695816e5bd9d9de37819f232b68bf90ef4dc6796dac45aab4c966dc9553a",
+      "branch_snapshot_matched": true
+    },
+    {
+      "local": "coreelec-vrr.c",
+      "url": "https://raw.githubusercontent.com/CoreELEC/common_drivers/8a89a9aae1cb7c7993cc20b943491af435b31801/drivers/media/vout/hdmitx21/hdmi_tx_vrr.c",
+      "sha256": "df8170778972dc1d864785e36432877851ba0ad493a2c5ebece4c0ba37f195af",
+      "branch_snapshot_matched": true
+    },
+    {
+      "local": "amlogic-vrr.c",
+      "url": "https://raw.githubusercontent.com/khadas/common_drivers/3a11a86a02e759fc57fc79410215f7c0c3a0d8e0/drivers/media/vout/hdmitx21/hdmi_tx_vrr.c",
+      "sha256": "e91fb039c409d43db7ebab552a0705a872793a1f1c91588c78c1d1d08fba96d6",
+      "branch_snapshot_matched": true
+    }
+  ],
+  "upstream_fixes": [
+    {
+      "commit": "4e0263ccc16a7425028e79f35222bbf011136936",
+      "repo": "CoreELEC/common_drivers",
+      "problem": "rounded 23.976 rate lookup mismatch",
+      "local_application": "not applicable verbatim: exact rational period mapping already used"
+    },
+    {
+      "commit": "cb523b18c40c46b39834f98e9728a319c0735cd5",
+      "repo": "rockchip-linux/kernel",
+      "problem": "NULL-sentinel QMS table dereference",
+      "local_application": "bounded local table and missing-entry checks already present"
+    }
+  ],
+  "review_sources": [
+    "https://lists.openwall.net/linux-kernel/2026/09/25/158",
+    "https://lists.openwall.net/linux-kernel/2026/09/25/736"
+  ],
+  "RFC_not_stable_API": "https://lists.openwall.net/linux-kernel/2026/09/21/2590",
+  "prioritized_followups": [
+    "preserve original fault phase; verify repeated integer hardware state before permitting observation reanchor; keep fractional and native completion checks",
+    "trace actual restore reasons and keep compatible base-rate return within QMS; do not suppress app vote clear",
+    "separate remaining VTEM/AVMUTE/HDR/HDCP faults without VOP rebuild"
+  ],
+  "limits": [
+    "TV QMS-VRR recognition is not seamless acceptance",
+    "gate93 does not explain all prior observed blackouts",
+    "packet END difference not proven causal",
+    "real runtime CPU cost unmeasured"
+  ]
+}

@@ -1,0 +1,195 @@
+{
+  "component": "decode-stack",
+  "version": "0.7.5-test1",
+  "date": "2026-10-18",
+  "status": "EXPERIMENTAL_BOUNDED_SCALED_LAYER_COMPOSITION_AND_REBOOT_ROLLBACK_VERIFIED",
+  "public_release": false,
+  "source_ref": "working-tree",
+  "original_priority": 1,
+  "objective": "Reduce unnecessary CLIENT composition for otherwise eligible RK3588 scaled linear layers",
+  "switch": {
+    "name": "hwc_scaled_overlay",
+    "default": 0,
+    "dependency": "hdr_static",
+    "reboot_required": true
+  },
+  "upstream": {
+    "commit": "e3e3d168e524da25620ef55da734e48c8e56afe6",
+    "url": "https://github.com/TinkerBoard-Android/rockchip-android-hardware-rk35-hwcomposer2/commit/e3e3d168e524da25620ef55da734e48c8e56afe6",
+    "implementation": "exact-hash private variant generated at install; four-byte branch-to-NOP; original plane planner and fences retained",
+    "source_patch": "magisk-hdr/patches/e3e3d168-rk3588-scaling.patch",
+    "license": "Apache-2.0; LICENSES/hwc/"
+  },
+  "installer": {
+    "filename": "rk3588-decode-stack-0.7.5-test1.zip",
+    "sha256": "83b8deba9f6b8acfa50f0d0aa99d3dd21e0cbd4b0e895573772058b6d9ee82ee",
+    "tested_bytes_preserved": true,
+    "embedded_validation_is_pre_device_snapshot": true,
+    "addendum": "docs/decode-hwc-overlay-075.zh-CN.md",
+    "legal_addendum": "LICENSES/hwc/NOTICE.txt"
+  },
+  "full_HWC_latest_upgrade": false,
+  "VOP2_kernel_changed": false,
+  "boot_changed": false,
+  "isolated_actual_method_probe": {
+    "cases": 768,
+    "obsolete_rejections_removed": 20,
+    "other_guards_and_input_bytes_preserved": true
+  },
+  "composition": {
+    "physical_output": "3840x2160p60",
+    "logical_window": "1920x1080",
+    "source": "641x360 linear RGBA",
+    "warmup_seconds": 6,
+    "measurement_seconds_approx": 8,
+    "successful_source_posts_each": 1200,
+    "on_plane": "Esmart0 direct 641x360 to 3840x2160 stride 2624",
+    "off": {
+      "totalFrames": 488.0,
+      "missedFrames": 0.0,
+      "clientCompositionFrames": 488.0,
+      "clientCompositionReusedFrames": 0.0,
+      "averageFrameDuration": 2.1,
+      "averageRenderEngineTiming": 3.0,
+      "post2present": {
+        "n": 486,
+        "p50_ms_bucket": 32,
+        "p95_ms_bucket": 33,
+        "histogram": {
+          "31": 1,
+          "32": 446,
+          "33": 39
+        }
+      },
+      "latch2present": {
+        "n": 486,
+        "p50_ms_bucket": 15,
+        "p95_ms_bucket": 15,
+        "histogram": {
+          "15": 486
+        }
+      },
+      "present2present": {
+        "n": 486,
+        "p50_ms_bucket": 16,
+        "p95_ms_bucket": 16,
+        "histogram": {
+          "16": 486
+        }
+      },
+      "target_composition": "CLIENT",
+      "overlay_enabled": false,
+      "no_optical_measurement": true,
+      "histogram_ms_quantized_not_FPS": true
+    },
+    "on": {
+      "totalFrames": 490.0,
+      "missedFrames": 0.0,
+      "clientCompositionFrames": 0.0,
+      "clientCompositionReusedFrames": 0.0,
+      "averageFrameDuration": 1.022,
+      "averageRenderEngineTiming": 0.0,
+      "post2present": {
+        "n": 488,
+        "p50_ms_bucket": 32,
+        "p95_ms_bucket": 32,
+        "histogram": {
+          "30": 1,
+          "31": 3,
+          "32": 483,
+          "33": 1
+        }
+      },
+      "latch2present": {
+        "n": 488,
+        "p50_ms_bucket": 15,
+        "p95_ms_bucket": 15,
+        "histogram": {
+          "14": 1,
+          "15": 487
+        }
+      },
+      "present2present": {
+        "n": 488,
+        "p50_ms_bucket": 16,
+        "p95_ms_bucket": 16,
+        "histogram": {
+          "16": 487,
+          "17": 1
+        }
+      },
+      "target_composition": "DEVICE",
+      "overlay_enabled": true,
+      "no_optical_measurement": true,
+      "histogram_ms_quantized_not_FPS": true
+    },
+    "source_pixelcopy_equal": true,
+    "pixelcopy_precision_bits": 8,
+    "off_drm_snapshot_had_transient_small_plane": true,
+    "conclusion": "CLIENT work eliminated in the bounded moving-layer scene; static-cache and other compositions unchanged"
+  },
+  "latency": {
+    "improvement_accepted": false,
+    "post2present_p50_ms_bucket_off_on": [
+      32,
+      32
+    ],
+    "post2present_p95_ms_bucket_off_on": [
+      33,
+      32
+    ],
+    "reason": "unchanged median; single one-bucket tail difference insufficient for stable benefit claim",
+    "optical_measurement": false
+  },
+  "new_version_compatibility": {
+    "av1_10bit_grain": {
+      "dimensions": [
+        854,
+        480
+      ],
+      "fps": 24,
+      "queued_and_decoded": 240,
+      "complete_eos_stop": true,
+      "DRM_format": "NV15 linear Esmart"
+    },
+    "HEVC_PQ_HLG_SDR": {
+      "on_total_frames": 390,
+      "off_PQ_SDR_frames": 200,
+      "pause_seek_EOS": true,
+      "HDMI_10bit_BT2020": true,
+      "DRM_metadata_and_register_packet": true,
+      "exit_SDR": true
+    },
+    "new_optical_or_full_ten_bit_low_bit_output_precision_measurement": false
+  },
+  "rollback": {
+    "independent_switch_original_companion_hash_restored": true,
+    "whole_module_original_HWC_and_six_platform_hashes_restored": true,
+    "injected_HWC_companion_and_Codec2_plugin_absent": true,
+    "reenable_exact_variant_and_health_passed": true,
+    "Mali_cold_binding_DVFS_and_external_injection_retained": true
+  },
+  "integrity": {
+    "installer_and_eight_nested_manifests": true,
+    "retained_installed_manifest": true,
+    "generated_payload_manifest": true,
+    "active_mounted_manifest": true,
+    "Magisk_removed_root_files_excluded": [
+      "customize.sh",
+      "README.md"
+    ]
+  },
+  "controls": {
+    "Android_new_scope_assertions": 14,
+    "browser_assertions": 57
+  },
+  "open": [
+    "whole latest HWC compatibility and integration",
+    "matching vendor kernel source required for VOP2 build",
+    "odd destination width physical-video acceptance",
+    "general app/multi-layer and hotplug coverage",
+    "repeatable display latency benefit and optical measurement",
+    "existing unrelated original-player UHD pacing and HEVC HLG seek/EOS timeout"
+  ],
+  "privacy": "No original/generated factory HWC, boot, addresses, raw logs, media, signing keys or test APK in public artifacts"
+}

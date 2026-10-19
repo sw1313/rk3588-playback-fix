@@ -1,0 +1,12 @@
+{
+  "revision": "0.4.1-test2-webui1",
+  "base_runtime": "0.4.1-test2",
+  "base_installer_sha256": "2c910b965e386989501ead2e3d8d07578a187a5f9f488f75e3dc36ae86af3faf",
+  "changes": [
+    "Apply shared role=switch track and thumb styles to all three switches",
+    "Version stylesheet and translation URLs to refresh WebView caches",
+    "Describe cold binding as experimental, consistent with bounded device validation"
+  ],
+  "driver_or_boot_changes": false,
+  "selection_or_rollback_policy_changes": false
+}

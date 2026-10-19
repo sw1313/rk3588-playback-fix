@@ -1,0 +1,76 @@
+{
+  "date": "2026-10-18",
+  "status": "ROOT_CAUSE_AUDIT_AND_SOURCE_CANDIDATE_ONLY",
+  "new_installer": false,
+  "public_release": false,
+  "installed_decode_version": "0.7.8-test1",
+  "installed_mali_version": "0.4.2-test1",
+  "frame_guard_changed": false,
+  "boot_written": false,
+  "device_rebooted": false,
+  "player_libraries_replaced": false,
+  "p010_hdr": {
+    "existing_observed_path": "valid P010 and HDR metadata -> CLIENT -> NATIVE AB24 UNKNOWN SDR target -> SDR HDMI",
+    "sdr_clearing_policy_retained": true,
+    "new_read_only_drm_inventory": {
+      "planes_with_rgb10_fourcc": 8,
+      "standard_P010_fourcc_observed": false,
+      "native_NV15_observed": true,
+      "does_not_certify_scanout_or_HDR_composition": true
+    },
+    "new_egl_inventory": {
+      "configs": 25,
+      "rgb10a2_configs": 1,
+      "rgba16_configs": 1,
+      "both_wide_configs_have_window_and_pbuffer_bits": true,
+      "BT2020_PQ_extension": false,
+      "BT2020_HLG_extension": false,
+      "actual_HDR_composition_tested": false
+    }
+  },
+  "hw_main10": {
+    "current_player_version": "2.1.0.11",
+    "actual_mpv_dependency": "separate libavcodec.so",
+    "actual_avcodec_version": "Lavc62.23.102; FFmpeg N-122558-gbf4d5037b4",
+    "actual_avcodec_sha256": "d5b74992d3fa6b00ea1c7a46c2c9e025c973a2aeb57a571cbf491b9b15fd9854",
+    "actual_binary_legacy_MediaCodec_format_table_confirmed": true,
+    "P010_54_in_that_table": false,
+    "matching_source_copy_switch_has_P010": false,
+    "fresh_master_source_has_P010_copyback": false,
+    "current_original_player_reproduction_in_this_round": false,
+    "all_green_screen_cases_explained": false,
+    "fix_requires_client_compatibility_and_full_precision_output": true
+  },
+  "exo_mode_cache_candidate": {
+    "upstream": "https://github.com/rockchip-toybrick/rk_hardware_rk35_hwcomposer2/commit/de31070c66c61ee2bd90c42c6877d26c4c5d7c24",
+    "scope": "GetDisplayAttribute and SetActiveConfig look up advertised sf_modes_; omit count change",
+    "factory_hwc_sha256": "ec3e42d172af843a74bad42674d6e5932f0070873c7bb73cf681a285ada44478",
+    "scaled_overlay_hwc_sha256": "47702a172f0b95ecc88dbc60a9b42a09b80841e9b4269ce74d7af916af33901b",
+    "candidate_source": "magisk-hdr/src/mode_cache.h",
+    "regression_source": "tools/hdr-probes/mode_cache_probe.c",
+    "both_binary_variants_passed": true,
+    "factory_defect_and_control_checks_per_variant": 15,
+    "candidate_isolated_cases_per_variant": 9808,
+    "original_binary_with_fake_objects_and_mocked_DRM_updates": true,
+    "normal_attribute_and_full_object_write_equivalence": true,
+    "fractional_refresh_and_physical_DPI_checked": true,
+    "unknown_and_unadvertised_IDs_rejected": true,
+    "nonstandard_and_crop_passthrough_checked": true,
+    "no_HAL_open_or_live_DRM_access": true,
+    "live_original_fault_mode_tables_captured": false,
+    "integrated_into_HWC_adapter_or_module_startup": false,
+    "independent_switch_and_reboot_rollback_implemented": false,
+    "actual_Exo_or_HDMI_switch_regression_passed": false,
+    "verified_black_screen_fix": false
+  },
+  "private_inputs_excluded": [
+    "device addresses",
+    "raw logs",
+    "APKs",
+    "vendor binaries",
+    "EDID identity",
+    "runtime scripts"
+  ],
+  "historical_pre_install_audit": true,
+  "subsequent_installation_evidence": "decode-hwui-rgb10-079.json"
+}

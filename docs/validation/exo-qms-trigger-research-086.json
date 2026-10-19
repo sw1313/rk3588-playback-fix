@@ -1,0 +1,22 @@
+{
+  "date": "2026-10-19",
+  "status": "PRIMARY_SOURCE_RESEARCH_AND_EXISTING_LOG_CORRELATION",
+  "closest_report": "https://github.com/google/ExoPlayer/issues/7921",
+  "report_match": [
+    "play/pause refresh-mode changes and TV blanking",
+    "scrcpy image unaffected"
+  ],
+  "upstream_verdict": "device-specific platform issue; no universal Exo patch provided",
+  "source": "https://github.com/google/ExoPlayer/blob/dd430f7053a1a3958deea3ead6a0565150c06bfc/library/core/src/main/java/com/google/android/exoplayer2/video/VideoFrameReleaseHelper.java",
+  "modern_source": "https://github.com/androidx/media/blob/8c6678b657ede1e7883fc164ef73ed483c7796c3/libraries/exoplayer/src/main/java/androidx/media3/exoplayer/video/VideoFrameReleaseHelper.java",
+  "source_behavior": "renderer stop clears Surface frame-rate vote; renderer start reapplies rate; helper does not require Surface destruction",
+  "local_evidence": "test12 eight logical 24/60 switches completed; SurfaceUtils connections seen at initial decoder setup, not repeatedly at subsequent switches",
+  "inference": "Exo vote lifecycle is a stronger trigger hypothesis than generic SurfaceView pause clears pixels; actual per-call arguments and app library version not yet verified",
+  "other_report": "https://github.com/androidx/media/issues/2941",
+  "other_report_limit": "media-item transition and device/API-specific decoder reuse issue, not a directly applicable API32 RK3588 pause fix",
+  "surface_guidance": "https://developer.android.com/media/media3/ui/surface",
+  "delivery_constraints": "preserve native SurfaceView, full resolution/HDR and Auto; no app-specific vote suppression as system repair",
+  "Frame_Guard": "disabled and paused",
+  "physical_HDMI_blackout_fixed": false,
+  "scheduler_candidate": "source compiled and injected-register cases48 passed; not installed; VTEM END reverted in source only"
+}

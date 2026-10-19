@@ -1,0 +1,48 @@
+{
+  "component": "lsposed-Main10-copy",
+  "version": "0.3.6-test6",
+  "public_release": false,
+  "apk_sha256": "46cbb35d9b023dbcdd64372dd193e54f13033d2ad3fe7e66a32f368ad77a9285",
+  "native_payload_sha256": "8bfc681b7f8d7eed1a2f6e99307aca1b33d228c051db2d28db9179d030571038",
+  "source_built_client": true,
+  "exact_P010_reference_equal": true,
+  "real_app_loader_verified": true,
+  "source_and_notices_in_APK": true,
+  "stale_payload_removal_build_verified": true,
+  "original_HW_menu_visual_seek_rollback_acceptance": true,
+  "full_green_screen_fix": false,
+  "prior_test2_record": {
+    "component": "lsposed-Main10-copy",
+    "version": "0.3.6-test2",
+    "public_release": false,
+    "apk_sha256": "12cc6355c417794802b124163315135badf723ad77f77c3a8b71ff1c719afd75",
+    "native_payload_sha256": "8bfc681b7f8d7eed1a2f6e99307aca1b33d228c051db2d28db9179d030571038",
+    "source_built_client": true,
+    "exact_P010_reference_equal": true,
+    "frames": 90,
+    "samples": 124416000,
+    "real_app_loader_verified": true,
+    "source_and_notices_in_APK": true,
+    "stale_payload_removal_build_verified": true,
+    "original_HW_menu_visual_seek_rollback_acceptance": false,
+    "full_green_screen_fix": false
+  },
+  "scope": "Pinned Main10 HW copy-back only; playback and seek passed, not every green-screen cause",
+  "requires_p010_copy_pool": true,
+  "system_framework_hash_guard": true,
+  "reboot_system_item_and_whole_rollback_original_loader": true,
+  "final_payload_new_mounted_framework_precision": {
+    "4K_frames": 3,
+    "4K_samples": 37324800,
+    "HLG_720_frames": 3,
+    "HLG_720_samples": 4147200,
+    "all_bytes_equal": true
+  },
+  "historical_standalone_client_precision": {
+    "frames": 90,
+    "samples": 124416000,
+    "not_current_mounted_framework_acceptance": true
+  },
+  "current_mounted_framework_precision_frames": 6,
+  "current_mounted_framework_precision_samples": 41472000
+}

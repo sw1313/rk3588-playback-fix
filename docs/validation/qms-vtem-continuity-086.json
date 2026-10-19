@@ -1,0 +1,52 @@
+{
+  "date": "2026-10-19",
+  "version": "0.8.6-qms-test13",
+  "status": "TEST13_BOOT_QUALIFIED_USER_REPORTS_NO_PHYSICAL_IMPROVEMENT",
+  "real_boot_qualified": true,
+  "user_physical_result": "completely unchanged",
+  "source_END_trial_withdrawn": true,
+  "device_END_trial_still_loaded_until_reboot": false,
+  "post_boot_scheduler_fault": "stable integer read-only check diagnostic103 followed by VOP/PHY rebuild; scheduler bits not captured, VTEM-clear versus other-owner change remains unresolved",
+  "capture_limit": "fault preceded fresh netlink/logcat collection; full kernel ring retained",
+  "physical_HDMI_blackout_fixed": false,
+  "release_accepted": false,
+  "source_basis": "https://lists.openwall.net/linux-kernel/2026/09/21/2244",
+  "basis_status": "RFC reference plus independent Amlogic continuous END=0 implementation; sink acceptance required",
+  "difference_from_test12": "VTEM data-set END bit only: 0xc6 -> 0x86; packet FIRST/LAST unchanged; exact readback verifier matches generator",
+  "retained": [
+    "test12 integer-notice reanchor",
+    "same HWC binary",
+    "same boot",
+    "same test11 ART settings repair",
+    "same Next_TFR and M_CONST state machine",
+    "same native commit/latch/fences",
+    "same g18 GPU KMD/userspace and DVFS",
+    "Frame Guard disabled and paused"
+  ],
+  "pairing": {
+    "profile_id": "bdc1b81df3b459ca96b4f66106c65db6336f5a15f352e08a77939583c74e097e",
+    "helper_sha256": "3d1acdbd16f71289ddbd8f5fb9156e9f77cd7d791214ad0232545e09fd7ad5fb",
+    "module_sha256": "45ffdfb0493ce3d0a6d6246c18d9513ce78fd67ed8a61ebff2018a5caab2902d",
+    "hwc_sha256": "b34b647f6664de292c5f10d3d75b1a0bb5ae69c33960e088530ecb8ad96102e9",
+    "image_sha256": "d9b764ad8342ce71ddde45bc0978e548ae636ce6d01fb4bf3f426eba5fff0740"
+  },
+  "Mali_version": "0.4.2-qms-test15; exact tuple registration only",
+  "tests": {
+    "rational_table_cycles": 66,
+    "switch_restore_scenarios": 738,
+    "stable_frames": 94464,
+    "engine_publication_cases": 33,
+    "native_register_lifecycle_injected_device_cases": 46,
+    "exact_pair_isolated_device_cases": 15
+  },
+  "preceding_test12_result": {
+    "QMS_requests_completed": 8,
+    "frame_errors": 0,
+    "notice_reanchor_exercised": false,
+    "VOP_PHY_rebuild_observed": false,
+    "connection_events_observed": false,
+    "user_physical_report": "play/pause/step short blackout persists"
+  },
+  "rollback": "private previous-module backups and existing per-item/whole-module reboot disable retained; not a claim of candidate-specific actual rollback acceptance",
+  "withdrawal": "Withdrawn by real test14 boot; vendor END=1 generator and verifier loaded together"
+}

@@ -1,0 +1,35 @@
+{
+  "date": "2026-10-19",
+  "revision": "controls-groups1",
+  "installed": true,
+  "reboot_performed": false,
+  "runtime_versions": {
+    "decode": "0.8.6-qms-test8",
+    "mali": "0.4.2-qms-test12"
+  },
+  "preserved_existing_selections": true,
+  "individual_rollback_retained": true,
+  "QMS_never_enabled_by_bundles": true,
+  "QMS_candidate_not_booted": true,
+  "browser_decode_assertions": 90,
+  "browser_mali_assertions": 39,
+  "real_Android_isolated_bundle_assertions": 41,
+  "live_bridge_status_readback": true,
+  "live_source_files_verified": 10,
+  "rollback_script_prepared_and_syntax_checked": true,
+  "manual_post_install_UI_rollback_executed": false,
+  "kernel_candidate": {
+    "controller_cases": 19,
+    "endpoint_cases": 11,
+    "exact_Image_import_CRCs": 74,
+    "Mali_pair_checker_cases": 15,
+    "hardware_IO_in_fixtures": false,
+    "real_playback_cost_measured": false
+  },
+  "current_test8_idle_CPU_observation": {
+    "seconds": 15.22,
+    "CPU_ticks_delta": 0,
+    "scope": "idle only; not playback or candidate acceptance"
+  },
+  "physical_HDMI_no_blackout_accepted": false
+}

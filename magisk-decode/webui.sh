@@ -7,7 +7,7 @@ if [ "$CURRENTROOT" = "/data/adb/modules/${CURRENTROOT##*/}" ] && [ -f "$NEXTROO
  MODROOT=$NEXTROOT
 fi
 . "$MODROOT/common.sh"
-keys='mpp rga codec2 codec2_sdk codec2_sdk_next codec2_buffer libyuv software hdr_static hdr10plus p010_fast av1_native av1_grain av1_afbc'
+keys='mpp rga codec2 codec2_sdk codec2_sdk_next codec2_buffer libyuv software hdr_static hdr10plus p010_fast av1_native av1_grain av1_afbc av1_texture_afbc codec2_lifecycle hwc_metadata_reuse hwc_scaled_overlay hwc_mode_cache hwc_client_hdr10 hwui_rgb10 gralloc_hdr_lease codec2_delay_notify hevc_native_surface hevc_eos_pending p010_pairs p010_copy_pool codec2_surface codec2_native_backpressure hdmi_audio_guard display_qms display_policy display_session'
 version() {
  v=$(sed -n 's/^version=//p' "$1/module.prop" 2>/dev/null)
  case "$v" in ''|*[!0-9A-Za-z._+-]*) printf 'unknown' ;; *) printf '%s' "$v" ;; esac
@@ -16,9 +16,28 @@ effective() {
  case "$1" in
  mpp) echo "$MPP" ;; rga) echo "$RGA" ;; codec2) echo "$C2" ;;
  codec2_sdk) echo "$SDK" ;; codec2_sdk_next) echo "$SDK_NEXT" ;;
+ codec2_surface) echo "$SURFACE" ;;
+ codec2_native_backpressure) echo "$NATIVE_BP" ;;
  codec2_buffer) echo "$BUFFER" ;; libyuv) echo "$YUV" ;; software) echo "$SOFT" ;;
  hdr_static) echo "$HDR_STATIC" ;; hdr10plus) echo "$HDR_PLUS" ;; p010_fast) echo "$P010_FAST" ;;
  av1_native) echo "$AV1_NATIVE" ;; av1_grain) echo "$AV1_GRAIN" ;; av1_afbc) echo "$AV1_AFBC" ;;
+ av1_texture_afbc) echo "$AV1_TEXTURE_AFBC" ;;
+ codec2_lifecycle) echo "$LIFECYCLE" ;;
+ hwc_metadata_reuse) echo "$HWC_REUSE" ;;
+ hwc_scaled_overlay) echo "$HWC_SCALE" ;;
+ hwc_mode_cache) echo "$HWC_MODE_CACHE" ;;
+ hwc_client_hdr10) echo "$HWC_CLIENT_HDR" ;;
+ hwui_rgb10) echo "$HWUI_RGB10" ;;
+ gralloc_hdr_lease) echo "$GRALLOC_HDR_LEASE" ;;
+ codec2_delay_notify) echo "$DELAY_NOTIFY" ;;
+ hevc_native_surface) echo "$HEVC_NATIVE" ;;
+ hevc_eos_pending) echo "$HEVC_EOS" ;;
+ p010_pairs) echo "$P010_PAIRS" ;;
+ p010_copy_pool) echo "$P010_POOL" ;;
+ hdmi_audio_guard) echo "$HDMI_GUARD" ;;
+ display_qms) echo "$DISPLAY_QMS" ;;
+ display_policy) echo "$DISPLAY_POLICY" ;;
+ display_session) echo "$DISPLAY_SESSION" ;;
  esac
 }
 bit() {
@@ -71,6 +90,14 @@ status() {
   if [ "$active_known" = true ]; then
    active=0
    [ "$active_enabled" = false ] || active=$(bit "$CURRENTROOT/active-config" "$key")
+   if [ "$key" = display_qms ] && [ "$active" = 1 ]; then
+    [ "$(cat /sys/module/rk_decode_qms/parameters/owner_online 2>/dev/null)" = 1 ] &&
+     [ "$(getprop vendor.rkhdr.qms_boot)" = "$boot" ] &&
+     [ "$(getprop vendor.rkhdr.qms)" = active ] || active=0
+   fi
+   if [ "$key" = display_session ] && [ "$active" = 1 ]; then
+    [ "$(getprop vendor.rkdecode.refresh_session)" = active ] || active=0
+   fi
   fi
   [ "$next" = "$active" ] || pending=true
   printf '%s"%s":{"requested":%s,"effective":%s,"active":%s}' "$sep" "$key" "$requested" "$next" "$active"
@@ -79,6 +106,15 @@ status() {
  printf '},"pendingReboot":%s}\n' "$pending"
 }
 case "$1" in
+ bundle)
+  [ "$#" = 3 ] || exit 2
+  . "$MODROOT/bundles.sh"
+  bundle_members "$2" >/dev/null || exit 2
+  case "$3" in on|off) ;; *) exit 2 ;; esac
+  [ ! -e "$CURRENTROOT/remove" ] && [ ! -e "$MODROOT/remove" ] || exit 3
+  sh "$CURRENTROOT/mode-control.sh" bundle "$2" "$3" >&2 || exit $?
+  status
+  ;;
  status) [ "$#" = 1 ] || exit 2; status ;;
  backend)
   [ "$#" = 2 ] || exit 2

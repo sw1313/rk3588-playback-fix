@@ -1,0 +1,113 @@
+{
+  "component": "decode-stack",
+  "version": "0.7.3-test1",
+  "date": "2026-10-18",
+  "status": "EXPERIMENTAL_BOUNDED_TRANSFER_HDR_PRECISION_AND_REBOOT_ROLLBACK_VERIFIED",
+  "public_release": false,
+  "source_ref": "working-tree",
+  "switch": {
+    "name": "gralloc_hdr_lease",
+    "default": 0,
+    "dependencies": [
+      "hdr_static",
+      "codec2_sdk_next"
+    ],
+    "reboot_required": true
+  },
+  "installer": {
+    "filename": "rk3588-decode-stack-0.7.3-test1.zip",
+    "sha256": "2449a55cdc596210ccc5baead650942dd8c2a4da04aa610e07337a44b62261cc",
+    "tested_bytes_preserved": true,
+    "embedded_validation_is_pre_device_snapshot": true,
+    "addendum": "docs/decode-gralloc-transfer-073.zh-CN.md"
+  },
+  "native_core_sha256": "e8542a427688ce60191489b00a6af7152e3b2c3b5bdcdfd4981c32955faa2c6e",
+  "source_scope": "Local current-OutBuffer mapper-import ownership transfer only; no full Gralloc/SDK update",
+  "provenance": "magisk-codec2-sdk-next/UPSTREAM.json#gralloc_hdr_transfer",
+  "controls": {
+    "browser_assertions": 53,
+    "Android_shell_assertions": 17,
+    "isolated_fixtures": true,
+    "live_bridge_state_and_switches_checked": true
+  },
+  "transfer_samples": {
+    "on": {
+      "scope": "Captured runtime trace sample; not full-frame census or FPS measurement",
+      "mode": "on",
+      "borrowed": 908,
+      "extra_import": 0,
+      "store_failure": false,
+      "cases": 6
+    },
+    "off_after_reboot": {
+      "scope": "Captured runtime trace sample; not full-frame census or FPS measurement",
+      "mode": "off",
+      "borrowed": 0,
+      "extra_import": 719,
+      "store_failure": false,
+      "cases": 6
+    },
+    "reenabled": {
+      "scope": "Captured runtime trace sample; not full-frame census or FPS measurement",
+      "mode": "on",
+      "borrowed": 209,
+      "extra_import": 0,
+      "store_failure": false,
+      "cases": 2
+    }
+  },
+  "HDR_on_and_off": {
+    "cases_per_mode": 6,
+    "reported_frames_per_mode": 690,
+    "same_surface": true,
+    "PQ1000_PQ4000_PQ_no_master_HLG_SDR_and_PQ_reentry": true,
+    "pause_seek_EOS_and_exit_SDR": true,
+    "InfoFrame_fields_match_on_off": true,
+    "HDR_10bit_BT2020_configuration_preserved": true,
+    "external_wire_optical_measurement": false
+  },
+  "precision": {
+    "hdr6": {
+      "samples": 74649600,
+      "bits": 10,
+      "exact": true
+    },
+    "eight3": {
+      "samples": 39813120,
+      "bits": 8,
+      "exact": true
+    }
+  },
+  "lifetime": {
+    "flush_32_empty_inputs_then_60_frames_and_EOS": true,
+    "held_output_stop_rounds_on": 6,
+    "held_output_stop_rounds_off": 6,
+    "long_duration_leak_claim": false,
+    "observation": "Process ashmem FD retention observed in both modes; not attributed to this optimization or claimed fixed"
+  },
+  "rollback": {
+    "independent_off_and_reenable_reboots_verified": true,
+    "whole_module_disable_verified": true,
+    "original_HWC_and_six_platform_library_hashes_restored": true,
+    "injected_plugin_and_companion_absent": true,
+    "new_property_cleared": true,
+    "boot_bytes_unchanged": true,
+    "Mali_cold_and_external_Zygisk_LSPosed_retained": true
+  },
+  "final_state": {
+    "version": "0.7.3-test1",
+    "gralloc_hdr_lease": 1,
+    "health": "passed",
+    "pending_reboot": false,
+    "Mali_cold": "on",
+    "GPU_DVFS_polling_ms": 20,
+    "external_injection": "passed"
+  },
+  "limitations": [
+    "Exact firmware and installed graphics combination only; experimental, not stable/public release",
+    "No FPS, total-memory-bandwidth or complete mapper-import reduction claim",
+    "Not long-duration or all-player validation; no physical HDMI measurement",
+    "Historical UHD player image acquisition and HEVC HLG seek/EOS queue timeout remain unresolved",
+    "Initial old hdr4000-input sample failed to establish expected output and is excluded; exact direct fixtures used for both counted modes"
+  ]
+}

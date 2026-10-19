@@ -1,0 +1,255 @@
+{
+  "component": "decode-stack",
+  "version": "0.7.2-test1",
+  "date": "2026-10-18",
+  "status": "experimental-hwc-metadata-reuse-bounded-validation-complete",
+  "public_release": false,
+  "source_ref": "working-tree",
+  "core_sha256": "36b7b3e385f725067412fcf5cb5405c06ecb2eb0e149512c70c4927b8950960f",
+  "switch": {
+    "name": "hwc_metadata_reuse",
+    "default": 0,
+    "requires": "hdr_static",
+    "reboot_required": true
+  },
+  "scope": "Local live HDR blob byte comparison and borrowed ID reuse; original commit and fences retained; not a VOP2 kernel replacement",
+  "new_validation": {
+    "isolated_actual_hook_cases": 16,
+    "android_control_assertions": 14,
+    "live_display": true,
+    "reboot_rollback": true,
+    "browser_assertions": 51,
+    "independent_reboot_rollback": true,
+    "whole_module_rollback": {
+      "original_hwc_restored": true,
+      "injected_companion_absent": true,
+      "new_property_cleared": true,
+      "mali_guard_event": "Existing Mali controller exited before transition while Decode Stack disabled; stock GPU retained. Original requested next kernel/DVFS restored and qualified after Decode Stack re-enable."
+    },
+    "surface_capture_comparisons": {
+      "count": 5,
+      "pixels_per_image": 921600,
+      "exact": true,
+      "precision": "8-bit PixelCopy; not a ten-bit sample comparison",
+      "hlg_capture": "unsupported, error 3; not included"
+    },
+    "off_path_sample": {
+      "hdr_commits": 840,
+      "reused": 0,
+      "created": 840,
+      "rejected": 0
+    },
+    "hdr_checks": {
+      "same_surface_cases_per_mode": 7,
+      "modes_tested": [
+        "reuse enabled after reboot",
+        "reuse disabled after reboot"
+      ],
+      "scenarios": [
+        "HLG",
+        "PQ 1000 nit",
+        "PQ 4000 nit",
+        "PQ no mastering metadata",
+        "SDR",
+        "PQ re-entry",
+        "HLG re-entry"
+      ],
+      "pause_seek_eos": true,
+      "hdr_link_config": "10-bit BT.2020",
+      "hdmi_infoframe_register_checksum": true,
+      "wire_or_optical_measurement": false,
+      "sdr_on_exit": true
+    },
+    "final_on_sample": {
+      "hdr_commits": 840,
+      "reused": 834,
+      "created": 6,
+      "rejected": 0,
+      "created_reduction_vs_one_create_per_commit_percent": 99.2857,
+      "trace_counters_sampled_every": 120
+    },
+    "final_reenable_same_surface_cases": 7,
+    "final_state": {
+      "decode_version": "0.7.2-test1",
+      "hwc_metadata_reuse": 1,
+      "av1_texture_afbc": 1,
+      "codec2_lifecycle": 1,
+      "mali_userspace": "active",
+      "mali_kernel": "active",
+      "mali_dvfs": "active",
+      "pending_reboot": false
+    },
+    "evidence_scope": "New HWC tests only; prior Codec2 validation retained below as historical evidence, not recounted"
+  },
+  "prior_codec2_validation": {
+    "component": "decode-stack",
+    "version": "0.7.1-test1",
+    "date": "2026-10-18",
+    "status": "experimental-bounded-upstream-backports-validated",
+    "public_release": false,
+    "source_ref": "working-tree",
+    "core_sha256": "36b7b3e385f725067412fcf5cb5405c06ecb2eb0e149512c70c4927b8950960f",
+    "reported_sdk_base": "1.14.16_[0]",
+    "switch": {
+      "name": "codec2_lifecycle",
+      "default": 0,
+      "requires": "codec2_sdk_next",
+      "reboot_required": true
+    },
+    "upstream_commits": [
+      {
+        "commit": "894f5b7ca773c646758ba91fbdea6eb5370f17e4",
+        "source": "https://github.com/Lineage-Rockchip/android_hardware_rockchip_codec2/commit/894f5b7ca773c646758ba91fbdea6eb5370f17e4",
+        "subject": "[C2RKMpiDec]: optimize buffer management",
+        "scope": "takeBlock ownership transfer",
+        "author": "Chen Jinsen",
+        "date": "2025-10-21T08:43:53Z"
+      },
+      {
+        "commit": "e577f69d04d7435a8e4a1088337ff2ed92a3a7e1",
+        "source": "https://github.com/Lineage-Rockchip/android_hardware_rockchip_codec2/commit/e577f69d04d7435a8e4a1088337ff2ed92a3a7e1",
+        "subject": "[C2RKMpiDec]: Fix input/output work count mismatch",
+        "scope": "empty non-EOS input completion only; other workflow restructuring excluded",
+        "author": "Chen Jinsen",
+        "date": "2025-11-14T03:02:55Z"
+      },
+      {
+        "commit": "f5e25f2fbf34ee41dbd083af6f58d6c6b22156cb",
+        "source": "https://github.com/Lineage-Rockchip/android_hardware_rockchip_codec2/commit/f5e25f2fbf34ee41dbd083af6f58d6c6b22156cb",
+        "subject": "[C2RKMpiDec]: Fix flush indices missing issue",
+        "scope": "pending-work removal and flush-flag serialization only; tunnel/drop handling excluded",
+        "author": "Chen Jinsen",
+        "date": "2025-11-19T06:09:55Z"
+      },
+      {
+        "commit": "9581b4ac11fae9ee81467bec3cc542466593bee8",
+        "source": "https://github.com/Lineage-Rockchip/android_hardware_rockchip_codec2/commit/9581b4ac11fae9ee81467bec3cc542466593bee8",
+        "subject": "[C2RKMpiDec]: Set flushing state control during release",
+        "scope": "set flushing state before release handler and clear after reply",
+        "author": "Chen Jinsen",
+        "date": "2025-12-03T03:44:58Z"
+      }
+    ],
+    "local_companion": "Cancel C2_BLOCKING and packet backpressure retries on lifecycle requests; fast busy-pool backoff; no legitimate pause timeout or skipped fence",
+    "environment": {
+      "soc": "RK3588",
+      "android_api": 32,
+      "kernel": "5.10.66",
+      "graphics": "Mali Global 0.3.1-test1 g18 userspace plus paired next kernel/CSF; 20ms polling"
+    },
+    "targeted_trigger": {
+      "before_existing_core": {
+        "empty_submitted": 21,
+        "real_packets": 0,
+        "output_frames": 0,
+        "timeout_seconds": 12,
+        "stop_success": true
+      },
+      "new_flag_on": {
+        "empty_submitted": 32,
+        "real_packets": 60,
+        "output_frames": 60,
+        "images": 60,
+        "eos": true,
+        "stop_success": true
+      },
+      "flush_seek": {
+        "empty_submitted_per_phase": 32,
+        "before_flush_frames": 12,
+        "after_seek_frames": 60,
+        "images_total": 72,
+        "eos": true,
+        "stop_success": true
+      }
+    },
+    "held_surface_output_stop": {
+      "av1_ten_bit_rounds": 6,
+      "avc_eight_bit_rounds": 3,
+      "all_passed": true,
+      "stop_ms": [
+        9.218,
+        5.331,
+        6.406,
+        8.557,
+        2.789,
+        8.655,
+        7.255,
+        8.36,
+        5.445
+      ],
+      "stop_min_ms": 2.789,
+      "stop_max_ms": 9.218,
+      "stop_median_ms": 7.255,
+      "actual_cancel_log_count": 9,
+      "no_previous_stop_performance_comparison": true
+    },
+    "precision": {
+      "ten_bit": {
+        "frames": 6,
+        "samples": 74649600,
+        "all_exact": true,
+        "pq_metadata_present": true
+      },
+      "eight_bit": {
+        "frames": 3,
+        "samples": 39813120,
+        "all_exact": true
+      },
+      "total_samples": 114462720,
+      "method": "Actual AFBC buffers, RGA synchronous decompression, codec crop matched by PTS; compared with existing independent FFmpeg references for the same clips"
+    },
+    "controls": {
+      "isolated_android_shell_assertions": 15,
+      "browser_assertions": 49,
+      "live_module_modified_by_fixtures": false
+    },
+    "helper": {
+      "arm32_assertions": 16,
+      "arm64_assertions": 16,
+      "controlled_busy_pool_only": true,
+      "playback_performance_claim": false
+    },
+    "rollback": {
+      "off_reboot": true,
+      "on_reboot": true,
+      "same_core_binary": true,
+      "off_restored_trigger": {
+        "empty_submitted": 21,
+        "real_packets": 0,
+        "output_frames": 0,
+        "elapsed_seconds": 12,
+        "stop_success": true
+      },
+      "reenabled": {
+        "empty_submitted": 32,
+        "real_frames": 60,
+        "eos": true,
+        "stop_success": true
+      },
+      "previous_texture_and_mali_selections_retained": true
+    },
+    "previous_texture_validation": "docs/validation/decode-texture-afbc-070.json",
+    "limitations": [
+      "Partial, explicitly scoped upstream backports; no full SDK upgrade or CTS/VTS claim.",
+      "Busy-pool cancellation only acts after a backend call returns; no guarantee against a hung ioctl/fence.",
+      "No general game FPS, all-player compatibility, long stress or HDMI wire precision claim.",
+      "Old original-player UHD image acquisition timeouts not claimed resolved.",
+      "Early ImageReader no-acquisition trial is excluded from the nine held-output cancellation cases."
+    ],
+    "final_state": {
+      "version": "0.7.1-test1",
+      "codec2_lifecycle": 1,
+      "av1_texture_afbc": 1,
+      "pending_reboot": false
+    }
+  },
+  "limitations": [
+    "No physical hotplug or multi-output device test",
+    "No optical HDMI or ten-bit sample-by-sample scanout measurement",
+    "Five exact captures are eight-bit PixelCopy only; HLG capture unsupported",
+    "Existing UHD HDR image acquisition/pacing issue remains unresolved",
+    "No general latency or FPS improvement claim",
+    "With Decode Stack disabled, the existing Mali guard failed early before GPU handover in this boot; original HWC rollback succeeded. This is retained as a compatibility limit, not hidden as a passing GPU boot."
+  ],
+  "hwc_adapter_sha256": "f02b3a082cb5bf021e51b81ef239d838650175f70db67eb8eff5834bae27669d"
+}

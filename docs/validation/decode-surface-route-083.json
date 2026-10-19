@@ -1,0 +1,53 @@
+{
+  "component": "decode-stack-native-surface-route-selection",
+  "version": "0.8.3-test2",
+  "date": "2026-10-19",
+  "status": "CANDIDATE_NOT_YET_DEVICE_ACCEPTED",
+  "public_release": false,
+  "new_codec_binary": false,
+  "new_upstream_backport": false,
+  "switch": {
+    "name": "codec2_surface",
+    "default": 0,
+    "dependencies": [
+      "codec2"
+    ],
+    "reboot_required": true,
+    "property": "debug.rkcodec2.native_surface_upgrade",
+    "off_route": "Existing firmware decoder for non-explicit-P010 Surface output",
+    "on_route": "Existing source-built quality decoder for Surface output; known errors remain",
+    "preserved": [
+      "explicit P010 quality route",
+      "P010 pool",
+      "MPP/RGA",
+      "HDR selections"
+    ],
+    "suppressed_native_features": [
+      "hevc_native_surface",
+      "av1_native",
+      "av1_afbc",
+      "av1_texture_afbc"
+    ]
+  },
+  "Frame_Guard": "disabled throughout current diagnosis and acceptance",
+  "player_operations": "User only; no screenshot, recording, or remote input",
+  "codec_queue_root_fixed": false,
+  "precise_seek_fixed": false,
+  "physical_HDMI_timing_blank_fixed": false,
+  "pre_candidate_evidence": {
+    "latest_core_pause_queue_fatal": true,
+    "prior_SDK_seek_error_0xe": true,
+    "whole_Decode_off_user_seek_codec_error_reproduced": false,
+    "MPP_RGA_on_Codec2_and_HDR_off_user_seek_codec_error_reproduced": false,
+    "seek_returns_to_start_in_both_controls": true,
+    "bounded_controls_are_not_long_term_acceptance": true
+  },
+  "candidate_device_acceptance": "pending",
+  "isolated_control_assertions": 25,
+  "isolated_controls_not_player_acceptance": true,
+  "browser_assertions": 79,
+  "unchanged_existing_ELF_payloads": 39,
+  "retained_P010_gate": "debug.rkcodec2.surface_upgrade follows codec2, independently of codec2_surface",
+  "changed_ELF": "Firmware-pinned Codec2 HIDL compatibility service routing only; all decoder cores unchanged",
+  "rejected_test1": "Native rollback reused shared P010 gate; bounded Exo no error but HW prerequisite was disabled. Not accepted."
+}

@@ -1,0 +1,205 @@
+{
+  "component": "decode-stack",
+  "version": "0.7.6-test1",
+  "date": "2026-10-18",
+  "source_ref": "working-tree",
+  "status": "EXPERIMENTAL_BOUNDED_LATE_PROFILE_HEVC_NATIVE_OUTPUT_AND_REBOOT_ROLLBACK_VERIFIED",
+  "public_release": false,
+  "original_priorities": [
+    1,
+    2
+  ],
+  "objective": "Eliminate full-frame P010 CPU conversion and CLIENT composition for late-discovered ten-bit HEVC on a qualifying native composer Surface",
+  "switch": {
+    "name": "hevc_native_surface",
+    "default": 0,
+    "dependencies": [
+      "codec2_sdk_next",
+      "hdr_static"
+    ],
+    "reboot_required": true
+  },
+  "installer": {
+    "filename": "rk3588-decode-stack-0.7.6-test1.zip",
+    "sha256": "85a23fd68c752c00fbe91e11e223657201799b6bba94556f3cdbfd0c35ad569b",
+    "tested_bytes_preserved": true,
+    "embedded_validation_is_pre_device_snapshot": true,
+    "addendum": "docs/decode-hevc-native-076.zh-CN.md"
+  },
+  "core_sha256": "2be6e10dc49fe6240caadab8fb6a1e80401d6fbf279278fd1c4ee4dd7ebb63cd",
+  "provenance": {
+    "upstream_repository": "https://github.com/khadas/android_vendor_rockchip_hardware_interfaces_codec2",
+    "upstream_commit": "e3c30156793f778541b6eaec54ac2a1ac0f6a70c",
+    "new_direct_upstream_backport": false,
+    "new_implementation": "Local API32 copy-protection guard correction preserving the existing upstream native NV15 path across late ten-bit info-change. Native output with an initially declared ten-bit profile already worked and is not a new benefit.",
+    "patch": "magisk-codec2-sdk-next/patches/hevc-native-surface.patch",
+    "upstream_license": "Apache-2.0; existing file-level and LICENSES/codec2_sdk_next notices retained"
+  },
+  "qualification": {
+    "RK3588": true,
+    "HEVC_only": true,
+    "actual_composer_consumer_required": true,
+    "CPU_and_encoder_usage_rejected": true,
+    "tunnel_explicit_P010_and_output_crop_excluded": true,
+    "GPU_only_texture_retains_previous_path": true,
+    "FBC_requests_unchanged": true,
+    "output_reference_slots_and_fences_unchanged": true
+  },
+  "new_path": {
+    "frames_traced": 90,
+    "CPU_copy_frames": 0,
+    "format": "NV15",
+    "plane": "Esmart",
+    "source_and_destination": "3840x2160",
+    "byte_stride": 4864,
+    "physical_output": "3840x2160p60",
+    "EOS_and_stop": true
+  },
+  "controlled_workload": {
+    "source": "same 3840x2160 30fps ten-bit HEVC compressed packets repeated without reencoding",
+    "frames_each": 360,
+    "source_duration_seconds": 12,
+    "same_linear_request_and_unspecified_profile": true,
+    "off": {
+      "native_enabled": false,
+      "queued_and_decoded_frames": 360,
+      "target_composition": "CLIENT",
+      "codec_service_cpu_seconds": 4.21,
+      "cpu_scope": "whole C2 service including initialization/stop; not isolated conversion timer or general FPS",
+      "measurement_wall_seconds": 13.96900000000096,
+      "CPU_ticks_per_second": 100,
+      "late_delivery_gt20ms": 0,
+      "scheduled_source_span_seconds": 11.966666
+    },
+    "on_first": {
+      "native_enabled": true,
+      "queued_and_decoded_frames": 360,
+      "target_composition": "DEVICE",
+      "codec_service_cpu_seconds": 0.28,
+      "cpu_scope": "whole C2 service including initialization/stop; not isolated conversion timer or general FPS",
+      "measurement_wall_seconds": 13.421999999998661,
+      "CPU_ticks_per_second": 100,
+      "late_delivery_gt20ms": 0,
+      "scheduled_source_span_seconds": 11.966666
+    },
+    "on_after_reenable": {
+      "native_enabled": true,
+      "queued_and_decoded_frames": 360,
+      "target_composition": "DEVICE",
+      "codec_service_cpu_seconds": 0.27,
+      "cpu_scope": "whole C2 service including initialization/stop; not isolated conversion timer or general FPS",
+      "measurement_wall_seconds": 13.84400000000096,
+      "CPU_ticks_per_second": 100,
+      "late_delivery_gt20ms": 0,
+      "scheduled_source_span_seconds": 11.966666
+    },
+    "CPU_scope": "whole Codec2 service including setup/stop, not isolated conversion timing or general FPS; casting environment retained",
+    "conclusion": "bounded CPU-work reduction and CLIENT-to-DEVICE transition verified; no universal playback FPS claim"
+  },
+  "pixel_precision": {
+    "groups": [
+      {
+        "case": "4k-on",
+        "frames": 3,
+        "samples": 37324800,
+        "expected_HAL_format": 23,
+        "exact": true
+      },
+      {
+        "case": "gradient-on",
+        "frames": 3,
+        "samples": 37324800,
+        "expected_HAL_format": 23,
+        "exact": true
+      },
+      {
+        "case": "hdr-on",
+        "frames": 6,
+        "samples": 8294400,
+        "expected_HAL_format": 23,
+        "exact": true
+      },
+      {
+        "case": "texture-on",
+        "frames": 3,
+        "samples": 37324800,
+        "expected_HAL_format": 54,
+        "exact": true
+      },
+      {
+        "case": "explicit-on",
+        "frames": 3,
+        "samples": 37324800,
+        "expected_HAL_format": 54,
+        "exact": true
+      },
+      {
+        "case": "4k-off",
+        "frames": 3,
+        "samples": 37324800,
+        "expected_HAL_format": 54,
+        "exact": true
+      }
+    ],
+    "frames_total": 21,
+    "samples_total": 194918400,
+    "all_exact_against_independent_software_decoder": true,
+    "gradient_nonzero_low_two_bit_samples": 27993600,
+    "texture_and_explicit_P010_each_nonzero_low_two_bit_samples": 21252105,
+    "HDR_720_reference_low_two_bits_all_zero": true,
+    "acquire_fence_wait_and_DMA_BUF_read_sync_retained": true,
+    "mapper_plane_offsets_and_strides_used": true,
+    "optical_HDMI_or_panel_precision_measurement": false
+  },
+  "HDR": {
+    "new_late_profile_linear_configuration": true,
+    "PQ_frames": 100,
+    "HLG_frames": 190,
+    "SDR_frames": 100,
+    "pause_resume_flush_seek_EOS": true,
+    "HDMI_10bit_BT2020": true,
+    "DRM_blob_and_register_packet_checksum": true,
+    "exit_SDR": true
+  },
+  "rollback": {
+    "independent_off_restores_P010_and_CLIENT": true,
+    "independent_off_exact_samples": true,
+    "whole_module_original_HWC_and_six_platform_hashes_restored": true,
+    "injected_HWC_companion_and_Codec2_plugin_absent": true,
+    "new_property_cleared": true,
+    "reenable_native_path_restored": true,
+    "boot_and_Mali_runtime_unchanged": true,
+    "external_Zygisk_Next_LSPosed_healthy": true
+  },
+  "controls": {
+    "Android_isolated_assertions": 17,
+    "browser_assertions": 59,
+    "default_off_and_dependency_and_reboot_status_verified": true
+  },
+  "integrity": {
+    "installer_and_eight_component_manifests": true,
+    "installed_retained_files_and_generated_payload_and_mounted_files": true,
+    "Magisk_removed_root_files_excluded": [
+      "customize.sh",
+      "README.md"
+    ]
+  },
+  "new_display_latency_measurement": false,
+  "full_latest_HWC_upgrade": false,
+  "VOP2_kernel_changed": false,
+  "whole_Codec2_SDK_version_upgrade": false,
+  "open": [
+    "universal app/multi-layer plane exhaustion, rotation and hotplug",
+    "long-duration power/thermal behavior",
+    "optical HDMI/panel validation and stable display-latency benefit",
+    "original-player GPU-only UHD acquisition timeout remains outside this option",
+    "whole latest HWC and VOP2 kernel upgrade",
+    "historical HEVC HLG seek/EOS queue timeout in other paths is not claimed fixed"
+  ],
+  "invalid_attempts_not_counted": [
+    "initial known-profile diagnostic expected 100 but source contains 90 frames",
+    "HDR rerun reused an old case label; fresh-case full run required",
+    "ten-bit HDR reference with zero low bits was not used alone to prove low-bit preservation"
+  ],
+  "privacy": "No device addresses, raw logs, media, private keys, test APKs, boot or original firmware blobs in delivery"
+}

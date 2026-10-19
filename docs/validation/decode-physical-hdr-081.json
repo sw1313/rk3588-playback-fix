@@ -1,0 +1,186 @@
+{
+  "component": "decode-stack-physical-HDR",
+  "version": "0.8.1-test7",
+  "date": "2026-10-19",
+  "public_release": false,
+  "status": "PRIMARY_10BIT_HDR_CHAIN_AND_REBOOT_ROLLBACK_PASSED_COLORIMETRY_BOUNDED",
+  "tested_installer_immutable": true,
+  "installer_sha256": "537955df1e784b5b127025d5c602d744115711bce7b8e445c113c76f37ff4d7c",
+  "Mali_policy_version": "0.4.2-test9",
+  "GPU_KMD_CSF_binary_changes": false,
+  "scope": "Pinned API32 firmware, primary HDMI, explicit P01054 to CLIENT AB30 AFBC; no whole HWC/Composer/kernel upgrade",
+  "actual_playback": [
+    {
+      "transfer": "pq",
+      "source_dimensions": [
+        1280,
+        720
+      ],
+      "explicit_P010": true,
+      "output_color_format": 54,
+      "frames": 100,
+      "pause_seek_EOS_passed": true,
+      "scanout": "AB30 AFBC",
+      "HDMI_10bit_BT2020": true,
+      "HDMI_packet_eotf": 2,
+      "PQ_static_metadata_equal_decoder": true,
+      "HLG_clears_PQ_static": true,
+      "mixed_SDR_UI": true,
+      "virtual_SDR_color_exact": true,
+      "SDR_exit_AB24": true
+    },
+    {
+      "transfer": "hlg",
+      "source_dimensions": [
+        1280,
+        720
+      ],
+      "explicit_P010": true,
+      "output_color_format": 54,
+      "frames": 190,
+      "pause_seek_EOS_passed": true,
+      "scanout": "AB30 AFBC",
+      "HDMI_10bit_BT2020": true,
+      "HDMI_packet_eotf": 3,
+      "PQ_static_metadata_equal_decoder": true,
+      "HLG_clears_PQ_static": true,
+      "mixed_SDR_UI": true,
+      "virtual_SDR_color_exact": true,
+      "SDR_exit_AB24": true
+    },
+    {
+      "transfer": "pq",
+      "source_dimensions": [
+        3840,
+        2160
+      ],
+      "explicit_P010": true,
+      "output_color_format": 54,
+      "frames": 130,
+      "pause_seek_EOS_passed": true,
+      "scanout": "AB30 AFBC",
+      "real_target_readback": true,
+      "virtual_SDR_color_exact": true
+    },
+    {
+      "transfer": "hlg",
+      "source_dimensions": [
+        3840,
+        2160
+      ],
+      "explicit_P010": true,
+      "output_color_format": 54,
+      "frames": 130,
+      "pause_seek_EOS_passed": true,
+      "scanout": "AB30 AFBC",
+      "real_target_readback": true,
+      "virtual_SDR_color_exact": true
+    }
+  ],
+  "actual_SF_target_precision": {
+    "physical_width": 3840,
+    "physical_height": 2160,
+    "format": 43,
+    "FourCC": "AB30",
+    "modifier": "AFBC_16x16",
+    "source": "4K full-range HEVC ten-bit lossless PQ and HLG ramps; all source samples equal raw software reference",
+    "actual_queued_target_read": true,
+    "producer_fence_duplicated_and_waited": true,
+    "original_fence_retained": true,
+    "original_EGL_display_retained": true,
+    "ordinary_8bit_screenshot_used_as_precision_proof": false,
+    "rows_each_transfer": [
+      540,
+      1080,
+      1620
+    ],
+    "distinct_levels_each_RGB_channel": 1020,
+    "RGB_range": [
+      0,
+      1023
+    ],
+    "max_absolute_difference_from_gray_reference_each_RGB": [
+      3,
+      3,
+      4
+    ],
+    "RGB_bit_exact": false,
+    "full_colorimetric_acceptance": false,
+    "diagnostic_not_performance_run": true
+  },
+  "isolated_tests": {
+    "actual_PopulateFB_Init_cases": 32,
+    "callback_validation_return_fence_cases": 128,
+    "actual_Mapper_import_cases": 24,
+    "actual_SF_method_cases": 321,
+    "actual_allocator_selection_cases": 768,
+    "one_shot_readback_exact_scratch_pixels": 4096,
+    "Android_shell_control_assertions": 21,
+    "Mali_pair_guard_cases": 14
+  },
+  "rollback": {
+    "independent_reboot": true,
+    "whole_reboot": true,
+    "restored_on": true,
+    "tested_installer_unchanged": true
+  },
+  "no_degradation_workarounds": {
+    "source_bitdepth_resolution_FPS_preserved": true,
+    "fences_not_ignored": true,
+    "statistics_unmodified": true,
+    "Frame_Guard": [
+      0,
+      60,
+      60
+    ],
+    "g18_existing_KMD_fence_and_DVFS20ms_retained": true,
+    "Zygisk_both_ABIs_LSPosed_retained": true
+  },
+  "failed_candidates_not_accepted": [
+    "test1/2 AB24 scan despite HDR labels",
+    "test3 linear AB30 import/present failed; stale AB24 scan",
+    "test4 linear plan invalid, original HWC null ReleaseFence crash",
+    "test5 AFBC AB30 mapper layout validation mismatch"
+  ],
+  "Exo": {
+    "upstream_selective_fix_retained": true,
+    "new_cross_resolution_mode_cache_ON_and_OFF_both_passed": true,
+    "surface_and_whole_display_screen_passed": true,
+    "historical_bad_config_live_mismatch_reproduced": false,
+    "historical_black_screen_fully_fixed": false,
+    "Frame_Guard_changed": false,
+    "new_user_reproduction_condition": "Pause Frame Guard before starting Exo playback",
+    "temporary_Frame_Guard_pause_for_repro": true,
+    "new_condition_acceptance": "FAILED_BLACKOUT_AND_CODEC_QUEUE_TIMEOUT",
+    "Frame_Guard_restored_after_repro": true,
+    "old_six_phase_test_Frame_Guard_enabled": true,
+    "user_path_reproduction": {
+      "player": "Yamby 2.1.0.11, actual Exo path",
+      "source": "1920x1080 HEVC Main10, BT709 SDR; source frame rate absent in container format, later operating-rate approximately 23.96",
+      "mode_cache_OFF": "60 -> 24 -> 60 Hz, BufferQueue repeated C2_BLOCKING then CCodec queue watchdog fatal error",
+      "mode_cache_ON": "same failure; config 11 and config 3 both reported=1 raw=1 result=0",
+      "advertised_raw_mode_mismatch_seen": false,
+      "failed_fetch_after_Surface_disconnect_is_not_initial_cause": true,
+      "no_complete_root_cause_yet": true,
+      "short_HDMI_blank_and_codec_error_are_separate_acceptance_targets": true,
+      "regression_report": "User reports short blackouts on play/seek/pause and an additional renderer error; specific introducing revision not identified",
+      "specific_regression_commit_identified": false,
+      "guard_ON_control": "New playback in same app: play, 7s pause, resume, fast-forward; position progressed, 4K60, no new codec error",
+      "guard_OFF_existing_session_control": "Existing live session continued at 4K30 through pause/resume/fast-forward without new error; does not cover failing startup transition",
+      "discarded_runs": [
+        "Retry left player paused; black screenshot/pool wait not counted as decoder deadlock",
+        "Attempted cycle outside player on details/home; not counted as playback acceptance"
+      ],
+      "new_binary_fix_deployed_in_this_reproduction": false,
+      "final_saved_and_actual_mode_cache": 1,
+      "final_Frame_Guard_enabled": true,
+      "final_Frame_Guard_settings": [
+        0,
+        60,
+        60
+      ],
+      "new_root_fix_release_accepted": false
+    }
+  },
+  "HW_Main10_reference": "docs/validation/lsposed-p010-036.json"
+}

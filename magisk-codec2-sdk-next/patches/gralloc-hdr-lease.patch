@@ -1,0 +1,144 @@
+--- a/component/video/C2RKMpiDec.cpp
++++ b/component/video/C2RKMpiDec.cpp
+@@ -838,6 +838,16 @@
+     }
+ }
+ 
++C2RKMpiDec::OutBuffer::~OutBuffer() {
++    if (mHdrMapperHandle) C2RKMediaUtils::freeGraphicBuffer(mHdrMapperHandle);
++}
++
++void C2RKMpiDec::OutBuffer::setHdrMapperHandle(buffer_handle_t handle) {
++    if (mHdrMapperHandle) C2RKMediaUtils::freeGraphicBuffer(mHdrMapperHandle);
++    mHdrMapperHandle = handle;
++    mHdrC2Handle = handle && mBlock ? mBlock->handle() : nullptr;
++}
++
+ bool C2RKMpiDec::OutBuffer::ownedByDecoder() {
+     return mOwnedByDecoder;
+ }
+@@ -2305,6 +2315,13 @@
+     if (outBuffer) {
+         /* reuse this buffer */
+         outBuffer->updateBlock(block);
++        if (!mTunneled && property_get_bool("debug.rkcodec2.gralloc_hdr_lease", false) &&
++                property_get_bool("debug.rkcodec2.hdr_static_buffer", false)) {
++            outBuffer->setHdrMapperHandle(handle);
++            handle = nullptr;
++        } else {
++            outBuffer->setHdrMapperHandle(nullptr);
++        }
+         outBuffer->submitToDecoder();
+ 
+         c2_trace("reuse this buffer, bufferId %d", bufferId);
+@@ -2346,6 +2363,13 @@
+         std::shared_ptr<OutBuffer> newBuffer =
+                 std::make_shared<OutBuffer>(bufferId, bufferInfo.size, mppBuffer, block);
+ 
++        // Transfer the import already validated for this exact allocation.
++        // Metadata remains rewritten every frame; no pixel/fence path changes.
++        if (!mTunneled && property_get_bool("debug.rkcodec2.gralloc_hdr_lease", false) &&
++                property_get_bool("debug.rkcodec2.hdr_static_buffer", false)) {
++            newBuffer->setHdrMapperHandle(handle);
++            handle = nullptr;
++        }
+         // signal buffer available to decoder
+         newBuffer->submitToDecoder();
+ 
+@@ -2365,7 +2389,7 @@
+                  bufferId, bufferInfo.size, mBuffers.size());
+     }
+ 
+-    C2RKMediaUtils::freeGraphicBuffer(handle);
++    if (handle) C2RKMediaUtils::freeGraphicBuffer(handle);
+ 
+     return err;
+ }
+@@ -2933,7 +2957,9 @@
+             mIntf->config({entry->hdr10Plus.get()}, C2_MAY_BLOCK, &failures);
+         }
+         if (plusEnabled || property_get_bool("debug.rkcodec2.hdr_static_buffer", false)) {
+-            bool stored = rk_hdr::store(mBufferMode ? mOutBlock : outBuffer->getBlock(), entry->hdrInfo, entry->hdr10Plus);
++            bool stored = rk_hdr::store(mBufferMode ? mOutBlock : outBuffer->getBlock(), entry->hdrInfo, entry->hdr10Plus,
++                    (!mBufferMode && !mTunneled && property_get_bool("debug.rkcodec2.gralloc_hdr_lease", false))
++                        ? outBuffer->getHdrMapperHandle() : nullptr);
+             if (!stored) c2_err("HDR bridge metadata store failed");
+             if (property_get_bool("debug.rkcodec2.hdr_trace", false))
+                 c2_info("HDR_BRIDGE pts=%lld static=%d plus=%zu store=%d", (long long)pts,
+--- a/component/video/C2RKMpiDec.h
++++ b/component/video/C2RKMpiDec.h
+@@ -98,6 +98,16 @@
+                 mBufferId(bufferId), mSize(size), mOwnedByDecoder(false),
+                 mMppBuffer(mppBuffer), mBlock(block) {}
+ 
++        ~OutBuffer();
++        OutBuffer(const OutBuffer &) = delete;
++        OutBuffer &operator=(const OutBuffer &) = delete;
++        // The import belongs to this current block, not a global FD/ID cache.
++        buffer_handle_t mHdrMapperHandle = nullptr;
++        const C2Handle *mHdrC2Handle = nullptr;
++        void setHdrMapperHandle(buffer_handle_t handle);
++        buffer_handle_t getHdrMapperHandle() const {
++            return mBlock && mBlock->handle() == mHdrC2Handle ? mHdrMapperHandle : nullptr;
++        }
+         bool ownedByDecoder();
+ 
+         void updateBlock(std::shared_ptr<C2GraphicBlock> block) { mBlock = block; }
+--- a/component/osal/include/RKHdrBridge.h
++++ b/component/osal/include/RKHdrBridge.h
+@@ -32,10 +32,12 @@
+ }
+ 
+ // Only metadata is touched. No buffer allocation, pixel lock, conversion or
+-// additional image copy is performed. Import and release a duplicate handle.
++// additional image copy is performed. A current-block import may be borrowed;
++// the legacy/fallback path imports and releases its own duplicate handle.
+ inline bool store(const std::shared_ptr<C2GraphicBlock> &block,
+                   const std::shared_ptr<C2StreamHdrStaticInfo::output> &hdr,
+-                  const std::shared_ptr<C2StreamHdr10PlusInfo::output> &dynamic) {
++                  const std::shared_ptr<C2StreamHdr10PlusInfo::output> &dynamic,
++                  buffer_handle_t borrowed = nullptr) {
+     (void)dynamic;
+     // Dynamic metadata travels in the C2Buffer/BufferQueue standard info,
+     // including explicit empty frames. The stock mapper rejects clearing its
+@@ -48,18 +50,22 @@
+     if(!mapper || !block || !block->handle()) {
+         __android_log_print(ANDROID_LOG_ERROR,"RKHdrBridge","missing mapper=%d block=%d",!!mapper,!!block);return false;
+     }
+-    auto c2=block->handle();uint32_t width,height,format,stride,generation,slot;
+-    uint64_t usage,id;
+-    _UnwrapNativeCodec2GrallocMetadata(c2,&width,&height,&format,&usage,&stride,&generation,&id,&slot);
+-    native_handle_t *raw=UnwrapNativeCodec2GrallocHandle(c2);
+-    if(!raw)return false;
+-    buffer_handle_t imported=nullptr;
++    buffer_handle_t imported=borrowed;
+     auto &gm=GraphicBufferMapper::get();
+-    status_t status=gm.importBuffer(raw,width,height,1,format,usage,stride,&imported);
+-    native_handle_delete(raw);
+-    if(status!=OK || !imported) {
+-        __android_log_print(ANDROID_LOG_ERROR,"RKHdrBridge","import=%d %ux%u fmt=%u stride=%u",status,width,height,format,stride);return false;
++    if (!imported) {
++        auto c2=block->handle();uint32_t width,height,format,stride,generation,slot;
++        uint64_t usage,id;
++        _UnwrapNativeCodec2GrallocMetadata(c2,&width,&height,&format,&usage,&stride,&generation,&id,&slot);
++        native_handle_t *raw=UnwrapNativeCodec2GrallocHandle(c2);
++        if(!raw)return false;
++        status_t status=gm.importBuffer(raw,width,height,1,format,usage,stride,&imported);
++        native_handle_delete(raw);
++        if(status!=OK || !imported) {
++            __android_log_print(ANDROID_LOG_ERROR,"RKHdrBridge","import=%d %ux%u fmt=%u stride=%u",status,width,height,format,stride);return false;
++        }
+     }
++    if (property_get_bool("debug.rkcodec2.hdr_trace", false))
++        __android_log_print(ANDROID_LOG_INFO,"RKHdrBridge","GRALLOC_HDR_TRANSFER borrowed=%d extra_import=%d",!!borrowed,!borrowed);
+     bool ok=true;
+     auto set=[&](const IMapper::MetadataType &type,const hidl_vec<uint8_t> &encoded) {
+         auto r=mapper->set(const_cast<native_handle_t*>(imported),type,encoded);
+@@ -88,6 +94,6 @@
+         if(gralloc4::encodeSmpte2086(mastering,&bytes)==OK)set(gralloc4::MetadataType_Smpte2086,bytes);else ok=false;
+         if(gralloc4::encodeCta861_3(light,&bytes)==OK)set(gralloc4::MetadataType_Cta861_3,bytes);else ok=false;
+     }
+-    gm.freeBuffer(imported);return ok;
++    if (!borrowed) gm.freeBuffer(imported);return ok;
+ }
+ } }

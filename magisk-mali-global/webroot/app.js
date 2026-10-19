@@ -7,10 +7,10 @@
  const t=k=>MaliI18n[lang][k]||k;
  const label=v=>t(v==='next'?'next':v==='stock'?'stock':v==='on'?'on':v==='off'?'off':v==='active'?'active':v==='checking'?'checking':v==='failed'?'failed':'unknown');
  function notice(key,kind=''){ $('notice').textContent=t(key);$('notice').className=kind; }
- function controls(){ $('whole').disabled=busy||!state||state.removing;$('kernel').disabled=busy||!state||!state.supported||state.removing;$('refresh').disabled=busy; }
+ function controls(){ $('whole').disabled=busy||!state||state.removing;$('kernel').disabled=busy||!state||!state.supported||state.removing;$('dvfs').disabled=busy||!state||state.removing||(!state.dvfsSupported&&state.dvfsRequested!=='on');$('cold').disabled=busy||!state||state.removing||(!state.coldPrepared&&state.coldRequested!=='on');$('fence').disabled=busy||!state||state.removing||(!state.fenceSupported&&state.fenceRequested!=='on');$('refresh').disabled=busy; }
  function paint(){
   document.documentElement.lang=lang==='zh'?'zh-CN':'en';document.title=t('title');$('language').textContent=lang==='zh'?'English':'中文';
-  const texts={'title':'title','whole-title':'whole','whole-desc':'wholeDesc','kernel-title':'kernel','kernel-desc':'kernelDesc','recovery-title':'recoveryTitle','recovery-desc':'recoveryDesc','refresh':'refresh','footnote':'footnote'};
+  const texts={'fence-title':'fence','fence-desc':'fenceDesc','cold-title':'cold','cold-desc':'coldDesc','title':'title','whole-title':'whole','whole-desc':'wholeDesc','kernel-title':'kernel','kernel-desc':'kernelDesc','dvfs-title':'dvfs','dvfs-desc':'dvfsDesc','recovery-title':'recoveryTitle','recovery-desc':'recoveryDesc','refresh':'refresh','footnote':'footnote'};
   for(const [id,key] of Object.entries(texts))$(id).textContent=t(key);
   for(const o of $('kernel').options)o.textContent=t(o.value);
   if(!state){notice(window.ksu?'loading':'host');controls();return;}
@@ -21,8 +21,19 @@
   $('kernel-card').classList.toggle('inactive',state.effective!=='on'||!state.supported);
   $('dependency').textContent=!state.supported?t('unsupported'):state.effective!=='on'?t('retained'):'';
   $('health').textContent=t('health')+label(state.kernelHealth);
+  $('dvfs').setAttribute('aria-checked',String(state.dvfsRequested==='on'));
+  $('dvfs-current').textContent=t('current')+label(state.dvfsActive);$('dvfs-next').textContent=t('after')+label(state.dvfsEffective);
+  $('dvfs-card').classList.toggle('inactive',state.dvfsEffective!=='on');
+  $('dvfs-detail').textContent=!state.dvfsSupported?t('dvfsUnsupported'):state.dvfsRequested==='on'&&state.dvfsEffective!=='on'?t('dvfsRetained'):t('dvfsInterval')+(state.pollingIntervalMs??'?')+' ms';
+  $('cold').setAttribute('aria-checked',String(state.coldRequested==='on'));
+  $('cold-current').textContent=t('current')+label(state.coldActive);$('cold-next').textContent=t('after')+label(state.coldEffective);
+  $('cold-detail').textContent=t(state.coldPrepared?'coldPrepared':'coldMissing');
+  $('fence').setAttribute('aria-checked',String(state.fenceRequested==='on'));
+  $('fence-current').textContent=t('current')+label(state.fenceActive);$('fence-next').textContent=t('after')+label(state.fenceEffective);
+  $('fence-card').classList.toggle('inactive',state.fenceEffective!=='on');
+  $('fence-detail').textContent=t(!state.fenceSupported?'fenceUnsupported':state.fenceRequested==='on'&&state.fenceEffective!=='on'?'fenceRetained':'fenceReady');
   $('recovery').textContent=t(state.recovery==='none'?'recoveryNone':'recoveryDone');
-  if(state.removing)notice('removing','pending');else if(!state.moduleEnabled)notice('disabled','pending');else if(state.kernelHealth==='failed')notice('failed','error');else if(state.kernelHealth==='checking')notice('checking');else if(state.staged)notice('staged','pending');else if(state.pendingReboot)notice('pending','pending');else notice('ready');controls();
+  if(state.removing)notice('removing','pending');else if(!state.moduleEnabled)notice('disabled','pending');else if(state.kernelHealth==='failed')notice('failed','error');else if(state.kernelHealth==='checking')notice('checking');else if(['failed','skipped'].includes(state.dvfsHealth))notice('dvfsFailed','error');else if(state.staged)notice('staged','pending');else if(state.pendingReboot)notice('pending','pending');else notice('ready');controls();
  }
  function exec(command){return new Promise((resolve,reject)=>{
   if(!window.ksu||typeof window.ksu.exec!=='function'){reject(Error('host'));return;}
@@ -34,5 +45,8 @@
  $('language').onclick=()=>{lang=lang==='zh'?'en':'zh';try{localStorage.setItem('mali-language',lang);}catch{}$('changes').textContent='';paint();};
  $('whole').onclick=()=>update('set '+(state.requested==='on'?'off':'on'));
  $('kernel').onchange=()=>{if(['stock','next'].includes($('kernel').value))update('kernel '+$('kernel').value);};
+ $('dvfs').onclick=()=>update('dvfs '+(state.dvfsRequested==='on'?'off':'on'));
+ $('fence').onclick=()=>update('fence '+(state.fenceRequested==='on'?'off':'on'));
+ $('cold').onclick=()=>update('cold '+(state.coldRequested==='on'?'off':'on'));
  $('refresh').onclick=()=>update('status');paint();update('status');
 })();

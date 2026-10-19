@@ -1,0 +1,80 @@
+--- a/component/base/include/C2RKComponent.h
++++ b/component/base/include/C2RKComponent.h
+@@ -126,6 +126,9 @@
+      */
+     void flushPeddingWorks();
+ 
++    // Only after true decoder EOS: return consumed work with no image output.
++    void finishConsumedPendingWorksAtEos();
++
+     // for derived classes
+     /**
+      * Finish pending work.
+--- a/component/base/C2RKComponent.cpp
++++ b/component/base/C2RKComponent.cpp
+@@ -472,6 +472,36 @@
+ 
+         queue->pending().erase(queue->pending().begin());
+     }
++}
++
++void C2RKComponent::finishConsumedPendingWorksAtEos() {
++    std::list<std::unique_ptr<C2Work>> completed;
++    {
++        Mutexed<WorkQueue>::Locked queue(mWorkQueue);
++        if (isPendingFlushing()) return;
++        while (!queue->pending().empty()) {
++            auto it = queue->pending().begin();
++            auto work = std::move(it->second);
++            queue->pending().erase(it);
++            work->worklets.front()->output.flags = (C2FrameData::flags_t)0;
++            work->worklets.front()->output.buffers.clear();
++            work->worklets.front()->output.ordinal = work->input.ordinal;
++            work->workletsProcessed = 1u;
++            work->result = C2_OK;
++            completed.emplace_back(std::move(work));
++        }
++    }
++    if (completed.empty()) return;
++    std::shared_ptr<C2Component::Listener> listener;
++    {
++        Mutexed<ExecState>::Locked state(mExecState);
++        listener = state->mListener;
++    }
++    // Do not hold queue/state locks while calling the client. These are input
++    // ownership completions, with zero image buffers; all decoded images have
++    // already been delivered before the hardware signalled EOS.
++    c2_info("HEVC_EOS_PENDING completed=%zu after decoder EOS", completed.size());
++    listener->onWorkDone_nb(shared_from_this(), std::move(completed));
+ }
+ 
+ void C2RKComponent::finish(
+--- a/component/video/C2RKMpiDec.h
++++ b/component/video/C2RKMpiDec.h
+@@ -201,6 +201,7 @@
+     bool mAv1VendorSurface = false;
+     bool mAv1TextureAfbc = false;
+     bool mHevcNativeSurface = false;
++    bool mHevcEosPending = false;
+     bool mStandardWorkFlow;
+ 
+     std::shared_ptr<C2GraphicBlock> mOutBlock;
+--- a/component/video/C2RKMpiDec.cpp
++++ b/component/video/C2RKMpiDec.cpp
+@@ -927,6 +927,8 @@
+       mStandardWorkFlow(true) {
+     c2_info("[%s] version %s", name, C2_COMPONENT_FULL_VERSION);
+     mCodingType = (MppCodingType)GetMppCodingFromComponentName(name);
++    mHevcEosPending = mCodingType == MPP_VIDEO_CodingHEVC &&
++            property_get_bool("debug.rkcodec2.hevc_eos_pending", false);
+     if (mCodingType == MPP_VIDEO_CodingUnused) {
+         c2_err("failed to get coding from name %s", name);
+     }
+@@ -2034,6 +2036,7 @@
+     };
+ 
+     if (work && (flags & WorkEntry::FLAGS_EOS)) {
++        if (mHevcEosPending) finishConsumedPendingWorksAtEos();
+         fillWork(work);
+     } else {
+         if (isPendingWorkExist(frameIndex)) {

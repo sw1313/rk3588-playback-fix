@@ -1,6 +1,6 @@
 id=rk3588_hdr_bridge
 name=RK3588 HDR Metadata Bridge Component
-version=0.1.2
-versionCode=102
+version=0.1.4
+versionCode=104
 author=sw1313
 description=Unified-stack component for exact API32 original HWC, standard static metadata and same-transaction HDMI HDR10 updates. No pixel conversion or Dolby/HDR10+ capability spoofing.

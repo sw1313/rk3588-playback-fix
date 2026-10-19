@@ -1,3 +1,48 @@
+# Release v0.8.6 / 正式版源码与构建
+
+Release components: Decode Stack 0.8.6, Mali Global 0.4.2, LSPosed 0.3.7. The accepted system refresh policy lives in `magisk-hdr/src/refresh_session.cpp`; `tools/build_refresh_session.py` builds its exact-firmware loader chain and `tools/build_decode_stack.py --refresh-session <component>` integrates it. `docs/validation/decode-refresh-session-086.json` records the tested binary SHA and bounded physical feedback.
+
+Use the existing component builders with hash-pinned private firmware as link/patch inputs. Public installers contain source-built shims, patches and contracts; original SF/HWUI/HWC, services.jar/OAT, boot images, closed Mali/CSF blobs, device logs and signing keys are excluded. Installers generate the firmware variants locally. QMS and private first-binding preparation are independently gated; a release package is not a universal boot adaptation.
+
+The release retains the accepted executable code and regenerates version, bilingual UI, provenance and integrity manifests. FFmpeg build-directory strings are redacted only in readonly configuration data; executable bytes and ELF offsets remain unchanged, and the payload/source contracts are regenerated. `tools/verify_open_source.py` verifies license documents and nested checksums. The source archive includes the local GPL kernel changes and FFmpeg patch/source obligations; external BSP/link inputs remain separate. New source-rate combinations, all TVs and complete HDR calibration are not newly certified.
+
+以下保留历史构建步骤和阶段记录。旧版本“候选／未发布”仅指当时状态，不覆盖上方正式版与当前验收记录。
+
+---
+
+# 当前工作区：Decode Stack 0.7.9 / LSPosed 0.3.6 候选
+
+HWUI 映射及 HWC 模式表查找已集成，完整 HDR 仍锁定不生效；
+范围及实机边界见[0.7.9 补充记录](docs/decode-hwui-rgb10-079.zh-CN.md)。
+使用 `tools/build_hdr.py` 和现有 Decode Stack 组合器重建，仅以精确哈希固件作为私有
+链接输入，不把原 HWUI/HWC 副本放进公开包。LSPosed 可选客户端使用 FFmpeg
+`bf4d5037b4`、本地 P010 补丁和静态 dav1d 1.5.3，构建／打包范围及未完成的应用验收
+见[说明](lsposed/patches/README.md)。这些是未发布的工作区候选，下方旧发布链接不包含它们。
+
+# Working-tree Mali Global 0.4.2-test1
+
+Selective Rockchip CSF fence metadata initialization backport (`194a7d5a7567395d37e11ffa9014589b83ba8aad`), independently selected at first binding. Full frozen source, original upstream patch, read-only KMD parameter, private boot builder and module WebUI are included. Rebuild with the same Linux 5.10.66 headers / pinned CRC inputs using the existing commands below; prepare a new private boot for the rebuilt KMD and keeper hashes. Installer excludes proprietary Mali libraries, CSF, private boot and device data. See [scope and validation](docs/mali-csf-fence-042.zh-CN.md).
+
+---
+
+# 当前工作区：Decode Stack 0.7.4-test1
+
+本地实验快照选择性回移 Rockchip 输出缓冲配置通知及其配套标志修正，保留原缓冲数量、像素和 fence。来源及新版本实机边界见[专项报告](docs/decode-output-delay-074.zh-CN.md)。安装包验收输入保留原字节，私有日志、媒体和诊断签名材料不进入源码包。
+
+---
+
+# 当前工作区：Decode Stack 0.7.3-test1
+
+本地实验快照新增独立 Gralloc HDR 传递复用项，保持固件／ABI 合约和重启回退。范围与新版本实机验证见[专项报告](docs/decode-gralloc-transfer-073.zh-CN.md)。没有整套替换 Gralloc，也不将本地补丁标成新的厂商 SDK。
+
+---
+
+# 当前工作区：Mali Global 0.4.1-test2 修复
+
+本地未发布快照包含 Zygisk 启动修复、固定上游来源及双 ABI 注入／回退实机结果。已实测安装包保留原字节；范围和限制见[修复验收](docs/mali-zygisk-repair-041.zh-CN.md)。私有 boot 和设备配置不进入源码包。下方旧版本构建说明保留作历史记录。
+
+---
+
 # v0.6.9 optional 应用内 PanVK driver / 可选 应用内驱动
 
 Checkout `v0.6.9` for `panvk/` and `tools/build_panvk.py`. The new driver is
@@ -13,7 +58,14 @@ requirements and exact reproduction commands: [panvk/README.md](panvk/README.md)
 
 ---
 
-# v0.6.8 Mali kernel / CSF integration
+# 未发布候选：Mali 0.4.0-cold1 / Decode Stack 0.7.2-cold2
+
+首次绑定模式默认关闭，使用 `tools/cold-boot/prepare.py` 私下生成匹配当前 root 的
+boot。开启此项会写入 boot；原生加载／恢复程序由现有 Mali 构建器编译，显示协调
+归入 Decode Stack。镜像和 root 配置不进入源码或安装包，旧版本测试不作为新模式
+验收。准备、回退及物理恢复边界见 `magisk-mali-global/boot/README.md`。
+
+# v0.6.8 Mali kernel / CSF integration（历史）
 
 Mali Global is now 0.3.0. Decode Stack 0.6.7, plugin 0.3.5 and Frame Guard 0.1.1
 are carried with unchanged bytes and v0.6.7 source metadata. Use v0.6.8 for the new
@@ -95,6 +147,20 @@ Release 额外提供项目源码 ZIP 与 SHA256。源码包包含已跟踪源码
 
 ## 系统输入与限制
 
+Decode Stack 0.7.6-test1 在固定新版 Codec2 核心的输出配置通知补丁之后应用
+`hevc-native-surface.patch`，为原生 HEVC 显示消费者保留晚发现十位后的 NV15
+路径。这是本地 API32 保护条件修正，未更换整个 SDK、强制改变 AFBC 或修改
+像素。独立默认关闭分项依赖新版核心与 HDR 适配；专项新验收与回退见
+`docs/decode-hevc-native-076.zh-CN.md` 及对应 JSON。新增测试源码可重建，影片、
+原始样本／日志、密钥和测试 APK 仍为私有输入，不进入公开交付。
+
+Decode Stack 0.7.5-test1 的 HDR 构建器增加 `plane_probe.c`，安装时由
+`overlay-scale.sh` 对完整哈希匹配的原 HWC 私有生成四字节差异的缩放资格变体。
+原伴随库与生成变体均不得进入公开源码／安装包。上游提交、选择性范围、许可、
+新版本验收和未通过的延迟改善目标见 `docs/decode-hwc-overlay-075.zh-CN.md`、
+对应 validation JSON 与 `LICENSES/hwc/`。保留已测 ZIP 原字节，实机结果和法律
+补充单独附带；不以文档更新冒充重新验收过的整套新版 HWC 或 VOP2。
+
 Codec2 的 prepared-root 需要 codec2-a12、AOSP Codec2/hardware 头、匹配的
 platform-private 头与 vendor32 链接库；具体文件列表在构建器内。它是开发者自行
 准备的目录，不是仓库附带的完整 SDK。VNDK 头固定在 UPSTREAM.json 的提交。
@@ -113,3 +179,19 @@ MPP/Codec2/libyuv 等来源、精确提交、补丁顺序和构建器见 SOURCE_
 十位精度、HDR、生命周期和回退测试；文档版不虚构新的播放结果。
 四个安装包、源码包、清单、验证记录和校验值一并发布，旧包不覆盖。
 不得上传个人路径、设备地址和标识、原始日志、账号、私钥、影片或原厂固件库。
+
+
+0.7.7 对 Lineage-Rockchip e577f69d04d7435a8e4a1088337ff2ed92a3a7e1 剩余 EOS 清理选择性回移，保留 HEVC 限定、默认关闭、重启回退和锁外批量回调。范围及新实机结果见 docs/decode-hevc-eos-077.zh-CN.md；诊断可重建源码在 tools/decode-lifecycle/eos_pending_probe.cpp 和 build_eos_pending_probe.py，不含影片或私有链接输入。
+
+
+0.7.8 在固定 Codec2 基线上新增本地 MIT NV15→P010 NEON 成对解包，规范头文件和独立边界/精度测试在 tools/pixel-conversion，构建器核对补丁内新头文件。没有新的直接上游回移或整库/SDK 更新；实际 CPU 收益、重启回退及显式 P010 HDMI HDR 既有限制见 docs/decode-p010-pairs-078.zh-CN.md。
+
+
+Decode Stack 0.8.2-test1 的内部 HDMI 事件组件源码为 `magisk-hdmi-event/src/`（MIT）。使用 `tools/build_hdmi_event.py --ndk ... --runtime <精确私有原库> --hardware-legacy <精确私有原库> --work <新目录>` 构建，将干净包通过 `--hdmi-event` 合入统一模块。原库不打包，只包含源码、新构建辅助库和本地生成配方；不是新版内核／Composer 升级。
+
+
+Decode Stack 0.8.4 私有候选新增 `magisk-codec2-sdk-next/patches/native-backpressure.patch`，在既有固定 SDK 上配套原生 Surface 输出预取与 MPP 输入背压流控。参考 AOSP V4L2 b/184020290 机制及固定 MPP mpp_put_packet 实现，没有直接套用 V4L2 缓冲常数、提高 watchdog 阈值或伪造 work。test1 实际用户失败，test2 当前用户场景有界通过；test3 收紧复制／tunnel 排除条件，验收单列。源码、独立异步帧数／PTS 检查及当前边界见 docs/decode-native-backpressure-084.zh-CN.md 与 tools/decode-lifecycle/native_backpressure_probe.cpp。不是新 SDK 整库升级或可发布声明。
+
+正在开发的Decode Stack QMS内核核心位于 `decode-kernel/qms/`，按GPL-2.0-only提供，选择性引入Rockchip d0e8f558时序数据和5a89a1cb的VTEM／多帧流程，范围及两项本地数据修正见该目录UPSTREAM.json。新增请求会话／UAPI、MIT HWC前端和启动屏障协调候选；普通构建关闭候选编译门禁。真实硬件绑定、内核端点、显示loader及可安装QMS升级尚未交付；私有Image／ELF／契约及日志不公开。该GPL源码不适用原创适配器的默认MIT授权。
+
+UAPI头文件使用GPL-2.0-only WITH Linux-syscall-note，MIT前端只引用该系统调用头，不引入GPL实现。增量检查入口为`tools/qms/test_session.py`、`tools/build_hdr.py --qms-candidate --qms-frontend-test`及`tools/tests/test_qms_cold_stage.py`；私有输入见各工具help。这些检查不操作真实显示或验收boot；Decode打包器拒绝只有前端而没有真实后端的候选组件。

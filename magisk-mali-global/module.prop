@@ -1,6 +1,6 @@
 id=rk3588_mali_global
 name=RK3588 Native Mali Global Upgrade
-version=0.3.0
-versionCode=300
+version=0.4.2
+versionCode=425
 author=sw1313
-description=RK3588 API32 global g18p0 userspace, optional matched g18p0 kernel + CSF pair, bilingual WebUI and reboot rollback. Kernel defaults off; exact 5.10.66 firmware checks. No boot flashing.
+description=Firmware-specific RK3588 API32 g18p0 userspace/KMD/CSF. Matched cold boot, CSF stability and bounded DVFS/rollback checks recorded; per-game gains still require comparison. Independent boot adaptation preserves external Zygisk and original-driver rollback.

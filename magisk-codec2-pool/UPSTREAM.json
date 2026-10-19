@@ -1,0 +1,15 @@
+{
+  "component": "API32 ARM64 P010 byte-buffer pool compatibility",
+  "upstream_commit": "08a8a2b6402e4492f1b5aad7615b83b96883d5d3",
+  "upstream_url": "https://github.com/LineageOS/android_frameworks_av/commit/08a8a2b6402e4492f1b5aad7615b83b96883d5d3",
+  "upstream_change_id": "Ie32d73cc0366c39bc7792bf328598b4441fd5ac4",
+  "selected_scope": "P010 MediaImage byte stride/UV offsets, single byte-depth accounting, 24bpp AllocateEmpty only",
+  "not_adopted": "CCodec.cpp flexible-format negotiation, new format advertisement, unrelated Android13 changes",
+  "local_adaptation": "Three exact-byte instructions in a device-generated private variant; source-built ABI-gated AllocateEmpty import adapter; its libcutils dependency preserves the replaced DT_NEEDED edge",
+  "base_component_sha256": "88b7f465273698775eea3c505a3b8ea2c5b8f663d342df02cb9454d9c8b0738a",
+  "variant_sha256": "f9e01d5ff014ab42a40ddaafee6f3df8122502dd1f0641de58ae75b1b96610dd",
+  "abi": "arm64-v8a",
+  "full_framework_upgrade": false,
+  "public_release": false,
+  "status": "ISOLATED_POOL_AND_90_FRAME_PRECISION_PASSED_MODULE_ACCEPTANCE_PENDING"
+}

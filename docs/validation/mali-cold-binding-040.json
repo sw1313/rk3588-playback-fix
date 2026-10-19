@@ -1,0 +1,90 @@
+{
+  "component": "mali-cold-binding",
+  "mali_version": "0.4.0-cold1",
+  "decode_version": "0.7.2-cold2",
+  "status": "EXPERIMENTAL_REAL_COLD_BOOT_AND_ROLLBACK_VALIDATED_WITH_OPEN_PLAYBACK_ANOMALY",
+  "public_release": false,
+  "native_fixture_cases": 27,
+  "pidfd_checked_on_disposable_android_child": true,
+  "android_switch_policy_checks": 48,
+  "browser_ui_checks": 27,
+  "decode_cold_coordination_cases": 7,
+  "independent_magiskboot_unpack": true,
+  "original_cpio_records_preserved": 22,
+  "kernel_second_dtb_byte_identical": true,
+  "decode_component_files_identical": 185,
+  "real_cold_boot_verified": true,
+  "real_hdr_acceptance": "bounded-five-scenarios-software-observation",
+  "real_disable_uninstall_rollback_verified": false,
+  "device_boot_written": true,
+  "runtime_changes": "Approved installer binaries unchanged during device trials",
+  "boot_binding": {
+    "graphics_release_boottime_ms": [
+      7795,
+      7728,
+      7582
+    ],
+    "pre_exec_services": 5,
+    "initial_service_pids_preserved_through_qualification_and_HDR": true,
+    "legacy_handover_controller_used": false,
+    "original_initcall_blacklist_verified_in_kernel_log": true,
+    "native_ARM32_ARM64_GLES_Vulkan_exact_readback": true,
+    "local_framework_audio_CSF_health": true,
+    "qualified_cold_boots": 3
+  },
+  "rollback": {
+    "cold_switch_off_original_root_boot_and_KMD": true,
+    "whole_module_disable_independent_keeper_original_root_boot_and_userspace": true,
+    "injected_previous_unqualified_latch_auto_restore": true,
+    "actual_kernel_hard_hang_or_power_loss_tested": false,
+    "actual_uninstall_removal_tested": false
+  },
+  "precision": {
+    "path": "AV1 10-bit AFBC, actual allocations decompressed through existing RGA probe",
+    "frames": 4,
+    "samples": 12441600,
+    "all_reference_samples_exact": true,
+    "nonzero_low_two_bits": 9326614,
+    "observed_sample_range": [
+      0,
+      1023
+    ],
+    "HDR_wire_or_optical_verification": false
+  },
+  "hdr": {
+    "same_surface_cases": 5,
+    "transfers": [
+      "HLG",
+      "PQ 1000-nit mastering",
+      "PQ 4000-nit mastering",
+      "PQ without mastering metadata",
+      "SDR"
+    ],
+    "pause_seek_EOS_passed": true,
+    "HDR_cases_ten_bit_BT2020_and_expected_DRM_InfoFrame": true,
+    "exit_returns_SDR": true,
+    "HLG_PixelCopy_supported": false,
+    "full_end_to_end_color_precision_claim": false
+  },
+  "open_issues": [
+    {
+      "issue": "One HEVC HLG seek/EOS run reported a Codec2 queue timeout and then releaseOutputBuffer IllegalStateException",
+      "classification": "Unresolved; later cold retries and original-startup control did not reproduce it. No causal attribution or repair claim. Failed trial retained privately."
+    },
+    {
+      "issue": "Initial HDR4000 observation used a 640x360 clip with a direct-scanout assertion",
+      "classification": "The same SDR observation occurred on original startup. Replaced the test input with the prior 1280x720 direct-path fixture; no product bit depth/resolution/frame-rate/fence/statistics modification."
+    }
+  ],
+  "final_state": {
+    "mali": "0.4.0-cold1",
+    "decode": "0.7.2-cold2",
+    "cold_binding": "on",
+    "KMD_CSF": "active",
+    "GPU_response": "20ms active",
+    "root_preserved_on_real_boot": true,
+    "decode_selections_preserved": true,
+    "approved_runtime_files_matched": 16,
+    "pending_reboot": false
+  }
+}

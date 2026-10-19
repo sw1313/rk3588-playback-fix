@@ -1,0 +1,71 @@
+{
+  "date": "2026-10-19",
+  "component": "decode-refresh-session",
+  "status": "BOUNDED_EXO_PHYSICAL_USER_ACCEPTED_RELEASE_0_8_6",
+  "public_release": false,
+  "test19": {
+    "user_feedback": "播放器内还是有短黑",
+    "physical_acceptance": false,
+    "read_only_counters": {
+      "held": 0,
+      "accepted": 0,
+      "reaped": 0,
+      "trace_logs": 0
+    },
+    "qms_serial": [
+      12,
+      20
+    ],
+    "meaning": "loaded does not prove request coverage"
+  },
+  "test20": {
+    "decode_version": "0.8.6-session-test20",
+    "mali_pairing_version": "0.4.2-session-test22",
+    "isolated_native_assertions": 110,
+    "isolated_actual_mali_checker_cases": 19,
+    "physical_acceptance": true,
+    "runtime_coverage_proven": true,
+    "scope": "common Layer setFrameRate; retain native same-layer fixed-source vote in Auto",
+    "library_sha256": "dc6f5d29a9590a3e65e1808aadcd80da3d13809b1ed05aeefd94ef9e9477e054",
+    "exit_and_new_media": "pending actual user operation",
+    "installed_and_rebooted": true,
+    "actual_boot_health": true,
+    "user_feedback": "可以了，整理下，改成正式版，然后上传更新吧",
+    "observed_request_events": 5,
+    "observed_retained_zero_votes": 2,
+    "observed_rate": 24,
+    "qms_serial_window": [
+      4,
+      6
+    ],
+    "frame_rate_transition_scope": "initial match and exit; no intervening reselection observed in bounded window",
+    "same_existing_selections": true,
+    "same_module_flags": true,
+    "auto_hdr_preserved": true,
+    "mali_g18_kmd_dvfs_active": true,
+    "external_zygisk_both_abis_lsposed": true,
+    "boot_unchanged": true,
+    "staged_component_off_on_restore": true
+  },
+  "frame_guard": "disabled and paused",
+  "player_inputs": false,
+  "screenshots": false,
+  "boot_flash": false,
+  "rollback": "display_session off plus reboot; module disable restores stock",
+  "release": {
+    "project": "0.8.6",
+    "decode": "0.8.6",
+    "mali": "0.4.2",
+    "client": "0.3.7",
+    "trace": "off after acceptance",
+    "limitations": [
+      "other source frame rates and all applications not newly certified",
+      "resolution and HDR-format changes may still blank",
+      "QMS wire-level universal receiver acceptance not claimed"
+    ],
+    "date": "2026-10-20",
+    "full_install_and_reboot_verified": true,
+    "bilingual_formal_ui": true,
+    "release_validation": "docs/validation/release-0.8.6.json"
+  }
+}

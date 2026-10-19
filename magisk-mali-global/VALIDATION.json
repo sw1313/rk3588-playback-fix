@@ -1,238 +1,355 @@
 {
   "component": "mali-global",
-  "version": "0.3.0",
-  "project_release": "v0.6.8",
-  "validation_date": "2026-10-17",
-  "scope": "Exact-firmware optional paired g18p0 kernel/CSF and bilingual WebUI",
-  "tested_platform": {
-    "soc": "RK3588",
-    "model": "H96 Max V58",
-    "android_api": 32,
+  "version": "0.4.2",
+  "date": "2026-10-19",
+  "status": "FIRMWARE_PINNED_RELEASE_MATCHED_PAIR_AND_ROLLBACK",
+  "public_release": true,
+  "source_ref": "working-tree",
+  "unchanged_companion": "Decode Stack 0.8.1-test7",
+  "upstream": {
+    "repository": "https://github.com/rockchip-linux/kernel",
+    "base_revision": "7a76350c1e0df810d8c11eb0d18285da4e79e6ed",
+    "selective_commit": "194a7d5a7567395d37e11ffa9014589b83ba8aad",
+    "scope": "Initialize and retain KCPU fence metadata before dma_fence_init trace callbacks; error cleanup, signaling, waiting and release remain intact.",
+    "local_changes": [
+      "Default-off read-only csf_fence_safe KMD parameter",
+      "Root-private independent fence selection latched by first-bind keeper",
+      "WebUI dependencies, requested/effective/actual and reboot state",
+      "First-binding qualification checks actual parameter against selection"
+    ]
+  },
+  "device_scope": {
+    "board": "H96 Max V58 / RK3588",
     "kernel": "5.10.66",
-    "original_kmd": "g12p0-01eac0 (UK version 1.11)",
-    "candidate_kmd": "g18p0-01eac0 (UK version 1.18)"
+    "android_sdk": 32,
+    "magisk_api": 30700,
+    "Mali_pair": "g18p0 userspace/KMD/CSF",
+    "zygisk_next": "1.5.2",
+    "LSPosed": "2.2.1"
   },
-  "source_built_kernel_modules": true,
-  "proprietary_userspace_or_csf_included": false,
-  "kernel_defaults_to_original": true,
-  "boot_flashed": false,
-  "offline_and_state_checks": {
-    "android_shell_state_cases": 20,
-    "webui_interaction_checks": 17,
-    "controller_policy_cases": 35,
-    "health_policy_cases": 13,
-    "health_output_capture_cases": 2,
-    "kernel_import_versions": 394,
-    "guard_import_versions": 34
+  "build": {
+    "candidate_sha256": "c2eedfc82e5bd7e11e832f69e92bc7fb4bfb4a6197731e78921bea791bb65dcd",
+    "canonical_import_versions": 394,
+    "guard_import_versions": 34,
+    "kernel_image_unchanged": true,
+    "original_root_cpio_records_preserved": 22,
+    "graphics_and_original_Zygote_dispatch_recipe_unchanged": true,
+    "private_first_bind_profile_reprepared": true
   },
-  "installed_boot_matrix": [
-    {
-      "phase": "installed-default",
-      "passed": true,
-      "expected": "stock",
-      "last_state": {
-        "schema": 1,
-        "version": "0.3.0",
-        "activeVersion": "0.3.0",
-        "requested": "on",
-        "effective": "on",
-        "active": "on",
-        "activeKnown": true,
-        "moduleEnabled": true,
-        "staged": false,
-        "removing": false,
-        "supported": true,
-        "kernelRequested": "stock",
-        "kernelEffective": "stock",
-        "kernelActive": "stock",
-        "kernelHealth": "stock",
-        "recovery": "none",
-        "pendingReboot": false
-      },
-      "boot_written": false,
-      "online": true
+  "controls": {
+    "native_startup_fixture_cases": 37,
+    "Android_shell_checks": 59,
+    "browser_checks": 39,
+    "default": "off",
+    "reboot_only": true,
+    "requires_matched_first_binding": true
+  },
+  "new_path_validation": {
+    "both_ABIs": true,
+    "successful_fences": 1024,
+    "fd_allocation_error_cleanup": 128,
+    "traced_native_init_callbacks": 1152,
+    "all_timeline_metadata_present": true,
+    "global_trace_setting_preserved": true,
+    "unpatched_traced_path_intentionally_not_executed": true
+  },
+  "off_path_validation": {
+    "successful_fences": 512,
+    "fd_allocation_failure_paths": 64,
+    "tracing_disabled": true,
+    "metadata_queried_after_queue_deletion": true
+  },
+  "pixel_precision": {
+    "hdr2": {
+      "samples": 24883200,
+      "bits": 10,
+      "frames": 2,
+      "exact": true
     },
-    {
-      "phase": "whole-original",
-      "passed": true,
-      "expected": "off",
-      "last_state": {
-        "schema": 1,
-        "version": "0.3.0",
-        "activeVersion": "0.3.0",
-        "requested": "off",
-        "effective": "off",
-        "active": "off",
-        "activeKnown": true,
-        "moduleEnabled": true,
-        "staged": false,
-        "removing": false,
-        "supported": true,
-        "kernelRequested": "next",
-        "kernelEffective": "stock",
-        "kernelActive": "stock",
-        "kernelHealth": "stock",
-        "recovery": "none",
-        "pendingReboot": false
-      },
-      "boot_written": false,
-      "online": true
-    },
-    {
-      "phase": "paired-upgrade",
-      "passed": true,
-      "expected": "next",
-      "last_state": {
-        "schema": 1,
-        "version": "0.3.0",
-        "activeVersion": "0.3.0",
-        "requested": "on",
-        "effective": "on",
-        "active": "on",
-        "activeKnown": true,
-        "moduleEnabled": true,
-        "staged": false,
-        "removing": false,
-        "supported": true,
-        "kernelRequested": "next",
-        "kernelEffective": "next",
-        "kernelActive": "next",
-        "kernelHealth": "active",
-        "recovery": "none",
-        "pendingReboot": false
-      },
-      "boot_written": false,
-      "online": true
-    },
-    {
-      "phase": "kernel-original",
-      "passed": true,
-      "expected": "stock",
-      "last_state": {
-        "schema": 1,
-        "version": "0.3.0",
-        "activeVersion": "0.3.0",
-        "requested": "on",
-        "effective": "on",
-        "active": "on",
-        "activeKnown": true,
-        "moduleEnabled": true,
-        "staged": false,
-        "removing": false,
-        "supported": true,
-        "kernelRequested": "stock",
-        "kernelEffective": "stock",
-        "kernelActive": "stock",
-        "kernelHealth": "stock",
-        "recovery": "none",
-        "pendingReboot": false
-      },
-      "boot_written": false,
-      "online": true
-    },
-    {
-      "phase": "interrupted-startup",
-      "passed": true,
-      "expected": "stock",
-      "last_state": {
-        "schema": 1,
-        "version": "0.3.0",
-        "activeVersion": "0.3.0",
-        "requested": "on",
-        "effective": "on",
-        "active": "on",
-        "activeKnown": true,
-        "moduleEnabled": true,
-        "staged": false,
-        "removing": false,
-        "supported": true,
-        "kernelRequested": "stock",
-        "kernelEffective": "stock",
-        "kernelActive": "stock",
-        "kernelHealth": "stock",
-        "recovery": "interrupted_previous_boot",
-        "pendingReboot": false
-      },
-      "boot_written": false,
-      "online": true
-    },
-    {
-      "phase": "final-paired",
-      "passed": true,
-      "expected": "next",
-      "last_state": {
-        "schema": 1,
-        "version": "0.3.0",
-        "activeVersion": "0.3.0",
-        "requested": "on",
-        "effective": "on",
-        "active": "on",
-        "activeKnown": true,
-        "moduleEnabled": true,
-        "staged": false,
-        "removing": false,
-        "supported": true,
-        "kernelRequested": "next",
-        "kernelEffective": "next",
-        "kernelActive": "next",
-        "kernelHealth": "active",
-        "recovery": "none",
-        "pendingReboot": false
-      },
-      "boot_written": false,
-      "online": true
+    "eight1": {
+      "samples": 13271040,
+      "bits": 8,
+      "frames": 1,
+      "exact": true
     }
-  ],
-  "graphics_verification": {
-    "gles_shader_and_exact_rgba_readback": [
-      "arm32",
-      "arm64"
-    ],
-    "vulkan_gpu_fill_exact_4096_byte_readback": [
-      "arm32",
-      "arm64"
-    ],
-    "desktop_actual_userspace": "g18p0",
-    "actual_kernel_binding": "rk_next_mali",
-    "csf_size_and_digest_checked": true,
-    "audio_pids_preserved_during_takeover": true,
-    "local_health_stability_ms": 30000,
-    "pc_or_network_required_for_health": false,
-    "supply_bridge_released": true,
-    "handover_callbacks_restored": true,
-    "firmware_search_path_restored": true
   },
-  "protected_state": {
-    "files_compared": 30,
-    "only_expected_module_metadata_changed": true,
-    "boot_unchanged": true,
-    "original_csf_unchanged": true,
-    "decode_stack_unchanged": true,
-    "yamby_native_libraries_unchanged": true,
-    "lsposed_module_unchanged": true
+  "HDR": {
+    "on_phases": [
+      "PQ",
+      "HLG",
+      "SDR"
+    ],
+    "on_reported_frames": 390,
+    "off_phases": [
+      "PQ",
+      "SDR"
+    ],
+    "off_reported_frames": 200,
+    "PQ_static_metadata_matched": true,
+    "HLG_static_fields_zero": true,
+    "HDMI_driver_ten_bit_BT2020_for_HDR": true,
+    "DRM_blob_and_packet_registers_checked": true,
+    "pause_seek_EOS_and_exit_SDR": true,
+    "optical_HDMI_measurement": false
   },
-  "manual_playback_scope": "Earlier controlled takeover of the same kernel/CSF source baseline: user confirmed game and HEVC 10-bit playback normal. This installed-module boot matrix adds automated checks; it does not claim new exhaustive app acceptance.",
+  "graphics": {
+    "new_boot_ARM32_ARM64_GLES_exact_RGBA": true,
+    "new_boot_ARM32_ARM64_Vulkan_exact_4096_byte_fill": true,
+    "fixed_resolution_OPP_thermal_and_fence_waits_retained": true,
+    "measured_FPS_uplift": false
+  },
+  "rollback": {
+    "independent_off_N_and_reenable_Y": true,
+    "whole_module_disable_original_root_boot_restored": true,
+    "original_builtin_GPU_and_two_userspace_hashes_restored": true,
+    "twelve_original_platform_hashes_matched": true,
+    "polling_restored_to_100ms_with_module_disabled": true,
+    "external_Zygisk_LSPosed_retained": true,
+    "Decode_Stack_unchanged_and_healthy": true,
+    "final_reenable_cold_first_binding_passed": true
+  },
+  "integrity": {
+    "installer_manifest_entries": 117,
+    "retained_installed_entries": 115,
+    "Magisk_deleted_install_only_files": [
+      "customize.sh",
+      "README.md"
+    ],
+    "deletion_verified_against_Magisk_util_functions": true,
+    "kernel_manifest_entries": 16,
+    "active_mounts_verified": true,
+    "current_boot_cold_receipt_qualified": true,
+    "three_initial_graphics_service_PIDs_retained": true,
+    "relevant_final_boot_kernel_fault_scan_hits": 0,
+    "private_boot_device_logs_media_and_keys_excluded": true
+  },
+  "final_state": {
+    "version": "0.4.2-test1",
+    "fence": "on",
+    "cold": "on",
+    "kernel": "next",
+    "health": "active",
+    "DVFS_polling_ms": 20,
+    "pending_reboot": false,
+    "external_injection": "passed",
+    "Decode_Stack": "0.7.4-test1 healthy"
+  },
   "limitations": [
-    "Exact pinned firmware only; unknown builds refused",
-    "Experimental; no full CTS or long-term power validation",
-    "Kernel hard hangs may require a power cycle; the next boot skips an incomplete attempt",
-    "No claim of arbitrary application coverage or proof of draining every hidden reference",
-    "Does not address existing AnTuTu application exit or editing completion limitations"
+    "Bounded exact-firmware experimental acceptance; not a general RK3588 binary replacement",
+    "No game FPS or lower latency measurement; existing 20ms policy is historical",
+    "Unpatched traced path was not deliberately executed to crash the device",
+    "FD-exhaustion failure cleanup exercised; no forced kernel allocation OOM or long-duration leak qualification",
+    "Prior original-player UHD pacing and historical HEVC HLG queue timeout remain unresolved",
+    "No whole newer CSF or Mali release, CTS/VTS, long-duration stress or optical HDMI acceptance"
   ],
-  "kernel_build": {
-    "candidate": {
-      "sha256": "748e34ddc7897f733725772a1be6fd9cdcd7e503526a7779ec27c17af9eddea1",
-      "canonical_import_versions": 394
+  "verification_correction": "Initial final-manifest attempt included two files Magisk intentionally removes. A fresh complete retained-file check passed after confirming that behavior in the installed util_functions.sh; installer ZIP manifest still validates all 117 entries.",
+  "recommendation_progress": {
+    "classification": "ancillary CSF event-tracing stability fix",
+    "counts_as_new_priority_4_DVFS_or_scheduling_performance_progress": false,
+    "priority_4_complete": false,
+    "correction": "The original sequence targets GPU DVFS and scheduling performance. This fence-initialization fix does not change either and must not be counted as completing that item."
+  },
+  "previous_installed_validation": {
+    "component": "mali-global",
+    "version": "0.4.2-test1",
+    "date": "2026-10-18",
+    "status": "EXPERIMENTAL_BOUNDED_CSF_FENCE_TRACE_HDR_AND_REBOOT_ROLLBACK_VERIFIED",
+    "public_release": false,
+    "source_ref": "working-tree",
+    "unchanged_companion": "Decode Stack 0.7.4-test1",
+    "installer": {
+      "filename": "rk3588-mali-global-0.4.2-test1.zip",
+      "sha256": "5e91a0a549a4b635357c2f4d05cf609c0a0ff25c0ed4df75fae7810d7e205925",
+      "bytes_preserved": true,
+      "embedded_validation_is_pre_device_snapshot": true,
+      "validation_addendum": "docs/mali-csf-fence-042.zh-CN.md"
     },
-    "guard": {
-      "sha256": "14d047bba8011ac40d7b403ee0da684418261914945b42a07252d574ceb88a55",
-      "canonical_import_versions": 34
+    "upstream": {
+      "repository": "https://github.com/rockchip-linux/kernel",
+      "base_revision": "7a76350c1e0df810d8c11eb0d18285da4e79e6ed",
+      "selective_commit": "194a7d5a7567395d37e11ffa9014589b83ba8aad",
+      "scope": "Initialize and retain KCPU fence metadata before dma_fence_init trace callbacks; error cleanup, signaling, waiting and release remain intact.",
+      "local_changes": [
+        "Default-off read-only csf_fence_safe KMD parameter",
+        "Root-private independent fence selection latched by first-bind keeper",
+        "WebUI dependencies, requested/effective/actual and reboot state",
+        "First-binding qualification checks actual parameter against selection"
+      ]
+    },
+    "device_scope": {
+      "board": "H96 Max V58 / RK3588",
+      "kernel": "5.10.66",
+      "android_sdk": 32,
+      "magisk_api": 30700,
+      "Mali_pair": "g18p0 userspace/KMD/CSF",
+      "zygisk_next": "1.5.2",
+      "LSPosed": "2.2.1"
+    },
+    "build": {
+      "candidate_sha256": "c2eedfc82e5bd7e11e832f69e92bc7fb4bfb4a6197731e78921bea791bb65dcd",
+      "canonical_import_versions": 394,
+      "guard_import_versions": 34,
+      "kernel_image_unchanged": true,
+      "original_root_cpio_records_preserved": 22,
+      "graphics_and_original_Zygote_dispatch_recipe_unchanged": true,
+      "private_first_bind_profile_reprepared": true
+    },
+    "controls": {
+      "native_startup_fixture_cases": 37,
+      "Android_shell_checks": 59,
+      "browser_checks": 39,
+      "default": "off",
+      "reboot_only": true,
+      "requires_matched_first_binding": true
+    },
+    "new_path_validation": {
+      "both_ABIs": true,
+      "successful_fences": 1024,
+      "fd_allocation_error_cleanup": 128,
+      "traced_native_init_callbacks": 1152,
+      "all_timeline_metadata_present": true,
+      "global_trace_setting_preserved": true,
+      "unpatched_traced_path_intentionally_not_executed": true
+    },
+    "off_path_validation": {
+      "successful_fences": 512,
+      "fd_allocation_failure_paths": 64,
+      "tracing_disabled": true,
+      "metadata_queried_after_queue_deletion": true
+    },
+    "pixel_precision": {
+      "hdr2": {
+        "samples": 24883200,
+        "bits": 10,
+        "frames": 2,
+        "exact": true
+      },
+      "eight1": {
+        "samples": 13271040,
+        "bits": 8,
+        "frames": 1,
+        "exact": true
+      }
+    },
+    "HDR": {
+      "on_phases": [
+        "PQ",
+        "HLG",
+        "SDR"
+      ],
+      "on_reported_frames": 390,
+      "off_phases": [
+        "PQ",
+        "SDR"
+      ],
+      "off_reported_frames": 200,
+      "PQ_static_metadata_matched": true,
+      "HLG_static_fields_zero": true,
+      "HDMI_driver_ten_bit_BT2020_for_HDR": true,
+      "DRM_blob_and_packet_registers_checked": true,
+      "pause_seek_EOS_and_exit_SDR": true,
+      "optical_HDMI_measurement": false
+    },
+    "graphics": {
+      "new_boot_ARM32_ARM64_GLES_exact_RGBA": true,
+      "new_boot_ARM32_ARM64_Vulkan_exact_4096_byte_fill": true,
+      "fixed_resolution_OPP_thermal_and_fence_waits_retained": true,
+      "measured_FPS_uplift": false
+    },
+    "rollback": {
+      "independent_off_N_and_reenable_Y": true,
+      "whole_module_disable_original_root_boot_restored": true,
+      "original_builtin_GPU_and_two_userspace_hashes_restored": true,
+      "twelve_original_platform_hashes_matched": true,
+      "polling_restored_to_100ms_with_module_disabled": true,
+      "external_Zygisk_LSPosed_retained": true,
+      "Decode_Stack_unchanged_and_healthy": true,
+      "final_reenable_cold_first_binding_passed": true
+    },
+    "integrity": {
+      "installer_manifest_entries": 117,
+      "retained_installed_entries": 115,
+      "Magisk_deleted_install_only_files": [
+        "customize.sh",
+        "README.md"
+      ],
+      "deletion_verified_against_Magisk_util_functions": true,
+      "kernel_manifest_entries": 16,
+      "active_mounts_verified": true,
+      "current_boot_cold_receipt_qualified": true,
+      "three_initial_graphics_service_PIDs_retained": true,
+      "relevant_final_boot_kernel_fault_scan_hits": 0,
+      "private_boot_device_logs_media_and_keys_excluded": true
+    },
+    "final_state": {
+      "version": "0.4.2-test1",
+      "fence": "on",
+      "cold": "on",
+      "kernel": "next",
+      "health": "active",
+      "DVFS_polling_ms": 20,
+      "pending_reboot": false,
+      "external_injection": "passed",
+      "Decode_Stack": "0.7.4-test1 healthy"
+    },
+    "limitations": [
+      "Bounded exact-firmware experimental acceptance; not a general RK3588 binary replacement",
+      "No game FPS or lower latency measurement; existing 20ms policy is historical",
+      "Unpatched traced path was not deliberately executed to crash the device",
+      "FD-exhaustion failure cleanup exercised; no forced kernel allocation OOM or long-duration leak qualification",
+      "Prior original-player UHD pacing and historical HEVC HLG queue timeout remain unresolved",
+      "No whole newer CSF or Mali release, CTS/VTS, long-duration stress or optical HDMI acceptance"
+    ],
+    "verification_correction": "Initial final-manifest attempt included two files Magisk intentionally removes. A fresh complete retained-file check passed after confirming that behavior in the installed util_functions.sh; installer ZIP manifest still validates all 117 entries.",
+    "recommendation_progress": {
+      "classification": "ancillary CSF event-tracing stability fix",
+      "counts_as_new_priority_4_DVFS_or_scheduling_performance_progress": false,
+      "priority_4_complete": false,
+      "correction": "The original sequence targets GPU DVFS and scheduling performance. This fence-initialization fix does not change either and must not be counted as completing that item."
     }
   },
-  "runtime_build": {
-    "kernel_controller": "045699586bcfe4819df2d664aed1e872bb07d0a9bd006d7464e6da3acd8da8db",
-    "kernel_health": "165d7aed573a3f049216b6515a0da46b501718f7935e96bc94c251a1b8829d3c",
-    "kernel_scan": "6ae9a13b202eca949a4cd072850851233f951816825c93536f91b5cc0e0e9f20"
+  "new_change": {
+    "GPU_KMD_CSF_payload_changed": false,
+    "scope": "Exact complete Decode SF/allocator/HWC tuple policy; every other platform check retained",
+    "isolated_cases": 14,
+    "installed": true
   },
-  "final_package_method": "Installed candidate runtime payload passed the six-phase boot matrix. Final package updates only notices, validation and the WebUI checking-state message; deployed files are synchronized and verified against the final checksum manifest."
+  "base_installer": {
+    "filename": "rk3588-mali-global-0.4.2-test1.zip",
+    "sha256": "5e91a0a549a4b635357c2f4d05cf609c0a0ff25c0ed4df75fae7810d7e205925",
+    "bytes_preserved": true,
+    "embedded_validation_is_pre_device_snapshot": true,
+    "validation_addendum": "docs/mali-csf-fence-042.zh-CN.md"
+  },
+  "GPU_KMD_CSF_binary_changes": false,
+  "Decode_HDR_pair_policy": {
+    "only_scanout_validated_pairs_accepted": [
+      "test6",
+      "test7"
+    ],
+    "failed_test1_to_test5_pairs_rejected": true,
+    "GPU_performance_upgrade": false
+  },
+  "post_install_addendum": "docs/validation/decode-physical-hdr-081.json",
+  "tested_installer_unchanged": true,
+  "installed_artifact_sha256": "8b80edee9431efcdd1337fbcfdfd8ed7925bbe19a36ca194d1d9995a14fcb456",
+  "current_private_QMS_pair": {
+    "version": "0.4.2-qms-test16",
+    "Decode_version": "0.8.6-qms-test14",
+    "actual_boot_and_rollback_qualified": true,
+    "g18_KMD_DVFS_unchanged": true,
+    "Zygisk_Next_LSPosed_both_ABIs_healthy": true,
+    "trial_test17_withdrawn_with_decode_test15": true,
+    "details": "docs/validation/qms-notice-window-086.json"
+  },
+  "latest_refresh_session_release": {
+    "record": "docs/validation/decode-refresh-session-086.json",
+    "decode_version": "0.8.6",
+    "mali_pair_version": "0.4.2",
+    "boot_health": true,
+    "bounded_exo_physical_user_acceptance": true,
+    "runtime_binary_sha256": "dc6f5d29a9590a3e65e1808aadcd80da3d13809b1ed05aeefd94ef9e9477e054",
+    "note": "Mali pairing only; no new per-game performance claim"
+  },
+  "previous_record_version": "0.4.2-test9"
 }

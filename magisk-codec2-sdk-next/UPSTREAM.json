@@ -22,5 +22,163 @@
     "scope": "RK3588, native composer Surface, original eight/ten-bit precision, width divisible by 64; honors client FBC-disable",
     "layout": "lossless AFBC; completed-frame crop for filter-dependent top padding",
     "fallback": "linear NV15; explicit P010, texture and CPU consumers retain existing paths"
+  },
+  "local_av1_texture_afbc_extension": {
+    "decode_stack": "0.7.0-test2",
+    "patch": "patches/av1-texture-afbc.patch",
+    "switch": "av1_texture_afbc; default off; reboot required",
+    "scope": "RK3588 GPU-only texture consumer, 64-aligned width, no CPU/encoder/tunnel/explicit P010/crop/FBC-disable request",
+    "quality": "Lossless AFBC retaining actual source precision and existing HDR metadata",
+    "fallback": "Disable and reboot restores original P010 texture route; adaptive nonaligned/linear-layout info-change uses bounded full-precision copy",
+    "validation": "Bounded new-route precision, allocation, adaptive fallback and reboot rollback verified; original-player UHD pacing unresolved; experimental/default-off, not a public release"
+  },
+  "lifecycle_backports": {
+    "decode_stack": "0.7.1-test1",
+    "switch": "codec2_lifecycle; default off; reboot required",
+    "patch": "patches/codec2-lifecycle-backports.patch",
+    "upstream_commits": [
+      {
+        "commit": "894f5b7ca773c646758ba91fbdea6eb5370f17e4",
+        "source": "https://github.com/Lineage-Rockchip/android_hardware_rockchip_codec2/commit/894f5b7ca773c646758ba91fbdea6eb5370f17e4",
+        "subject": "[C2RKMpiDec]: optimize buffer management",
+        "scope": "takeBlock ownership transfer",
+        "author": "Chen Jinsen",
+        "date": "2025-10-21T08:43:53Z"
+      },
+      {
+        "commit": "e577f69d04d7435a8e4a1088337ff2ed92a3a7e1",
+        "source": "https://github.com/Lineage-Rockchip/android_hardware_rockchip_codec2/commit/e577f69d04d7435a8e4a1088337ff2ed92a3a7e1",
+        "subject": "[C2RKMpiDec]: Fix input/output work count mismatch",
+        "scope": "empty non-EOS input completion only; other workflow restructuring excluded",
+        "author": "Chen Jinsen",
+        "date": "2025-11-14T03:02:55Z"
+      },
+      {
+        "commit": "f5e25f2fbf34ee41dbd083af6f58d6c6b22156cb",
+        "source": "https://github.com/Lineage-Rockchip/android_hardware_rockchip_codec2/commit/f5e25f2fbf34ee41dbd083af6f58d6c6b22156cb",
+        "subject": "[C2RKMpiDec]: Fix flush indices missing issue",
+        "scope": "pending-work removal and flush-flag serialization only; tunnel/drop handling excluded",
+        "author": "Chen Jinsen",
+        "date": "2025-11-19T06:09:55Z"
+      },
+      {
+        "commit": "9581b4ac11fae9ee81467bec3cc542466593bee8",
+        "source": "https://github.com/Lineage-Rockchip/android_hardware_rockchip_codec2/commit/9581b4ac11fae9ee81467bec3cc542466593bee8",
+        "subject": "[C2RKMpiDec]: Set flushing state control during release",
+        "scope": "set flushing state before release handler and clear after reply",
+        "author": "Chen Jinsen",
+        "date": "2025-12-03T03:44:58Z"
+      }
+    ],
+    "local_extension": "Cancelable C2_BLOCKING retries and packet backpressure during flush/stop/release; no timeout on legitimate pause or skipped fence",
+    "validation": "Installed bounded empty-work, flush/seek, held-output, exact 8/10-bit and independent off/on reboot rollback verified; experimental/default-off, not a public release"
+  },
+  "gralloc_hdr_transfer": {
+    "decode_stack": "0.7.3-test1",
+    "switch": "gralloc_hdr_lease; default off; reboot required",
+    "patch": "patches/gralloc-hdr-lease.patch",
+    "implementation": "Local current-OutBuffer ownership transfer of an already validated mapper import; every-frame HDR encoding/set and all fences preserved. No global FD/ID cache, no borrowed-handle free by HDR bridge. Internal-copy/tunnel/missing-lease routes retain per-frame import.",
+    "screened_upstream": [
+      {
+        "commit": "85ed287e855429aac08899a148fe0514440894e2",
+        "source": "https://github.com/Lineage-Rockchip/android_hardware_rockchip_codec2/commit/85ed287e855429aac08899a148fe0514440894e2",
+        "decision": "Generic mapper direction reviewed; Android16/gralloc5 refactor not backported into API32"
+      },
+      {
+        "commit": "828d00b3a4a398deba0489e593817e3b2eec57af",
+        "source": "https://github.com/Lineage-Rockchip/android_hardware_rockchip_codec2/commit/828d00b3a4a398deba0489e593817e3b2eec57af",
+        "decision": "Rejected: upstream reverted it in 1fb8bc6048b23fdf14c603474ac7ad0bdd5c9e31; retain flush buffer cleanup"
+      }
+    ],
+    "validation": "Installed bounded on/off/re-enabled transfer tracing, six-phase HDR metadata, exact 8/10-bit AFBC, flush/held-stop and whole-module rollback verified; experimental/default-off, no FPS or long-duration claim",
+    "API32_ownership_reference": {
+      "repository": "platform/frameworks/native",
+      "tag": "android-12.0.0_r34",
+      "commit": "3e846409f064570d19769748a3050882c29fa999",
+      "file": "libs/ui/include/ui/GraphicBufferMapper.h",
+      "url": "https://android.googlesource.com/platform/frameworks/native/+/3e846409f064570d19769748a3050882c29fa999/libs/ui/include/ui/GraphicBufferMapper.h",
+      "scope": "Follow importBuffer/freeBuffer lifetime contract; no AOSP implementation copied or ABI changed"
+    }
+  },
+  "output_delay_notification": {
+    "decode_stack": "0.7.4-test1",
+    "switch": "codec2_delay_notify; default off; reboot required",
+    "patch": "patches/codec2-delay-notify.patch",
+    "upstream_commits": [
+      {
+        "commit": "2a4d75b7138f697b12ccef869cce45ec904bed50",
+        "source": "https://github.com/Lineage-Rockchip/android_hardware_rockchip_codec2/commit/2a4d75b7138f697b12ccef869cce45ec904bed50",
+        "subject": "[C2RKMpiDec]: fix output delay configuration update mechanism",
+        "author": "Chen Jinsen",
+        "date": "2026-01-08T12:36:18Z"
+      },
+      {
+        "commit": "34dd42c01675eeb92bbe0f2ed0b689f72c636a69",
+        "source": "https://github.com/Lineage-Rockchip/android_hardware_rockchip_codec2/commit/34dd42c01675eeb92bbe0f2ed0b689f72c636a69",
+        "subject": "[C2RKMpiDec]: Set incomplete flag during config update",
+        "author": "Chen Jinsen",
+        "date": "2026-01-19T02:28:27Z"
+      }
+    ],
+    "scope": "Independent config-only C2Work output delay notification, paired with reserved input index and FLAG_INCOMPLETE; no buffer count cap or low-memory tuning adopted",
+    "local_adaptation": "Keep legacy inline-work/unknown-null-work behavior when disabled; initialize ordinal fields to zero; only cache null-work state when independent notification enabled",
+    "quality": "Existing reference/output slots, pixel format, bit depth, AFBC and fences retained; no video frame or input completion fabricated",
+    "validation": "Installed bounded four-codec zero-frame callback, null-work 6-to-16 update, async 3597-frame TextureView on/off, exact 8/10-bit AFBC, HDR and independent/whole-module reboot rollback verified; experimental/default-off, no FPS claim"
+  },
+  "hevc_native_surface": {
+    "decode_stack": "0.7.6-test1",
+    "switch": "hevc_native_surface",
+    "default": 0,
+    "dependencies": [
+      "codec2_sdk_next",
+      "hdr_static"
+    ],
+    "patch": "patches/hevc-native-surface.patch",
+    "upstream_native_route_commit": "e3c30156793f778541b6eaec54ac2a1ac0f6a70c",
+    "new_direct_upstream_backport": false,
+    "implementation": "Local API32 info-change guard correction for verified RK3588 HEVC composer-only consumers; keep existing native NV15 output when ten-bit is discovered after setup. CPU, encoder, tunnel, explicit P010 and output-crop retain previous paths. FBC requests, pixels, bit depth, reference/output slots and fences unchanged.",
+    "validation": "Installed bounded late-profile native NV15/DEVICE, process CPU A/B, 194918400 exact samples including low bits, HDR and independent/whole-module reboot rollback verified; experimental/default-off, no universal FPS or latency claim"
+  },
+  "hevc_eos_pending": {
+    "switch": "hevc_eos_pending",
+    "default": 0,
+    "dependency": "codec2_sdk_next",
+    "upstream_commit": "e577f69d04d7435a8e4a1088337ff2ed92a3a7e1",
+    "upstream_url": "https://github.com/Lineage-Rockchip/android_hardware_rockchip_codec2/commit/e577f69d04d7435a8e4a1088337ff2ed92a3a7e1",
+    "range": "Only pending input ownership completion after true decoder EOS; HEVC-only qualification. Other process/init/stop changes excluded.",
+    "local_changes": "Default-off constructor-latched property, batched completion outside queue/state locks, flushing guard, existing API32 core and module dependency/reboot rollback.",
+    "patch": "patches/hevc-eos-pending.patch",
+    "validation": "Installed bounded input census: 8 to 0 pending at actual EOS, exact 60-frame/PTS output, reentrant queue callbacks, full ten-bit/HDR and independent/whole-module reboot rollback verified; default-off experimental, no generic FPS/seek claim"
+  },
+  "p010_pairs": {
+    "switch": "p010_pairs",
+    "default": 0,
+    "dependencies": [
+      "codec2_sdk_next",
+      "p010_fast"
+    ],
+    "new_direct_upstream_backport": false,
+    "origin": "Local optimization of existing project MIT NV15 conversion, fixed upstream decoder base unchanged",
+    "implementation": "Gather adjacent source bytes into halfword lanes using two-register NEON table lookups; combine shift and masking without reducing ten-bit precision. Exactly twenty bytes per sixteen samples; row staging, mapper/fences, copies, output and reference slots unchanged. Constructor-latched reboot property.",
+    "patch": "patches/p010-pairs.patch",
+    "validation": "Installed bounded TextureView Codec2 CPU-work reduction, exact full-ten-bit samples, native HDR and two-level reboot rollback verified. Explicit-P010 HDMI-HDR limitation reproduces identically ON/OFF and is not claimed fixed. Experimental/default-off; no universal FPS claim."
+  },
+  "native_backpressure_candidate": {
+    "patch": "patches/native-backpressure.patch",
+    "switch": "codec2_native_backpressure",
+    "default": 0,
+    "scope": "HEVC, non-tunneled native outputs; copy/P010 initialization/info-change retain prior fetching",
+    "dependencies": [
+      "codec2_sdk_next",
+      "codec2_surface",
+      "codec2_lifecycle"
+    ],
+    "reference": "https://android.googlesource.com/platform/external/v4l2_codec2/+/f28937be2f3832ed7f6be9412ff222315e49f42b/v4l2/V4L2DecodeComponent.cpp",
+    "new_direct_upstream_backport": false,
+    "implementation": "Local single-attempt prefetch via the existing platform pool; one delayed retry with flush/stop generation; actual completed-frame work only. No output-delay increase, watchdog change, fence bypass, or fake completions. V4L2 buffer-count constants are not transplanted.",
+    "validation": "UNVALIDATED_CANDIDATE",
+    "test1_result": "Actual Exo pause/seek still reached MPP retry exhaustion and err0xe; rejected as fix.",
+    "test2_input_flow_control": "Only MPP_ERR_BUFFER_FULL plus an actual atomic native BQ C2_BLOCKING state waits for Surface recovery/flush without consuming the active delivery retry budget; other MPP errors fail and CCodec watchdog is unchanged.",
+    "mpp_reference": "https://github.com/rockchip-linux/mpp/blob/c08762ebfadeb4e986d2fed993bc7a54862d3ebe/mpp/mpp.c"
   }
 }

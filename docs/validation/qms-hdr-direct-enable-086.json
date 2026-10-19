@@ -1,0 +1,164 @@
+{
+  "date": "2026-10-19",
+  "version": "0.8.6-qms-test14-ddc1",
+  "status": "DIRECT_AUTO_QMS_REAL_SWITCHES_COMPLETE_PHYSICAL_SHORT_BLACKOUT_PERSISTS",
+  "public_release": false,
+  "requested_items": [
+    "QMS",
+    "GPU composition ten-bit HDR output path"
+  ],
+  "changes": [
+    "Restore the existing verified private cold-boot selection through Mali Global mode-control; no newly generated boot image",
+    "Run the existing corrected-EDID native initialization before QMS initial qualification under the cold graphics barrier",
+    "Retain direct HDMI E-DDC repair and system HDMI transient audio-event filtering"
+  ],
+  "active_selections": {
+    "display_qms": 1,
+    "hwc_client_hdr10": 1,
+    "hwui_rgb10": 1,
+    "hdr_static": 1,
+    "hdmi_audio_guard": 1,
+    "display_policy": 1,
+    "display_ddc": 1,
+    "Frame_Guard": "disabled and paused"
+  },
+  "real_boot": {
+    "cold_first_binding": true,
+    "QMS_owner_online": 1,
+    "QMS_HWC": "active",
+    "QMS_endpoint_error": 0,
+    "QMS_proof": 63,
+    "QMS_pregraphics_baseline_switch_restore": true,
+    "QMS_service_qualified": true,
+    "RGB10_allocator": "active",
+    "SF_target10": "active",
+    "SF_target10_error": 0,
+    "HWC_target_plan": "active",
+    "HWC_target_plan_error": 0,
+    "Mali_userspace": "g18",
+    "Mali_KMD": "g18 rk_next_mali",
+    "Mali_DVFS": "active",
+    "Mali_cold_qualification": "COLD_AUTOMATED_PASS",
+    "Zygisk_Next_and_LSPosed_both_ABIs": true,
+    "HDMI_DDC": "active",
+    "HDMI_transient_audio_guard": "active",
+    "SCDC_clock_and_all_channel_locks": true
+  },
+  "current_idle_link": {
+    "mode": "3840x2160p60",
+    "format": "YUV420",
+    "bits": 8,
+    "EOTF": "SDR/off",
+    "qualification": "Idle SDR status; does not prove or disprove ten-bit HDR video output"
+  },
+  "physical": {
+    "Exo_short_blackout": "Still present under direct HDMI1 and actual Auto/QMS",
+    "sound_after_new_cold_boot": "awaiting user feedback",
+    "HDR10_HDMI_bit_depth_and_EOTF": "awaiting known HDR10 content",
+    "HDR10_GPU_CLIENT_composition": "awaiting a real CLIENT-composed HDR scenario; patch activation alone is insufficient",
+    "TV_QMS_acknowledgement": "not inferred from source proof/clock lock",
+    "blackout_fixed": false,
+    "direct_HDMI_user_report": "Correction: Auto still has short blackouts; earlier no-black report was mistaken"
+  },
+  "rollback": {
+    "private_module_and_state_backup_saved": true,
+    "original_root_boot_preserved": true,
+    "existing_candidate_boot_sha256": "7d756cd222e82ee4805804d26f275bcf914f97d463a21824e06a3e621c7411f5",
+    "no_other_module_enable_flags_changed": true
+  },
+  "private_logs_and_EDID_in_public_package": false,
+  "mode_audit": {
+    "saved_resolution_key": "Auto",
+    "endpoint_after_user_report": {
+      "generation": 2,
+      "serial": 0,
+      "completed": 0,
+      "effective_tfr": 10,
+      "error": 0
+    },
+    "owner_refreshes": 1,
+    "owner_boundary_records": 40,
+    "preserved_transition_trace_for_user_actions": true,
+    "requested_user_confirmation": "Actual Auto versus fixed 4K60 selection",
+    "claim_limit": "Do not infer seamless QMS switching, matrix damage, or a matrix-specific root cause from this report",
+    "actual_specs": "primary [0,60], application [0,Infinity]",
+    "endpoint_after_corrected_report": {
+      "generation": 2,
+      "serial": 26,
+      "completed": 26,
+      "error": 0
+    },
+    "actual_QMS_switches": 26,
+    "frame_errors": 0,
+    "VOP_PHY_full_rebuild_observed": false,
+    "NOISY_broadcast_observed": false,
+    "earlier_fixed_60_snapshot": "Superseded by later Auto property and unlocked native policy; never use earlier direct no-black report as acceptance",
+    "matrix_necessary_for_fault": false
+  },
+  "receiver_SCDC_trial": {
+    "duration_seconds_approximately": 60,
+    "samples_completed": 591,
+    "interval_ms": 100,
+    "all_sampled_clock_detected": true,
+    "all_sampled_channel_locks": [
+      true,
+      true,
+      true
+    ],
+    "status0_unchanged": "0x4f",
+    "SCDC_config_writes": false,
+    "clear_on_read_CED_access": false,
+    "tool_stopped": true,
+    "user_confirmed_operations": true,
+    "user_explicitly_reconfirmed_blackout_in_capture_reply": false,
+    "QMS_kernel_boundaries_correlated_in_window": 56,
+    "serials_with_full_boundary_records": [
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15,
+      16,
+      17,
+      18,
+      19,
+      20
+    ],
+    "boundary_cap_reached": 96,
+    "end_endpoint_completed_serial": 26,
+    "physical_root_cause_proven": false,
+    "limits": "100ms read sampling may miss shorter losses. Lock bits are not received VTEM or a panel-mute acknowledgement."
+  },
+  "observed_rate_consistency": {
+    "base_clock_Hz": 594000000,
+    "htotal": 4400,
+    "stable_vtotal_and_TFR": [
+      {
+        "vtotal": 2250,
+        "tfr_code": 10,
+        "calculated_Hz": 60
+      },
+      {
+        "vtotal": 5625,
+        "tfr_code": 2,
+        "calculated_Hz": 24
+      }
+    ],
+    "matches": true,
+    "basis": "Captured hardware timing and VTEM rate registers, checked against the independent upstream RFC TFR map",
+    "reference": "https://lists.openwall.net/linux-kernel/2026/09/21/2415"
+  },
+  "protocol_audit": {
+    "references": [
+      "https://lkml.iu.edu/2609.2/14407.html",
+      "https://lists.openwall.net/linux-kernel/2026/09/21/2213"
+    ],
+    "status": "RFC references, not claimed merged or a proven fix",
+    "mapping": "QP mapper omits hardware-supplied organisation bytes; do not insert generic wire bytes directly into reserved register slots",
+    "remaining_difference": "RFC END=0 / 0x86 versus retained vendor END=1 / 0xc6; previous END=0 matrix trial did not improve. No new packet edit installed in this diagnostic turn."
+  }
+}

@@ -4,7 +4,7 @@ RUN=$STATE/kernel-run
 read_mode(){ v=$(cat "$STATE/mode" 2>/dev/null);case "$v" in on|off) echo "$v";;*) echo on;;esac; }
 read_kernel(){ v=$(cat "$STATE/kernel-mode" 2>/dev/null);case "$v" in stock|next) echo "$v";;*) echo stock;;esac; }
 atomic_state(){
- case "$1" in mode|kernel-mode|kernel-pending|kernel-boot-plan|kernel-recovery|kernel-active-boot) ;;*) return 2;;esac
+ case "$1" in mode|kernel-mode|kernel-pending|kernel-boot-plan|kernel-recovery|kernel-active-boot|dvfs-mode|cold-mode|cold-plan|fence-mode) ;;*) return 2;;esac
  case "$2" in ''|*[!a-zA-Z0-9_-]*) return 2;;esac
  [ ! -L "$STATE" ] || return 2
  mkdir -p "$STATE";chmod 0700 "$STATE"

@@ -19,6 +19,7 @@ def main():
  for name in ['ndk','sdk','headers','binder32','binder64','libcpp32','libcpp64','work']:parser.add_argument('--'+name,type=Path,required=True)
  parser.add_argument('--kernel-artifacts',type=Path,required=True)
  parser.add_argument('--kernel-runtime',type=Path,required=True)
+ parser.add_argument('--source-ref',help='Source tag/ref; working-tree marks an unpublished local candidate')
  parser.add_argument('--build-tools',default='35.0.0');parser.add_argument('--aidl-build-tools',default='34.0.0')
  a=parser.parse_args();w=a.work.resolve();out=w/'package'
  if out.exists():raise SystemExit('Use a fresh output directory')
@@ -30,6 +31,7 @@ def main():
   args+=['-I'+str(src/'aidl'/name) for name in PACKAGES];args+=list((src/'aidl'/key).rglob('*.aidl'));run(args)
  shutil.copytree(MODULE,out,ignore=shutil.ignore_patterns('payload','system','bin','active*','status.txt','compositor-status.txt','disable','checksums.sha256','payload.sha256','skip_mount'))
  (out/'bin').mkdir()
+ run([llvm/('clang'+ext),'--target=aarch64-linux-android32','-std=c11','-O2','-static','-Wall','-Wextra','-Werror','-ffile-prefix-map='+ROOT.as_posix()+'=/src',src/'cold_boot.c','-Wl,-z,relro,-z,now','-o',out/'bin/cold_boot64'])
  common_args=['-std=c++17','-O2','-fPIC','-shared','-fno-exceptions','-fno-rtti','-nostdinc++','-nostdlib++','-DANDROID','-DBINDER_STABILITY_SUPPORT','-isystem'+str(h/'external/libcxx/include'),'-isystem'+str(h/'generated-headers/bionic/libc/libc/android_vendor.32_arm_armv8-a_shared/gen/include'),'-I'+str(src/'binder-cpp')]
  for original,replacement in [(MODULE.resolve(),'/src'),(h,'/platform'),(ndk,'/ndk'),(w,'/obj')]:
   for spelling in {str(original).replace('\\','/'),str(original).replace('/','\\')}:common_args+=['-ffile-prefix-map='+spelling+'='+replacement]
@@ -52,8 +54,17 @@ def main():
  for line in (MODULE/'contracts/driver-sources.txt').read_text(encoding='utf-8').splitlines():
   abi,size,digest,url=line.split();directory='lib' if abi=='arm' else 'lib64';lines.append(digest+'  payload/'+directory+'/egl/libGLES_mali.so')
  (out/'payload.sha256').write_bytes(('\n'.join(sorted(lines))+'\n').encode())
- stage_licenses(out,'mali-global')
+ stage_licenses(out,'mali-global',source_ref=a.source_ref)
  stage_kernel(out,a.kernel_artifacts,a.kernel_runtime)
+ report=ROOT/'docs/mali-dvfs-031.zh-CN.md'
+ if report.exists():shutil.copyfile(report,out/'GPU_RESPONSE_VALIDATION.zh-CN.md')
+ cold_report=ROOT/'docs/mali-cold-binding-040.zh-CN.md'
+ if cold_report.exists():shutil.copyfile(cold_report,out/'COLD_BINDING_CANDIDATE.zh-CN.md')
+ repair_report=ROOT/'docs/mali-zygisk-repair-041.zh-CN.md'
+ if repair_report.exists():shutil.copyfile(repair_report,out/'ZYGISK_REPAIR_VALIDATION.zh-CN.md')
+ fence_report=ROOT/'docs/mali-csf-fence-042.zh-CN.md'
+ if fence_report.exists():shutil.copyfile(fence_report,out/'CSF_FENCE_CANDIDATE.zh-CN.md')
+ shutil.copyfile(ROOT/'mali-kernel/UPSTREAM.json',out/'KERNEL_UPSTREAM.json')
  files=sorted(f for f in out.rglob('*') if f.is_file())
  for f in files:
   if f.suffix in {'.sh','.md','.txt','.json','.sha256','.prop','.java','.c','.cpp','.h','.aidl'}:f.write_bytes(f.read_bytes().replace(b'\r\n',b'\n'))

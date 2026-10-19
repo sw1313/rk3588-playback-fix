@@ -1,0 +1,109 @@
+{
+  "component_version": "0.1.4",
+  "original_hwc_sha256": "ec3e42d172af843a74bad42674d6e5932f0070873c7bb73cf681a285ada44478",
+  "new_change": "Local paired SF/allocator/HWC/Mapper and HWUI repairs; selective advertised-mode cache backport. Bounded test7 ten-bit HDR chain and rollback passed; Exo fault reproduction ongoing.",
+  "new_direct_backports": [],
+  "reviewed_commits": [
+    {
+      "commit": "8719dc99b24751706c137df07c9244ec78f2d996",
+      "source": "https://github.com/TinkerBoard-Android/rockchip-android-hardware-rk35-hwcomposer2/commit/8719dc99b24751706c137df07c9244ec78f2d996",
+      "result": "Same-transaction HDR behavior already present; not recounted as new upgrade"
+    },
+    {
+      "commit": "7009cc1909804ef707376441b5b3f986b492d66a",
+      "source": "https://android.googlesource.com/platform/external/drm_hwcomposer/+/7009cc1909804ef707376441b5b3f986b492d66a",
+      "result": "Generic HWC classes/EDID incompatible with pinned original ABI; retain and retest existing SDR clearing semantics"
+    }
+  ],
+  "scaled_overlay": {
+    "commit": "e3e3d168e524da25620ef55da734e48c8e56afe6",
+    "url": "https://github.com/TinkerBoard-Android/rockchip-android-hardware-rk35-hwcomposer2/commit/e3e3d168e524da25620ef55da734e48c8e56afe6",
+    "scope": "Remove RK356x act_w%16==1 and odd-destination-width upscaling exclusions from the pinned RK3588 CheckGLESLayer. Native plane matching, dimensions, formats, atomic commits and fences unchanged.",
+    "local_implementation": "Installer generates private exact-hash variant. At ARM64 file/VA 0x85dc8, replace the sole branch into the two obsolete checks with NOP; only four bytes differ. Boot assembly selects the variant only with an independent default-off switch. Original companion retained for reboot rollback.",
+    "original_sha256": "ec3e42d172af843a74bad42674d6e5932f0070873c7bb73cf681a285ada44478",
+    "patched_sha256": "47702a172f0b95ecc88dbc60a9b42a09b80841e9b4269ce74d7af916af33901b",
+    "whole_HWC_latest_version_upgrade": false,
+    "isolated_actual_method_cases": 768
+  },
+  "decode_stack_integration_version": "0.8.1-test7",
+  "mode_cache": {
+    "commit": "de31070c66c61ee2bd90c42c6877d26c4c5d7c24",
+    "url": "https://github.com/rockchip-toybrick/rk_hardware_rk35_hwcomposer2/commit/de31070c66c61ee2bd90c42c6877d26c4c5d7c24",
+    "scope": "GetDisplayAttribute and SetActiveConfig use advertised sf_modes_; do not adopt GetDisplayConfigs count change",
+    "local_adaptation": "Exact pinned vendor object layout/callback and import slots; guards check firmware hash, method RVAs, exports and original imports; independent default-off boot selection",
+    "whole_HWC_upgrade": false,
+    "full_historical_fault_acceptance": false
+  },
+  "hwui_rgb10": {
+    "origin": "Local missing-case repair, not an upstream commit backport",
+    "reference": "https://android.googlesource.com/platform/frameworks/base/+/android-12.1.0_r11/libs/hwui/DeviceInfo.cpp",
+    "Skia_enum_reference": "https://android.googlesource.com/platform/external/skia/+/android-12.1.0_r11/include/core/SkImageInfo.h",
+    "reviewed_AOSP_versions": [
+      "android-12.1.0_r11",
+      "android-13.0.0_r1",
+      "android-14.0.0_r1"
+    ],
+    "review_result": "DeviceInfo case 43 absent; existing explicit EGL/Skia RGB10 support does not prove generic WCG is complete",
+    "contract": "contracts/hwui-rgb10.json",
+    "full_HWUI_upgrade": false,
+    "full_rendering_acceptance": false
+  },
+  "physical_hdr_target": {
+    "status": "BOUNDED_PRIMARY_HDR_CHAIN_AND_ROLLBACK_PASSED_COLORIMETRY_BOUNDED",
+    "origin": "Local paired SF/allocator/HWC repair; no whole Composer/HWC/kernel upgrade",
+    "observed_root_cause": "Pinned HW_FB allocator branch replaces requested43 with RGBA8888/AFBC. Preserve AFBC layout and requested43. Linear RGB10 is rejected by this firmware HWC Cluster policy.",
+    "allocator_reference_repository": "https://github.com/TinkerBoard-Android/rockchip-android-device-rockchip-rksdk",
+    "reference_commit": "ca9cd2d3577fa9f80187b75558f06fa32e353b3e",
+    "reference_file": "gralloc.device.mk",
+    "reference_is_fix_backport": false,
+    "SF_reference": "https://android.googlesource.com/platform/frameworks/native/+/android-12.1.0_r11/services/surfaceflinger/DisplayHardware/FramebufferSurface.cpp",
+    "allocator_fixture_cases": 768,
+    "SF_fixture_cases": 321,
+    "HWC_fixture_cases": 71,
+    "new_copies": 0,
+    "HDR_FB_AFBC": true,
+    "SDR_FB_AFBC_unchanged": true,
+    "dependencies": "Exact SF, source-built target shim, exact allocator variant/source-built selection shim, original HWC adapter, first-binding graphics barrier",
+    "HWC_plan": {
+      "origin": "Local exact-ABI adaptation, not an upstream commit backport",
+      "cause": "PopulateFB validate invents AB24 and omits HDR dataspace; linear RGB10 candidate cannot match Cluster planes",
+      "scope": "Paired primary PQ/HLG AB30 AFBC preview and matching real target; original AFBC properties and fences retained",
+      "isolated_actual_factory_cases": 32,
+      "actual_scanout_accepted": true,
+      "validation_error_cases": 128,
+      "failed_validation_recovery": "Return NOT_VALIDATED on present after failed primary HDR validate; latch service reboot rollback; never fabricate or ignore fences",
+      "accepted_version_scope": "test7 PQ/HLG actual AB30 AFBC, mixed SDR UI, SDR virtual display, SDR exit, item/whole reboot rollback"
+    },
+    "mapper_validation": {
+      "origin": "Local matching selection repair, not a skipped validation or upstream backport",
+      "scope": "Existing original libui SP-HAL mapper select_format GOT, pinned method RVA0x1b568/import0x1fc58, primary HDR present TLS only",
+      "actual_isolated_import_cases": 24,
+      "controls": "Original rejects RGB10 AFBC with FB usage; scoped candidate accepts; incorrect width, height, format and stride still rejected; outside scope restores original; 64/1920/3840 widths",
+      "global_mapper_file_changed": false,
+      "global_properties_changed": false,
+      "fences_changed": false
+    },
+    "target_precision_diagnostic": {
+      "status": "ACTUAL_4K_SF_TARGET_TEN_BIT_CONFIRMED_NOT_BIT_EXACT",
+      "source": "src/target_readback.h",
+      "scope": "Root-requested one-shot read-only actual queued target; duplicate/wait producer fence; preserve original fence, queue callback, EGL display and caller resources",
+      "public_data": "No private input, frame dumps or raw logs included",
+      "scratch_exact_pixels": 4096,
+      "scratch_original_EGL_and_fence_retained": true,
+      "not_a_performance_run": true,
+      "distinct_RGB_levels": 1020,
+      "RGB_range": [
+        0,
+        1023
+      ],
+      "maximum_RGB_reference_delta": [
+        3,
+        3,
+        4
+      ],
+      "RGB_bit_exact": false,
+      "full_colorimetric_acceptance": false
+    },
+    "validation_reference": "docs/validation/decode-physical-hdr-081.json"
+  }
+}

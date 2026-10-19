@@ -1,6 +1,6 @@
 id=rk3588_decode_stack
 name=RK3588 Decode Stack
-version=0.6.7
-versionCode=607
+version=0.8.6
+versionCode=881
 author=sw1313
-description=Firmware-specific RK3588 API32 decode stack with offline KSU WebUI, dependency-aware switches and reboot status. Lossless AV1 AFBC and existing rollback retained.
+description=RK3588 API32 playback/display upgrade with per-feature reboot rollback. Keeps matched video rates across pause/seek in Auto; includes native-buffer stability, ten-bit format and HDMI compatibility repairs. Exact firmware required.

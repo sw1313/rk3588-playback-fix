@@ -1,0 +1,112 @@
+{
+  "purpose": "Trace the complete vendor QMS series to its firmware-specific adaptation; this file is not activation proof",
+  "target_component": "Decode Stack",
+  "source_baseline": [
+    "https://github.com/rockchip-linux/kernel/commit/d0e8f558bc58984f8f4508133143cc9ca77c8b0d",
+    "https://github.com/rockchip-linux/kernel/commit/5a89a1cb8b9c3cba5666151e838d2a3d760fe0ea"
+  ],
+  "adaptations": [
+    {
+      "vendor_area": "rockchip_drm_drv.c: QMS timing records, TFR conversion and fractional sequence",
+      "local": [
+        "core.c",
+        "timings.h"
+      ],
+      "status": "Actual C precision/state tests passed; variable HDMI timing not enabled",
+      "differences": [
+        "Bounded lookup",
+        "Exact rational rates",
+        "Two documented upstream table corrections"
+      ]
+    },
+    {
+      "vendor_area": "rockchip_drm_drv.h and rockchip_drm_vop2.c: hdmi_vrr CRTC state, duplicate/reset, IRQ timing updates",
+      "local": [
+        "session.c",
+        "native_atomic.h",
+        "native_carrier.h",
+        "native_engine.h",
+        "native_binding.c"
+      ],
+      "status": "Native carrier and OFF-session observation tested; continuous variable timing/deadlines pending",
+      "differences": [
+        "Sidecar state rather than extending the factory allocation",
+        "Native process-context flush transaction rather than taking the factory ordinary reg_lock in IRQ",
+        "Preserve native planes and fences",
+        "Staged publication only after native completion"
+      ]
+    },
+    {
+      "vendor_area": "dw-hdmi-qp.c/h: class1 VTEM payload, TX_EN, next_tfr/m_const state and setup refresh",
+      "local": [
+        "transaction.c",
+        "native_registers.h",
+        "native_lifecycle.h"
+      ],
+      "status": "Original-value writes tested; enabled VTEM transitions and powered reinitialization pending",
+      "differences": [
+        "Write only owned scheduler bit9",
+        "Track ownership before a possibly partial write",
+        "Verify power and expected TX_EN at completion",
+        "Never reapply stale QMS after native mode/power change"
+      ]
+    },
+    {
+      "vendor_area": "dw_hdmi-rockchip.c: enable/rate-change/disable work, real vsync waits and encoder reset",
+      "local": [
+        "core.c",
+        "controller.c",
+        "lifecycle.c",
+        "native_lifecycle.h",
+        "native_pm.h",
+        "native_binding.c"
+      ],
+      "status": "Lifecycle policy/native-wrapper injection tests and actual table preparation passed; callbacks not published",
+      "differences": [
+        "Absolute command deadlines with independent status publication",
+        "Native failure recovery and foreign-mode preservation",
+        "PM route also guarded before suspend",
+        "Fresh link/HDR qualification required after resume"
+      ]
+    },
+    {
+      "vendor_area": "dw_hdmi-rockchip.c: next_tfr DRM connector property",
+      "local": [
+        "uapi.h",
+        "endpoint.c",
+        "../../magisk-hdr/src/qms_client.h",
+        "../../magisk-hdr/src/qms_frontend.h"
+      ],
+      "status": "Private ioctl/HWC candidate compiled and isolated tests passed; actual endpoint not registered",
+      "differences": [
+        "Versioned private syscall instead of pretending the old firmware implements the new DRM property",
+        "Successful logical HWC config requires a real completed native ticket"
+      ]
+    },
+    {
+      "vendor_area": "Board prerequisites for the vendor QMS stream: current sink/link/format and ordinary recovery identity",
+      "local": [
+        "native_link.c",
+        "native_link.h",
+        "native_qualify.c"
+      ],
+      "status": "Current TMDS SDR EDID/DDC/PHY/clock observation tested; board validator source connected, continuous binding not activated",
+      "differences": [
+        "Read current retained immutable native blobs and direct physical DDC without property update or software override",
+        "Compare actual PHY readiness and clock with output format and AVI/HDR metadata",
+        "Reject unsupported FRL/422/DSC and foreign VRR ownership without forcing a lower quality mode",
+        "Fail stale generation/cookie/epoch and retain dirty ownership on recovery failure"
+      ]
+    }
+  ],
+  "mandatory_remaining": [
+    "Actual ten-bit/HDR hardware validation and ordinary recovery after enabled VTEM/changed timing; current uncompressed TMDS SDR profile has real EDID/DDC/PHY/clock checks, unsupported profiles remain gated",
+    "Full cold-binding owner retaining device/module lifetimes and publishing bridge/PM guards before graphics",
+    "Requalification of a fresh native mode/link/HDR session after power/hotplug; never reuse a stale generation or ticket",
+    "Continuous native frame/deadline tests with ordinary compositor traffic and real enabled-VTEM recovery",
+    "Real kernel endpoint and HWC integration, functional Decode loader/selection/dependencies, boot and reboot rollback",
+    "Physical HDMI no-black and ten-bit/HDR acceptance with Frame Guard disabled"
+  ],
+  "complete_vendor_stack_ported": false,
+  "release_accepted": false
+}

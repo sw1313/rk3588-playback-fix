@@ -1,31 +1,318 @@
 {
-  "version": "1.14.16_[0]",
-  "decode_stack": "0.6.3",
-  "stage": "local_playback_precision_and_selector_validation",
-  "sha256": "c07bdfa3d3ee96e1d7104d7ca48542f243024db403b30f22cb686e0f5e3b3ac3",
-  "details_in_unified_package": "../../VALIDATION.json",
-  "details_in_source_tree": "../magisk-decode/VALIDATION.json",
-  "afbc_sample_cases": 5,
-  "native_exact_cases": 6,
-  "prior_validation": {
-    "version": "1.14.16_[0]",
-    "decode_stack": "0.6.1",
-    "stage": "local_validation_passed_with_documented_limits",
-    "sha256": "dc9a6c82837e5dbdb41de62a611ca01fb6f83e08268a2d0bc7e11fca5cb83332",
-    "native_exact_cases": 11,
-    "local_lifecycle_cases": 5,
-    "local_available_format_paths": 16,
-    "details_in_unified_package": "../../VALIDATION.json",
-    "details_in_source_tree": "../magisk-decode/VALIDATION.json",
-    "prior_validation": "../docs/validation/decode-0.6.0.json",
-    "limitations": [
-      "Complete SmartTube UI/custom-renderer/network playback not revalidated; final performance tests used local files.",
-      "Small startup drop counts remain in video-only Exo tests; no universal zero-drop or all-stream claim.",
-      "Synthetic/transcoded/repeated samples are not independent HDR photography, a thermal soak, or exhaustive codec-tool coverage.",
-      "AV1+Opus MP4 local playback clock stalls with both output routes in this old Exo diagnostic path; exact encoded audio/video streams remuxed as WebM pass. This container case is excluded from the passing matrix.",
-      "P010 texture consumers have no NV15 display-plane performance guarantee.",
-      "HDR wire signaling inferred from driver and packet registers; no external HDMI analyzer.",
-      "Existing HDR4000 client-composition boundary, inherited capability registry, lack of Dolby/HDR10+ HDMI support remain."
-    ]
-  }
+  "version": "0.8.4-test3",
+  "status": "NATIVE_TEST2_BOUNDED_PASS_TEST3_SCOPE_GATE_PENDING",
+  "public_release": false,
+  "previous_results_historical": {
+    "component": "codec2-sdk-next",
+    "version": "0.7.8-test1",
+    "date": "2026-10-18",
+    "source_ref": "working-tree",
+    "status": "EXPERIMENTAL_BOUNDED_NV15_P010_CPU_REDUCTION_PRECISION_AND_REBOOT_ROLLBACK_VERIFIED",
+    "public_release": false,
+    "goal": "P1/P5: reduce required full-ten-bit NV15-to-P010 conversion CPU work for texture and explicit-P010 consumers",
+    "switch": {
+      "name": "p010_pairs",
+      "default": 0,
+      "dependencies": [
+        "codec2_sdk_next",
+        "p010_fast"
+      ],
+      "constructor_latched": true,
+      "reboot_required": true,
+      "device_final_active": true
+    },
+    "installer": {
+      "filename": "rk3588-decode-stack-0.7.8-test1.zip",
+      "sha256": "42f0f231a13e164a41516f76834a494f2a9eaaa88710dc0980a406dbfbd98cbe",
+      "tested_bytes_preserved": true,
+      "embedded_validation_is_pre_device_snapshot": true,
+      "addendum": "docs/decode-p010-pairs-078.zh-CN.md"
+    },
+    "core_sha256": "5a1d49ee548abe31195e2d7f170fc27a42f48300cd3756c4dd0e6d223e858172",
+    "provenance": {
+      "base_repository": "https://github.com/khadas/android_vendor_rockchip_hardware_interfaces_codec2",
+      "base_commit": "e3c30156793f778541b6eaec54ac2a1ac0f6a70c",
+      "new_direct_upstream_backport": false,
+      "implementation": "Local MIT optimization of project NV15 row unpacking: adjacent-byte pair gather into halfword lanes, combined shift/mask, exactly twenty-byte source window per sixteen samples",
+      "patch": "magisk-codec2-sdk-next/patches/p010-pairs.patch",
+      "canonical_header": "tools/pixel-conversion/RKPacked10Wide.h",
+      "old_header_unchanged": true,
+      "builder_verifies_applied_header": true
+    },
+    "quality_and_bounds": {
+      "ARM32_cases": 140,
+      "ARM64_cases": 140,
+      "independent_bit_level_reference_all_ten_bit_values": true,
+      "scalar_tails_strides_unaligned_destinations_guard_pages_and_padding": true,
+      "invalid_input_no_destination_write": true
+    },
+    "cached_memory_microbenchmark": {
+      "alternating_old_new_order_batches_per_size": 8,
+      "frames_per_batch_path": 10,
+      "summary": {
+        "arm": {
+          "1280": {
+            "old_ms_median": 0.8070999999999999,
+            "new_ms_median": 0.57315,
+            "change_percent": -28.986494858134048
+          },
+          "1920": {
+            "old_ms_median": 1.7699,
+            "new_ms_median": 1.1179999999999999,
+            "change_percent": -36.83258941183119
+          },
+          "3840": {
+            "old_ms_median": 6.96565,
+            "new_ms_median": 4.3945,
+            "change_percent": -36.91184598709382
+          }
+        },
+        "arm64": {
+          "1280": {
+            "old_ms_median": 0.73875,
+            "new_ms_median": 0.56635,
+            "change_percent": -23.336717428087983
+          },
+          "1920": {
+            "old_ms_median": 1.6071,
+            "new_ms_median": 1.18185,
+            "change_percent": -26.460705618816494
+          },
+          "3840": {
+            "old_ms_median": 6.28545,
+            "new_ms_median": 4.57455,
+            "change_percent": -27.220008113977514
+          }
+        }
+      },
+      "scope": "cached memory only; not mapper, playback FPS or total bandwidth"
+    },
+    "installed_controlled_workload": {
+      "source": "same unmodified 3840x2160 30fps ten-bit HEVC packets",
+      "consumer": "GPU-only TextureView with identical linear request and omitted profile",
+      "runs": {
+        "base": [
+          {
+            "pairs_enabled": false,
+            "real_frames": 360,
+            "codec_service_cpu_seconds": 3.96,
+            "measurement_wall_seconds": 13.718999999997322,
+            "late_delivery_gt20ms": 0,
+            "callback_gap_p95_ms": 33.334,
+            "frame_census_complete": true,
+            "scheduled_source_span_seconds": 11.966666,
+            "source_and_configuration_unchanged": true
+          },
+          {
+            "pairs_enabled": false,
+            "real_frames": 360,
+            "codec_service_cpu_seconds": 3.75,
+            "measurement_wall_seconds": 13.593000000000757,
+            "late_delivery_gt20ms": 0,
+            "callback_gap_p95_ms": 33.334,
+            "frame_census_complete": true,
+            "scheduled_source_span_seconds": 11.966666,
+            "source_and_configuration_unchanged": true
+          }
+        ],
+        "on": [
+          {
+            "pairs_enabled": true,
+            "real_frames": 360,
+            "codec_service_cpu_seconds": 3.11,
+            "measurement_wall_seconds": 13.718999999997322,
+            "late_delivery_gt20ms": 0,
+            "callback_gap_p95_ms": 33.334,
+            "frame_census_complete": true,
+            "scheduled_source_span_seconds": 11.966666,
+            "source_and_configuration_unchanged": true
+          },
+          {
+            "pairs_enabled": true,
+            "real_frames": 360,
+            "codec_service_cpu_seconds": 3.1,
+            "measurement_wall_seconds": 13.609000000004016,
+            "late_delivery_gt20ms": 0,
+            "callback_gap_p95_ms": 33.334,
+            "frame_census_complete": true,
+            "scheduled_source_span_seconds": 11.966666,
+            "source_and_configuration_unchanged": true
+          }
+        ],
+        "off": [
+          {
+            "pairs_enabled": false,
+            "real_frames": 360,
+            "codec_service_cpu_seconds": 3.83,
+            "measurement_wall_seconds": 13.610000000000582,
+            "late_delivery_gt20ms": 0,
+            "callback_gap_p95_ms": 33.334,
+            "frame_census_complete": true,
+            "scheduled_source_span_seconds": 11.966666,
+            "source_and_configuration_unchanged": true
+          },
+          {
+            "pairs_enabled": false,
+            "real_frames": 360,
+            "codec_service_cpu_seconds": 3.85,
+            "measurement_wall_seconds": 13.735000000000582,
+            "late_delivery_gt20ms": 0,
+            "callback_gap_p95_ms": 33.334,
+            "frame_census_complete": true,
+            "scheduled_source_span_seconds": 11.966666,
+            "source_and_configuration_unchanged": true
+          }
+        ],
+        "reenabled": [
+          {
+            "pairs_enabled": true,
+            "real_frames": 360,
+            "codec_service_cpu_seconds": 3.17,
+            "measurement_wall_seconds": 13.860000000000582,
+            "late_delivery_gt20ms": 0,
+            "callback_gap_p95_ms": 33.334,
+            "frame_census_complete": true,
+            "scheduled_source_span_seconds": 11.966666,
+            "source_and_configuration_unchanged": true
+          },
+          {
+            "pairs_enabled": true,
+            "real_frames": 360,
+            "codec_service_cpu_seconds": 3.13,
+            "measurement_wall_seconds": 13.375,
+            "late_delivery_gt20ms": 0,
+            "callback_gap_p95_ms": 33.334,
+            "frame_census_complete": true,
+            "scheduled_source_span_seconds": 11.966666,
+            "source_and_configuration_unchanged": true
+          }
+        ]
+      },
+      "same_new_core_off_CPU_median_seconds": 3.84,
+      "on_and_reenabled_CPU_median_seconds": 3.12,
+      "CPU_reduction_percent": 18.74999999999999,
+      "frames_per_run": 360,
+      "total_frames": 2880,
+      "delivery_over_20ms": 0,
+      "callback_gap_P95_ms": 33.334,
+      "scope": "whole Codec2 service CPU including setup/stop; casting environment retained; no universal FPS, P95 latency or power claim"
+    },
+    "pixel_precision": {
+      "groups": {
+        "gradient-p010": {
+          "frames": 3,
+          "samples": 37324800,
+          "low_two_bits_nonzero": 27993600,
+          "exact": true,
+          "expected_HAL_format": 54,
+          "consumer": 2
+        },
+        "texture-p010": {
+          "frames": 3,
+          "samples": 37324800,
+          "low_two_bits_nonzero": 21252105,
+          "exact": true,
+          "expected_HAL_format": 54,
+          "consumer": 1
+        },
+        "explicit-p010": {
+          "frames": 3,
+          "samples": 37324800,
+          "low_two_bits_nonzero": 21252105,
+          "exact": true,
+          "expected_HAL_format": 54,
+          "consumer": 2
+        },
+        "native-bypass": {
+          "frames": 3,
+          "samples": 37324800,
+          "low_two_bits_nonzero": 21252105,
+          "exact": true,
+          "expected_HAL_format": 23,
+          "consumer": 0
+        }
+      },
+      "samples_total": 149299200,
+      "frames_total": 12,
+      "low_two_bits_nonzero_total": 91749915,
+      "exact_against_independent_software_decoder": true,
+      "P010_gradient_texture_explicit_and_native_NV15_bypass": true,
+      "acquire_fence_mapper_layout_and_DMA_BUF_read_sync_retained": true
+    },
+    "HDR": {
+      "native_NV15_PQ_HLG_SDR_pass": true,
+      "PQ_frames": 100,
+      "HLG_frames": 190,
+      "SDR_frames": 100,
+      "native_pause_seek_flush_EOS_and_exit_SDR": true,
+      "native_HDMI_10bit_BT2020_DRM_blob_and_register_packet_checksum": true,
+      "explicit_P010_output_metadata_and_100_frame_PTS_on_off_exact": true,
+      "explicit_P010_PixelCopy_summary_on_off_exact": true,
+      "explicit_P010_to_HDMI_HDR_qualified": false,
+      "existing_limit": "Explicit P010 uses CLIENT and SDR HDMI in both old and pair paths; not caused or fixed by byte unpack optimization",
+      "optical_HDMI_measurement": false
+    },
+    "rollback": {
+      "independent_off_restores_previous_conversion_and_CPU_work": true,
+      "other_requested_options_retained": true,
+      "whole_module_original_HWC_and_six_platform_hashes_restored": true,
+      "injected_HWC_companion_and_Codec2_plugin_absent": true,
+      "new_property_cleared": true,
+      "reenable_CPU_reduction_restored": true,
+      "boot_Mali_042_DVFS_and_external_injection_retained": true,
+      "Frame_Guard_0_60_60_unchanged": true
+    },
+    "controls": {
+      "browser_assertions": 63,
+      "Android_isolated_assertions": 18,
+      "default_off_both_dependencies_and_reboot_receipts_verified": true
+    },
+    "integrity": {
+      "installer_sha256": "42f0f231a13e164a41516f76834a494f2a9eaaa88710dc0980a406dbfbd98cbe",
+      "manifests": {
+        "checksums.sha256": 249,
+        "components/codec2/checksums.sha256": 44,
+        "components/codec2_sdk/checksums.sha256": 6,
+        "components/codec2_sdk_next/checksums.sha256": 17,
+        "components/hdr/checksums.sha256": 21,
+        "components/libyuv/checksums.sha256": 17,
+        "components/mpp/checksums.sha256": 43,
+        "components/rga/checksums.sha256": 20,
+        "components/software/checksums.sha256": 18
+      },
+      "factory_binaries_excluded": true
+    },
+    "unchanged": [
+      "source and output pixel precision",
+      "source resolution and frame rate",
+      "number of decoded pictures and reference/output slots",
+      "row staging and memory copies",
+      "fences, mapper and DMA synchronization",
+      "Frame Guard, boot, Mali and game settings"
+    ],
+    "open": [
+      "Existing explicit P010 CLIENT-to-HDMI HDR limitation: both paths produce SDR HDMI despite correct C2 HDR metadata; this upgrade neither causes nor fixes it",
+      "Historical original-player UHD acquisition and other-path HLG timeouts not claimed fixed",
+      "No universal game/playback FPS, power, thermal or optical display-latency acceptance",
+      "No complete Codec2 SDK/libyuv/RGA/HWC or kernel upgrade"
+    ],
+    "invalid_attempts_not_counted": [
+      "Initial browser parent row was declared after its new child; corrected before the tested installer",
+      "First performance attempt had no diagnostic APK and yielded no run",
+      "Explicit P010 HDMI packet acceptance failed and is recorded as an existing on/off limitation, not counted as a HDR pass"
+    ],
+    "privacy": "No device addresses, raw logs, media, test APKs, keys, boot or original firmware libraries in public artifacts"
+  },
+  "actual_Exo_acceptance": false,
+  "precision_and_HDR_for_this_version": "pending",
+  "test1_failure": "MPP retry exhausted / codec err0xe, no queue watchdog in captured run",
+  "test2_bounded_user_Exo": {
+    "user_report": "no error, resumes",
+    "log_seconds": 122,
+    "codec_error": false,
+    "queue_watchdog": false,
+    "actual_MPP_BUFFER_FULL_branch": true,
+    "Frame_Guard_off": true
+  },
+  "test3_delta": "Gate new input flow control with !mBufferMode && !mTunneled as already used by output side; native path logic unchanged; copy/tunnel retain old input retry path."
 }

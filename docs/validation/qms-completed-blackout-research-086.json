@@ -1,0 +1,38 @@
+{
+  "date": "2026-10-19",
+  "status": "RESEARCH_COMPLETE_CAUSAL_HYPOTHESES_NOT_HARDWARE_ACCEPTANCE",
+  "scope": "persistent software QMS ACTIVE and eight completed local switches with physical HDMI blackout",
+  "local_completion_is_sink_acknowledgement": false,
+  "direct_applicable_confirmed_fix_found": false,
+  "prioritized_hypotheses": [
+    {
+      "cause": "wire-visible VTEM notice / timing latch / M_CONST transition mismatch",
+      "source": "https://www.synopsys.com/blogs/chip-design/hdmi-quick-media-switching.html",
+      "local_proof_gap": "register state and native completion do not prove packet transmission at required frame",
+      "confirmed_locally": false
+    },
+    {
+      "cause": "HDMI mute or HDCP control transition without full modeset",
+      "source": "https://github.com/rockchip-linux/kernel/commit/f26d0d9c77e0a72e5c5137da620aba9938e4e0c4",
+      "local_proof_gap": "need actual state transition correlation and firmware equivalent-code audit",
+      "confirmed_locally": false
+    },
+    {
+      "cause": "chroma / dynamic-range / other format changes outside rate-only switch",
+      "source": "https://support.apple.com/en-ie/guide/tv/atvb553e7afe/27/tvos/27",
+      "priority_limit": "test12 native format/bpc/eotf identity stayed consistent; transient wire state not directly measured",
+      "confirmed_locally": false
+    },
+    {
+      "cause": "player shutter or deliberate wait produces black frames despite QMS",
+      "source": "https://community.firecore.com/t/qms-match-content-adjustable-delay-fix/42519/30",
+      "evidence_type": "first-hand report about another app/platform, not confirmed Exo fix",
+      "priority_limit": "HDMI-only visibility currently favors output-path cause",
+      "confirmed_locally": false
+    }
+  ],
+  "runtime_changes_this_research": false,
+  "physical_HDMI_blackout_fixed": false,
+  "Frame_Guard": "disabled and paused",
+  "report": "docs/system-hdmi-blackout-086.zh-CN.md"
+}

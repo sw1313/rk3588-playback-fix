@@ -1,0 +1,523 @@
+{
+  "status": "TEST8_AUTO_MENU_USER_CONFIRMED_QMS_PLAYBACK_DIAGNOSIS_PENDING",
+  "system_wide_display_goal": true,
+  "device_or_boot_changed": true,
+  "persistent_display_config_or_boot_changed": true,
+  "transient_research_modules_loaded_then_removed": true,
+  "Frame_Guard": "off",
+  "existing_seek_and_backpressure_retained": true,
+  "actual_original_kernel_audit": {
+    "recovered_symbols": 141540,
+    "VOP2_clock_reset_already_present": true,
+    "QMS_helpers_and_next_tfr_interface_missing": true,
+    "HDCP_notifier_exports_missing": true,
+    "HDR_selector_patch_context_differs": true,
+    "offline_original_selector_fixture_cases": 18,
+    "hardware_blackout_acceptance": false
+  },
+  "reference_510_apply_checks": {
+    "d0e8f558bc58984f8f4508133143cc9ca77c8b0d": false,
+    "5a89a1cb8b9c3cba5666151e838d2a3d760fe0ea": false,
+    "2eeed1b87d7d72d1bcfc51b2c6234679b19c644a": true
+  },
+  "reference_source_is_factory_source": false,
+  "qms_implementation": {
+    "scope": "Exact original-kernel cold native owner, endpoint and HWC; actual 60-to-24Hz completed but sustained operation recovers with EIO",
+    "source": "decode-kernel/qms/",
+    "actual_ARM64_C_tests": {
+      "exact_rational_cycles": 66,
+      "switch_and_restore_scenarios": 738,
+      "stable_phase_samples": 94464,
+      "negative_cases": 15,
+      "injected_transaction_failures": 11,
+      "EDID_cases": 10,
+      "device_IO": false,
+      "physical_HDMI_acceptance": false
+    },
+    "upstream_data_corrections": [
+      "VIC4/TFR4 first fractional byte 0x1f to 0x0f",
+      "VIC63/TFR6 integer vtotal 2812 to 2815"
+    ],
+    "native_ABI_probe": {
+      "ko_sha256": "a71cf32f8c2a2088f37604331006876cf507e74742e378024f56f0ed7e9a72ce",
+      "canonical_import_crcs": 29,
+      "matched_static_tables": 7,
+      "current_base_modes_accepted_by_core": 1,
+      "regmap_32_bit_and_stride4": true,
+      "regmap_spin_lock_pair_verified": true,
+      "native_atomic_clone_and_release_roundtrips": 1,
+      "live_CRTC_state_pointer_unchanged": true,
+      "reject_guard_test": true,
+      "normal_init_and_nonforced_unload": true,
+      "module_absent_after": true,
+      "atomic_check_or_commit_called": false,
+      "display_register_reads_or_writes": false,
+      "probe_core_compatibility_flag_is_not_hardware_backend_readiness": true
+    },
+    "programming_window_candidate": "Factory atomic commit/flush with preserved planes, fences and cfg_done ordering; constructor only verified, no hook/commit/writes tested",
+    "functional_hardware_binding": true,
+    "HWC_frontend": true,
+    "Decode_Stack_boot_and_rollback_integration": true,
+    "hardware_enabled": true,
+    "full_QMS_complete": false,
+    "release_accepted": false,
+    "HWC_frontend_source_compiled": true,
+    "incremental_session_and_client_tests": {
+      "request_gate_cases": 22,
+      "lifecycle_cases": 20,
+      "HWC_policy_cases": 25,
+      "rate_cases": 14,
+      "cached_private_EDID_parser_cases": 1,
+      "UAPI_ARM32_and_ARM64_layout_checked": true,
+      "cached_EDID_is_not_current_link_proof": true
+    },
+    "isolated_actual_HWC_callbacks": {
+      "assertions": 22,
+      "transport": "injected",
+      "kernel_endpoint_or_display_used": false,
+      "remote_test_removed": true
+    },
+    "candidate_preexec_rendezvous": {
+      "cases": 17,
+      "all_passed": true,
+      "display_prepare_before_GPU_load_and_graphics_release": true,
+      "previous_unqualified_display_trial_skipped": true,
+      "independent_selections_preserved": true,
+      "failed_display_stage_does_not_write_GPU_boot": true,
+      "loader": "fixture script only; functional native loader missing",
+      "real_first_binding_or_reboot_rollback_acceptance": false
+    },
+    "build_gates": {
+      "normal_cold_binary_contains_no_QMS_stage": true,
+      "candidate_cold_binary_compiled_with_stage": true,
+      "incomplete_QMS_component_refused_by_Decode_builder": true,
+      "installable_ZIP_created": false,
+      "normal_HWC_binary_identical_to_existing_component": true
+    },
+    "native_ioctl_device_registered": false,
+    "current_trial": {
+      "version": "0.8.6-qms-test6",
+      "startup": "passed current-boot owner/baseline VTEM/HWC, Mali g18/DVFS and Zygisk Next dual ABI LSPosed; sustained-rate not accepted",
+      "boot_image_changed_from_test5": false,
+      "test5_startup_passed": true,
+      "real_60_to_24_completed": true,
+      "sustained_rate_passed": false,
+      "observed_failure": "EIO before current register finish; factory full restore returns 4K60",
+      "current_frame_diagnostic_0_not_success": true,
+      "frame_checks_relaxed": false,
+      "native_engine_policy_cases": 17,
+      "Mali_exact_pair_shell_cases": 13,
+      "physical_HDMI_accepted": false,
+      "Auto_idle_observation": {
+        "selection": "Auto",
+        "min_and_peak_settings": "unset",
+        "primary_range_hz": [
+          0,
+          60
+        ],
+        "current_equals_default_mode": true,
+        "QMS_frame_errors": 0,
+        "playback_interaction_accepted": false,
+        "remote_control_trigger_proven": false,
+        "user_report": "4K60 may be observed after reboot or remote-control connection, not necessarily playback; cause not established"
+      }
+    }
+  },
+  "dedicated_ko_research": {
+    "research_only": true,
+    "object_probe": {
+      "ko_sha256": "74749eb56fc7c1a7765eb7c82b14cca5a0e11811fd741f519846554fe45fd8c6",
+      "canonical_import_crcs": 17,
+      "callback_tables_matched": 7,
+      "native_connectors": 3,
+      "native_crtcs": 4,
+      "QP_connector_identity_matches": 1,
+      "reject_guard_test": true,
+      "normal_init_and_nonforced_unload": true,
+      "module_absent_after": true
+    },
+    "passive_vblank_observer": {
+      "ko_sha256": "8e824e94770f10fcd4c25ed30e53dfc1c8e89ee12a46af9b0695d65bad20c739",
+      "canonical_import_crcs": 17,
+      "matched_tracepoints": 1,
+      "pipe_counts_at_parameter_read": [
+        197,
+        0,
+        0,
+        0
+      ],
+      "pipe_counts_at_synchronized_unload": [
+        210,
+        0,
+        0,
+        0
+      ],
+      "out_of_range_pipe_events": 0,
+      "reject_guard_test": true,
+      "normal_init_and_nonforced_unload": true,
+      "SRCU_and_RCU_grace_periods": true,
+      "unregister_failure_retains_callback_memory_and_retries": true,
+      "unregister_failure_injected_on_device": false,
+      "module_absent_after": true,
+      "register_writes_or_modesets": false,
+      "tracepoint_registration_state_temporarily_changed": true,
+      "performance_or_blackout_acceptance": false
+    },
+    "initial_metadata_mismatch_detected_and_removed": true,
+    "corrected_module_init_exit_offsets": [
+      344,
+      864
+    ],
+    "force_load_or_ignored_modversions": false,
+    "optimized_python_wrong_image_and_template_rejected": true,
+    "DRM_callback_replacement": false,
+    "new_DRM_properties": false,
+    "QMS_implemented": false,
+    "installed_in_Decode_Stack": false,
+    "outstanding": [
+      "Callback publication, atomic state and object lifetime safety",
+      "IRQ/event_lock constraints and deterministic VOP2 vtotal/VFP cfg_done updates",
+      "HDMI VTEM/M_CONST multi-frame state machine and sink constraints",
+      "HWC end-to-end mode selection, HDR and ten-bit compatibility",
+      "Decode Stack firmware/ABI gates and reboot rollback",
+      "User observation on physical HDMI display"
+    ]
+  },
+  "required_for_delivery": "Proven per-field display ABI and board dependencies for dedicated extension, or matching/recoverable replacement kernel; real kernel and HWC QMS implementation with physical HDMI acceptance",
+  "release_accepted": false,
+  "native_submission_increment": {
+    "scoped_helper_flush_window": {
+      "native_all_modeset_locks": true,
+      "factory_tail_mutex_publication_and_restore": true,
+      "tagged_task_and_transaction_only": true,
+      "original_flush_delegated_once": true,
+      "functional_hot_unload_proven": false
+    },
+    "register_echo": {
+      "sha256": "be48196f0c3fd1c79401154eb34ab31818161f76d3aab8e5d7a5a3e0eaffed24",
+      "original_values_only": true,
+      "VTEM_enabled": false,
+      "words": 8,
+      "initial_vtotal": 2250,
+      "timing_descriptor_offset": "0x9c",
+      "VP_register_offset": "0xc50 + port * 0x100",
+      "mask": "0x1fff1fff",
+      "superseded_wrong_location": "0x90 / 0xc4c is HACT, not vertical timing",
+      "wrong_location_rejected_before_custom_write": true
+    },
+    "factory_baseline_recovery": {
+      "sha256": "8025949802dcdd002f72488859e36753b738be0e1a5a87b904fd826d00862d1c",
+      "native_full_modeset": true,
+      "mode_and_framebuffer_identities_preserved": true,
+      "base_timing_power_scheduler_verified": true,
+      "recovery_from_changed_QMS_timing_or_enabled_VTEM_tested": false,
+      "physical_HDMI_observation": false
+    },
+    "actual_OFF_session_publication": {
+      "sha256": "c19684edd35263533ecf086a72b16bb0b6a14c38406a60df744307390e87f44f",
+      "passed": true,
+      "real_native_commit_and_vblank": true,
+      "identity": "injected internal OFF-only fixture; not current link/HDR/boot proof",
+      "register_writes": false
+    },
+    "actual_C_publication_fault_cases": 13,
+    "controller_and_endpoint": {
+      "source_objects_built": true,
+      "native_import_CRCs_available": 25,
+      "controller_cases": 15,
+      "dispatcher_cases": 11,
+      "test_native_operations": "injected; pthread primitives; no display IO",
+      "actual_kernel_endpoint_registered": false,
+      "permanent_native_binding_connected": false
+    },
+    "user_physical_observation": "unavailable; only ADB viewing possible",
+    "probe_cleanup_verified": true,
+    "Frame_Guard_off": true,
+    "boot_write_or_reboot": false,
+    "full_QMS_complete": false,
+    "release_accepted": false
+  },
+  "vendor_series_lifecycle_increment": {
+    "port_map": "decode-kernel/qms/PORTING.json",
+    "lifecycle_actual_C_cases": 17,
+    "actual_native_register_bridge_PM_injection_cases": 26,
+    "fixture_uses_display_IO": false,
+    "native_ABI_preparation": {
+      "sha256": "31d51b6787ee84ec77dd81f0ef9d6258592d375dc8b12f376cbce0d344fdc54b",
+      "canonical_module_CRCs": 46,
+      "tables_matched": 8,
+      "bridge_and_PM_table_preparation_passed": true,
+      "callbacks_published": false,
+      "register_writes_or_commits": false,
+      "negative_guard_and_nonforced_unload": true,
+      "module_and_temporary_files_absent": true
+    },
+    "native_binding_source_objects": {
+      "compiled": true,
+      "sha256": "b3736f3a3d03085e404ad51c5e8ded4de3228ec6bc5c5c95c28995dac5dfc739",
+      "native_import_CRCs_available": 45,
+      "real_controller_operations_connected_in_source": true,
+      "board_live_validate_and_verify_clean_supplied": false,
+      "linked_into_functional_module": false,
+      "real_endpoint_registered": false
+    },
+    "power_guard_native_commit": {
+      "status": "PASSED_UNCHANGED_NATIVE_OFF_SESSION_ONLY",
+      "sha256": "31d51b6787ee84ec77dd81f0ef9d6258592d375dc8b12f376cbce0d344fdc54b",
+      "native_commit_calls": 1,
+      "planes": 2,
+      "native_vblank_advance": 1,
+      "framebuffer_and_mode_preserved": true,
+      "staged_observation_published": true,
+      "QP_power_and_CRTC_active_completion_guard": "positive path exercised",
+      "power_loss_failure_cases": "injected fixture only; no actual forced power-off",
+      "identity": "injected internal OFF fixture, not current link/HDR/boot proof",
+      "window_restored_and_nonforced_unload": true,
+      "temporary_file_absent": true,
+      "QMS_enabled": false,
+      "custom_register_writes": false,
+      "physical_HDMI_acceptance": false
+    },
+    "full_QMS_complete": false,
+    "physical_HDMI_acceptance": false,
+    "Frame_Guard_off": true,
+    "release_accepted": false
+  },
+  "live_link_qualification_increment": {
+    "scope": "Current uncompressed TMDS SDR link qualification only; no QMS activation",
+    "sources": [
+      "decode-kernel/qms/native_link.c",
+      "decode-kernel/qms/native_link.h",
+      "decode-kernel/qms/native_qualify.c"
+    ],
+    "live_observation": {
+      "sha256": "77fa263c27df617e86515bd0bcee6df8e7fc0f460fc83b9045f6b0d08ac55bbe",
+      "canonical_module_CRCs": 32,
+      "native_tables_matched": 8,
+      "physical_DDC_matches_current_retained_EDID": true,
+      "EDID_software_override_accepted": false,
+      "EDID_property_updated": false,
+      "QMS_sink_capability": true,
+      "HPD_and_PHY_ready": true,
+      "native_PHY_clock_framework_rate_matches_output": true,
+      "current_profile": "3840x2160p60 YUV420 8-bit SDR TMDS",
+      "clock_Hz": 297000000,
+      "ordinary_native_timing_and_VTEM_off_verified": true,
+      "display_commits": false,
+      "display_register_writes": false,
+      "callbacks_published": false,
+      "QMS_enabled": false,
+      "physical_HDMI_acceptance": false,
+      "probe_and_temporary_files_removed": true,
+      "same_boot": true
+    },
+    "actual_C_injected_cases": 54,
+    "injection_binary_sha256": "7e7092355a276eb72d2cb8bf4c5661935b0140a2d490692a39d68907db59e397",
+    "injected_scope": "Actual board reader, binding validator and ordinary cleanup checker; synthetic native objects/DDC/clock/MMIO, including ten-bit HDR; not hardware HDR validation",
+    "board_validation_source_connected": true,
+    "control_object_sha256": "2e62839b6cbd4cbc0fd3f35b8e553d1260d3ff031f55b4966f871694ac20a835",
+    "native_import_CRCs_available": 52,
+    "control_objects_linked_into_functional_module": false,
+    "kernel_endpoint_registered": false,
+    "unsupported_profiles_refused": [
+      "FRL",
+      "DSC/CVTEM",
+      "active foreign VTEM or AMD VRR",
+      "unqualified YUV422 or other bit-depth/packing formats"
+    ],
+    "remaining": [
+      "Cold owner and retained module/native object lifetimes before graphics",
+      "Requalification after native mode/link/power/HDR events",
+      "Actual functional endpoint/HWC and Decode loader/selection/dependencies plus reboot rollback",
+      "Enabled VTEM, rate changes and failure recovery with real compositor deadlines",
+      "Physical HDMI no-black and actual ten-bit/HDR acceptance"
+    ],
+    "Frame_Guard_off": true,
+    "refresh_policy": {
+      "match_content_frame_rate": 1,
+      "min_refresh_rate": null,
+      "peak_refresh_rate": null
+    },
+    "full_QMS_complete": false,
+    "release_accepted": false
+  },
+  "cold_integration_086": {
+    "functional_owner_and_endpoint_built": true,
+    "canonical_import_CRCs": 68,
+    "native_tables_checked": 8,
+    "normal_Android_cold_bind_refused": true,
+    "actual_cold_finit_module": "ESTALE; exact failed field unresolved",
+    "endpoint_registered": false,
+    "VTEM_enable_passed": false,
+    "HWC_hardware_integration_accepted": false,
+    "private_POSIX_packaging_fixed": true,
+    "private_boot_receipt_mode_fixed": true,
+    "unstarted_GPU_pending_defer_guard_tested": true,
+    "injected_cold_cases": 21,
+    "Android_QMS_control_cases": 19,
+    "active_device_restored": "original working boot; Decode0.8.4-test3; g18; ZygiskNext and LSPosed both ABIs",
+    "Frame_Guard": "disabled and paused",
+    "automatic_cold_retry": false,
+    "release_accepted": false,
+    "full_QMS_complete": false,
+    "physical_HDMI_accepted": false
+  },
+  "owner_preparation_readonly_diagnostics": {
+    "warm_preparation": "passed phase 13; normally unloaded; no publication or commit",
+    "pregraphics_boot_observations": 2,
+    "cold_failure": {
+      "result": "ESTALE",
+      "owner_phase": 7,
+      "native_link_step": 15,
+      "mode": "3840x2160p60",
+      "pixel_clock_hz": 594000000,
+      "tmds_clock_hz": 297000000,
+      "phy_clock_hz": null,
+      "interpretation": "PHY API comparison mismatch; concrete API return still not captured; do not bypass"
+    },
+    "zygisk_dual_ABI_and_LSPosed_preserved": true,
+    "temporary_device_diagnostic_hook_retired": true,
+    "original_module_startup_script_exactly_restored": true,
+    "diagnostic_build4": "offline only; not loaded",
+    "QMS_enabled": false
+  },
+  "system_auto_Exo_observation": {
+    "system_locale": "zh-CN",
+    "resolution_policy": "Auto",
+    "Frame_Guard": "disabled and paused",
+    "first_two_attempts": "mpv; excluded from Exo acceptance; user subsequently confirmed engine correction",
+    "confirmed_Exo_extractor_real_Cues": true,
+    "seek_flush_observed": true,
+    "observed_framework_mode_changes": 11,
+    "observed_refresh_rates_hz": [
+      24,
+      60
+    ],
+    "native_rebuild_observed": [
+      "HWC plane disable",
+      "VOP2 atomic disable and enable",
+      "PHY PLL and lane relock"
+    ],
+    "observed_outputs": [
+      "4K60 YUV420 8-bit SDR",
+      "4K24 RGB888 SDR"
+    ],
+    "observed_TMDS_hz": 297000000,
+    "fatal_Exo_codec_or_BadConfig_error_observed": false,
+    "physical_HDMI_observation": "unavailable; user remote only",
+    "no_blackout_acceptance": false,
+    "full_interaction_acceptance": false,
+    "QMS_enabled": false,
+    "conclusion": "Auto applied in Chinese UI and native switching executes; Auto alone does not eliminate full display rebuild; same TMDS rate alone cannot qualify QMS across differing output formats"
+  },
+  "system_display_policy": {
+    "component": "Decode Stack display_policy",
+    "default": 0,
+    "trial_requested": 1,
+    "firmware_services_sha256": "922c443c3a2b609b7f7f3755bbfbeb90f3c0b0c141829f3b6151371c2aa607b6",
+    "locale_formatter_sites": 4,
+    "native_setter_delegation_sites": 2,
+    "director_policy_sites": 1,
+    "fixed": "supported size and exact rate through native desired specs",
+    "Auto": "delegate original policy",
+    "device_isolated_DEX_ABI_six_locale_check_passed": true,
+    "JVM_policy_cases": 19,
+    "Android_switch_assertions": 11,
+    "Android_independent_boot_fallback_cases": 10,
+    "WebUI_mock_assertions": 85,
+    "private_firmware_bundled": false,
+    "menu_and_playback_accepted": false,
+    "real_startup_passed": true,
+    "HDR_menu_fix": {
+      "version": "0.8.6-qms-test7",
+      "status": "startup qualified; read-only factory Binder getter returns true for absent property",
+      "root_cause": "Factory menu compares the raw empty volatile disable property to literal 0 and reports off; original HWC property_get default is 0",
+      "original_HWC_sha256": "ec3e42d172af843a74bad42674d6e5932f0070873c7bb73cf681a285ada44478",
+      "original_HWC_SwitchHdrMode_RVA": "0x3fa04",
+      "original_property_get_call_RVA": "0x3fac4",
+      "original_default_string": "0",
+      "getter": "Preserve explicit native value; absent disable matches native HWC default",
+      "setter": "Delegate actual HAL write; save explicit 0/1 only on success, report persistence failure",
+      "boot": "Replay saved 0/1 only when display_policy active; no saved choice leaves original default untouched",
+      "component_disabled": "No replay and stock services overlay restored on reboot",
+      "JVM_actual_adapter_cases": 30,
+      "Android_startup_and_HDR_replay_fixture_cases": 15,
+      "actual_Android_DEX_ABI_preflight": true,
+      "WebUI_mock_assertions": 85,
+      "real_reboot_persistence_accepted": false,
+      "real_HDR_output_accepted": false,
+      "real_factory_Binder_getter_passed": true,
+      "raw_HDR_disable_after_boot": "",
+      "saved_HDR_disable_after_boot": "",
+      "factory_menu_enabled_after_boot": true
+    },
+    "Auto_menu_fix": {
+      "version": "0.8.6-qms-test8",
+      "status": "startup and real factory Binder selection read passed",
+      "root_cause": "getCurMode checks legacy persist.vendor.resolution.main for Auto but native setting is saved in persist.vendor.resolution.HDMI-A-0",
+      "before_real_factory_Binder_query": {
+        "interface": 11,
+        "saved_selection": "Auto",
+        "menu_selection": "3840x2160p60.00"
+      },
+      "scope": "Only connector-verified primary HDMI property reads inside the original getCurMode; retain native query/formatting and actual Display.Mode",
+      "getter_property_sites": 2,
+      "strategy_cases": 39,
+      "secondary_and_non_HDMI_preserved": true,
+      "failed_connector_read_retains_original_property": true,
+      "physical_output_or_HWC_state_modified": false,
+      "real_post_reboot_selection_accepted": true,
+      "after_real_factory_Binder_query": {
+        "interface": 11,
+        "saved_selection": "Auto",
+        "menu_selection": "Auto",
+        "HDR_menu_enabled": true
+      },
+      "real_factory_Binder_after_reboot_passed": true,
+      "user_visible_menu_confirmation": true,
+      "user_result": "Auto 正常"
+    }
+  },
+  "current_summary": {
+    "installed": "0.8.6-qms-test9",
+    "source_candidate": "0.8.6-qms-test9",
+    "historical_fields": "Older version-specific verdicts remain historical; use this summary for current scope.",
+    "Auto_selection_user_confirmed": true,
+    "HDR_default_display_user_confirmed": true,
+    "explicit_HDR_persistence_and_sustained_fixed_lock": "not accepted",
+    "QMS_test8": "five gate93 faults: sampled-previous=2 at stable 24Hz, matching timing, native_error=0",
+    "candidate": "hardware constant hold + event wake + 100ms read-only watchdog; transition/fractional strict synchronization retained",
+    "candidate_installed": true,
+    "new_UI_browser_assertions": 90,
+    "candidate_controller_cases": 19,
+    "candidate_endpoint_cases": 11,
+    "real_candidate_CPU_cost_measured": false,
+    "physical_HDMI_blackout_fixed": false,
+    "Frame_Guard": "disabled and paused",
+    "new_UI_installed": true,
+    "new_UI_real_Android_bundle_assertions": 41,
+    "UI_validation": "docs/validation/decode-controls-qms-cost-086.json",
+    "runtime_components_unchanged_by_UI": "UI-only installation preceded the later explicitly authorized QMS install/reboot",
+    "runtime_Mali": "0.4.2-qms-test13",
+    "current_boot_QMS_baseline_enable_restore": true,
+    "Mali_g18_kernel_DVFS_active": true,
+    "Zygisk_Next_and_LSPosed_both_ABIs": true,
+    "module_flags_preserved": true,
+    "current_primary_goal": "actual QMS rate hold and recovery, UI work deferred",
+    "temporary_isolation": {
+      "hdmi_audio_guard": 0,
+      "display_policy": 0
+    },
+    "QMS_playback_test9": "user operation requested; not yet performed in captured samples",
+    "QMS_real_playback_cost": "not yet measured",
+    "first_test9_startup_failure": "HDMI event framework adapter readiness failed; Decode disabled and Mali unqualified fallback restored original boot",
+    "retry_startup_failure": "display-policy fallback repeatedly replaced config with 0666, rejected by cold loader ownership check; fixed writer umask/chmod, actual device writer confirmed 0600 before successful boot"
+  },
+  "current_private_trial": {
+    "version": "0.8.6-qms-test9",
+    "status": "boot qualified, actual playback pending",
+    "details": "docs/validation/system-hdmi-commit-086.json",
+    "Frame_Guard": "off",
+    "display_policy": "temporarily off for QMS isolation"
+  }
+}

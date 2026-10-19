@@ -22,6 +22,36 @@ if [ -d "$STACKROOT/components/$sdk_component" ]; then
  grep -q HIDL_CONSTRUCTION_PASS "$c/preflight.txt" || abort "SDK HIDL contract check failed."
 fi
 done
+if [ -d "$STACKROOT/components/codec2_pool" ]; then
+ c="$STACKROOT/components/codec2_pool"
+ (cd "$c" && sha256sum -c checksums.sha256 >/dev/null 2>&1) || abort "P010 pool payload differs."
+ set_perm_recursive "$c" 0 0 0755 0644
+ set_perm "$c/bin/byte_patch64" 0 0 0755
+ set_perm "$c/bin/pool-test64" 0 0 0755
+ sha256sum -c "$c/contracts/platform.sha256" >/dev/null 2>&1 || abort "P010 pool framework ABI differs."
+ sh "$c/prepare.sh" "$STACKROOT/components/codec2" > "$c/preflight.txt" 2>&1 || abort "P010 pool preparation failed."
+fi
+if [ -d "$STACKROOT/components/hdmi_event" ]; then
+ c="$STACKROOT/components/hdmi_event"
+ (cd "$c" && sha256sum -c checksums.sha256 >/dev/null 2>&1) || abort "HDMI event payload differs."
+ set_perm_recursive "$c" 0 0 0755 0644
+ set_perm "$c/bin/byte_patch64" 0 0 0755
+ set_perm "$c/bin/event-test64" 0 0 0755
+ sh "$c/prepare.sh" > "$c/preflight.txt" 2>&1 || abort "HDMI event exact firmware/import preflight failed."
+fi
+if [ -d "$STACKROOT/components/qms" ]; then
+ c="$STACKROOT/components/qms"
+ (cd "$c" && sha256sum -c checksums.sha256 >/dev/null 2>&1) || abort "QMS cold payload differs."
+ set_perm_recursive "$c" 0 0 0755 0644
+ set_perm "$c/boot-stage64" 0 0 0755
+fi
+if [ -d "$STACKROOT/components/ddc" ]; then
+ (cd "$STACKROOT/components/ddc" && sha256sum -c checksums.sha256) >/dev/null 2>&1 || abort "Native HDMI E-DDC payload differs."
+fi
+if [ -d "$STACKROOT/components/display_policy" ]; then
+ c="$STACKROOT/components/display_policy"
+ sh "$c/prepare.sh" > "$c/preflight.txt" 2>&1 || abort "Exact display-policy firmware/DEX/ABI preflight failed."
+fi
 cd "$STACKROOT" || abort "Module directory unavailable."
 sha256sum -c files.sha256 >/dev/null 2>&1 || abort "Generated platform patches or component payload differ."
 if [ -f /data/adb/modules/rk3588_decode_stack/config ]; then
@@ -34,13 +64,35 @@ else
 fi
 if [ -d "$STACKROOT/components/codec2_sdk" ]; then default_sdk=1; else default_sdk=0; fi
 grep -q '^codec2_sdk=' "$STACKROOT/config" || printf 'codec2_sdk=%s\n' "$default_sdk" >> "$STACKROOT/config"
+# Default to the firmware Surface decoder until upgraded native queue regression is repaired.
+grep -q '^codec2_native_backpressure=' "$STACKROOT/config" || printf 'codec2_native_backpressure=0\n' >> "$STACKROOT/config"
+grep -q '^codec2_surface=' "$STACKROOT/config" || printf 'codec2_surface=0\n' >> "$STACKROOT/config"
+
 grep -q '^codec2_buffer=' "$STACKROOT/config" || printf 'codec2_buffer=1\n' >> "$STACKROOT/config"
+grep -q '^display_ddc=' "$STACKROOT/config" || printf 'display_ddc=0\n' >> "$STACKROOT/config"
 grep -q '^p010_fast=' "$STACKROOT/config" || printf 'p010_fast=1\n' >> "$STACKROOT/config"
 if [ -d "$STACKROOT/components/codec2_sdk_next" ]; then default_next=1; else default_next=0; fi
 grep -q '^codec2_sdk_next=' "$STACKROOT/config" || printf 'codec2_sdk_next=%s\n' "$default_next" >> "$STACKROOT/config"
 grep -q '^av1_native=' "$STACKROOT/config" || printf 'av1_native=1\n' >> "$STACKROOT/config"
 grep -q '^av1_grain=' "$STACKROOT/config" || printf 'av1_grain=1\n' >> "$STACKROOT/config"
 grep -q '^av1_afbc=' "$STACKROOT/config" || printf 'av1_afbc=1\n' >> "$STACKROOT/config"
+grep -q '^av1_texture_afbc=' "$STACKROOT/config" || printf 'av1_texture_afbc=0\n' >> "$STACKROOT/config"
+grep -q '^codec2_lifecycle=' "$STACKROOT/config" || printf 'codec2_lifecycle=0\n' >> "$STACKROOT/config"
+grep -q '^hwc_metadata_reuse=' "$STACKROOT/config" || printf 'hwc_metadata_reuse=0\n' >> "$STACKROOT/config"
+grep -q '^hwc_scaled_overlay=' "$STACKROOT/config" || printf 'hwc_scaled_overlay=0\n' >> "$STACKROOT/config"
+grep -q '^gralloc_hdr_lease=' "$STACKROOT/config" || printf 'gralloc_hdr_lease=0\n' >> "$STACKROOT/config"
+grep -q '^codec2_delay_notify=' "$STACKROOT/config" || printf 'codec2_delay_notify=0\n' >> "$STACKROOT/config"
+grep -q '^hevc_native_surface=' "$STACKROOT/config" || printf 'hevc_native_surface=0\n' >> "$STACKROOT/config"
+grep -q '^hevc_eos_pending=' "$STACKROOT/config" || printf 'hevc_eos_pending=0\n' >> "$STACKROOT/config"
+grep -q '^p010_pairs=' "$STACKROOT/config" || printf 'p010_pairs=0\n' >> "$STACKROOT/config"
+grep -q '^hwc_mode_cache=' "$STACKROOT/config" || printf 'hwc_mode_cache=0\n' >> "$STACKROOT/config"
+grep -q '^hwc_client_hdr10=' "$STACKROOT/config" || printf 'hwc_client_hdr10=0\n' >> "$STACKROOT/config"
+grep -q '^hwui_rgb10=' "$STACKROOT/config" || printf 'hwui_rgb10=0\n' >> "$STACKROOT/config"
+grep -q '^p010_copy_pool=' "$STACKROOT/config" || printf 'p010_copy_pool=0\n' >> "$STACKROOT/config"
+grep -q '^hdmi_audio_guard=' "$STACKROOT/config" || printf 'hdmi_audio_guard=0\n' >> "$STACKROOT/config"
+grep -q '^display_qms=' "$STACKROOT/config" || printf 'display_qms=0\n' >> "$STACKROOT/config"
+grep -q '^display_policy=' "$STACKROOT/config" || printf 'display_policy=0\n' >> "$STACKROOT/config"
+grep -q '^display_session=' "$STACKROOT/config" || printf 'display_session=0\n' >> "$STACKROOT/config"
 sh "$STACKROOT/assemble.sh" || abort "Cannot prepare the selected overlays."
 # Prevent overlapping mounts, including a previous update waiting for reboot.
 # Original modules are retained disabled until migration tests pass.

@@ -1,0 +1,44 @@
+{
+  "version": "0.3.7-test2",
+  "status": "USER_SEEK_ACCEPTED_ROLLBACK_PENDING",
+  "public_release": false,
+  "switch": "exo_seekhead",
+  "default": false,
+  "APK_SHA256": "cdf2fc35e770cd1bd8792ecd65f388c88ff1b2465596623966435c81a1d08be2",
+  "original_player_APK_modified": false,
+  "P010_assets": "five files byte-identical to installed 0.3.6-test6",
+  "parser_unit_tests": 8,
+  "existing_crop_unit_tests": 4,
+  "native_Cues_parser_and_SeekMap_retained": true,
+  "seek_request_or_seekable_override": false,
+  "max_heads": 64,
+  "max_head_bytes": 65536,
+  "max_total_bytes": 1048576,
+  "actual_user_seek_acceptance": true,
+  "restart_rollback_acceptance": false,
+  "HDMI_blank_fixed": false,
+  "Frame_Guard": "off",
+  "latest_user_trial": {
+    "result": "seek_returns_to_start",
+    "runtime_switch": "OFF_LOG_CONFIRMED",
+    "actual_shared_preference": "exo_seekhead key absent; default false",
+    "candidate_algorithm_exercised": false
+  },
+  "configuration_correction": {
+    "actual_LSPosed_shared_preferences_updated": true,
+    "other_keys_uid_mode_selinux_preserved": true,
+    "runtime_armed_after_restart": true,
+    "actual_user_seek_retest_pending": true,
+    "reboot_completed": true,
+    "external_Zygisk_LSPosed_health": "PASS",
+    "native_Cues_resolved_after_restart": true
+  },
+  "acceptance_evidence": {
+    "runtime_armed": true,
+    "real_Cues_resolved": true,
+    "tail_heads_read": 1,
+    "user_result": "seek normal",
+    "codec_error_pattern_matches": 0,
+    "long_term_HDR_acceptance": false
+  }
+}

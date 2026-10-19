@@ -9,6 +9,6 @@ def stage(destination,kernel,runtime):
   p=kernel/name;assert hashlib.sha256(p.read_bytes()).hexdigest()==k[key]['sha256'];shutil.copyfile(p,out/'kernel'/name)
  for name,digest in u.items():
   p=runtime/name;assert hashlib.sha256(p.read_bytes()).hexdigest()==digest;shutil.copyfile(p,out/'bin'/name)
- entries=[*sorted((out/'kernel').glob('*.ko')),*[out/'bin'/n for n in sorted(u)],*[out/n for n in ['kernel-boot.sh','kernel-state.sh','kernel-transition.sh','kernel-verify.sh']]]
+ entries=[*sorted((out/'kernel').glob('*.ko')),*[out/'bin'/n for n in sorted(u)],out/'bin/cold_boot64',*[out/n for n in ['kernel-boot.sh','kernel-state.sh','kernel-transition.sh','kernel-verify.sh','dvfs-state.sh','dvfs-boot.sh','cold-state.sh','cold-verify.sh','zygisk-health.sh','fence-state.sh']]]
  (out/'kernel.sha256').write_text(''.join(hashlib.sha256(p.read_bytes()).hexdigest()+'  '+p.relative_to(out).as_posix()+'\n' for p in entries),encoding='utf-8',newline='\n')
  (out/'KERNEL_BUILD.json').write_text(json.dumps({'kernel':k,'runtime':u,'source_license':'GPL-2.0-only for kernel components; file-level licenses retained','original_kernel_image_included':False,'csf_firmware_included':False},indent=2))

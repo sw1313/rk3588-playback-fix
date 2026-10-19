@@ -1,0 +1,65 @@
+--- a/component/video/C2RKMpiDec.cpp
++++ b/component/video/C2RKMpiDec.cpp
+@@ -1382,12 +1382,21 @@
+         err = mIntf->config({&delay}, C2_MAY_BLOCK, &failures);
+         if (err != C2_OK) {
+             c2_err("failed to config delay tuning, err %d", err);
+-        } else if (work != nullptr) {
+-            // update outputDelay config to framework
+-            work->worklets.front()->output.configUpdate.push_back(C2Param::Copy(delay));
+-
+-            mSlotsToReduce  = slotsToReduce;
+-            mNumOutputSlots = numOutputSlots;
++        } else {
++            const bool independent = property_get_bool("debug.rkcodec2.delay_notify", false);
++            if (independent) {
++                finishConfigUpdate(C2Param::Copy(delay));
++            } else if (work != nullptr) {
++                // Preserve the previous inline-work notification when disabled.
++                work->worklets.front()->output.configUpdate.push_back(C2Param::Copy(delay));
++            }
++            c2_info("OUTPUT_DELAY_NOTIFY independent=%d input_work=%d slots=%u delay=%u",
++                    independent, work != nullptr, numOutputSlots, delay.value);
++            // A null-work update must record state only with the new notification.
++            if (independent || work != nullptr) {
++                mSlotsToReduce  = slotsToReduce;
++                mNumOutputSlots = numOutputSlots;
++            }
+         }
+     }
+ 
+@@ -1917,6 +1926,24 @@
+     work->worklets.front()->output.buffers.clear();
+     work->worklets.front()->output.ordinal = work->input.ordinal;
+     work->workletsProcessed = 1u;
++}
++
++// Paired upstream fixes: a configuration-only work is not a decoded frame or
++// an input completion. API32 CCodec must see FLAG_INCOMPLETE and the reserved ID.
++void C2RKMpiDec::finishConfigUpdate(std::unique_ptr<C2Param> config) {
++    std::unique_ptr<C2Work> work(new C2Work);
++    work->worklets.clear();
++    work->worklets.emplace_back(new C2Worklet);
++    work->worklets.front()->output.configUpdate.push_back(std::move(config));
++    work->input.ordinal = {};
++    work->input.ordinal.frameIndex = OUTPUT_WORK_INDEX;
++    work->worklets.front()->output.ordinal = work->input.ordinal;
++    work->worklets.front()->output.flags = C2FrameData::FLAG_INCOMPLETE;
++    auto fillWork = [](const std::unique_ptr<C2Work> &work) {
++        work->workletsProcessed = 1u;
++        work->result = C2_OK;
++    };
++    finish(work, fillWork);
+ }
+ 
+ void C2RKMpiDec::finishWork(
+--- a/component/video/C2RKMpiDec.h
++++ b/component/video/C2RKMpiDec.h
+@@ -240,6 +240,7 @@
+     c2_status_t configOutputDelay(const std::unique_ptr<C2Work> &work = nullptr);
+     c2_status_t configTunneledPlayback(const std::unique_ptr<C2Work> &work);
+     void fillEmptyWork(const std::unique_ptr<C2Work> &work);
++    void finishConfigUpdate(std::unique_ptr<C2Param> config);
+     void finishWork(const std::unique_ptr<C2Work> &work, WorkEntry entry);
+ 
+     c2_status_t initDecoder(const std::unique_ptr<C2Work> &work);

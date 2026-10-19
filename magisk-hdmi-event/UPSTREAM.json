@@ -1,0 +1,26 @@
+{
+  "origin": "Local firmware-specific compatibility adaptation, not an upstream fix backport",
+  "AOSP_native_reference": "https://android.googlesource.com/platform/frameworks/base/+/android-12.1.0_r11/core/jni/android_os_UEventObserver.cpp",
+  "AOSP_framework_reference": "https://android.googlesource.com/platform/frameworks/base/+/android-12.1.0_r11/services/core/java/com/android/server/WiredAccessoryManager.java",
+  "scope": "Bounded HDMI extcon reset coalescing only while independent DRM physical connector stays connected",
+  "whole_kernel_or_Composer_upgrade": false,
+  "player_codec_fence_or_watchdog_change": false,
+  "device_acceptance": "BOUNDED_EXO_AND_REAL_HOTPLUG_PASSED_SEEK_AND_TIMING_BLANKS_REMAIN",
+  "real_physical_hotplug_acceptance": true,
+  "public_release": false,
+  "kernel_reference_fixes": [
+    {
+      "commit": "b84c5d0c819a3b544738cf00a79cc496917bb767",
+      "url": "https://github.com/rockchip-linux/kernel/commit/b84c5d0c819a3b544738cf00a79cc496917bb767",
+      "scope": "Move extcon state changes from bridge enable/disable to physical connector detection; upstream describes player self-destruction and repeated HDMI enable/disable"
+    },
+    {
+      "commit": "48498c68b5da4c658d7c363dfbbfb6632ca1d324",
+      "url": "https://github.com/rockchip-linux/kernel/commit/48498c68b5da4c658d7c363dfbbfb6632ca1d324",
+      "scope": "Move audio handle_plugged_change notification to real connector detection; dependency/completeness reference"
+    }
+  ],
+  "local_adaptation": "Kernel behavior confirmed by real extcon 0/1 while DRM stayed connected; current builtin driver not rebuilt. Bounded framework event compatibility adapter, not direct kernel commit backport.",
+  "item_and_whole_reboot_rollback": true,
+  "validation_addendum": "docs/validation/decode-hdmi-event-082.json"
+}

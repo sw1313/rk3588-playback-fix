@@ -39,6 +39,10 @@ public final class SettingsActivity extends Activity {
             preferences.edit().putBoolean("yamby_menu", true).commit();
         if (!preferences.contains("cropfix"))
             preferences.edit().putBoolean("cropfix", false).commit();
+        if (!preferences.contains("exo_seekhead"))
+            preferences.edit().putBoolean("exo_seekhead", false).commit();
+        if (!preferences.contains("hw_main10_copy"))
+            preferences.edit().putBoolean("hw_main10_copy", false).commit();
         LinearLayout column = new LinearLayout(this);
         column.setOrientation(LinearLayout.VERTICAL);
         int pad = (int) (32 * getResources().getDisplayMetrics().density);
@@ -60,6 +64,8 @@ public final class SettingsActivity extends Activity {
         addSwitch(column, preferences, "yamby_menu", getString(R.string.yamby_menu_label));
         addSwitch(column, preferences, "noncopy", getString(R.string.noncopy_label));
         addSwitch(column, preferences, "cropfix", getString(R.string.cropfix_label));
+        addSwitch(column, preferences, "hw_main10_copy", getString(R.string.hw_main10_copy_label));
+        addSwitch(column, preferences, "exo_seekhead", getString(R.string.exo_seekhead_label));
         TextView limits = new TextView(this);
         limits.setText(R.string.settings_limits);
         limits.setTextSize(16); column.addView(limits);

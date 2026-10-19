@@ -1,0 +1,42 @@
+{
+  "version": "0.8.5-test1",
+  "client_version": "0.3.7-test3",
+  "status": "WITHDRAWN_APP_SPECIFIC_SCOPE_REJECTED",
+  "public_release": false,
+  "switch": "exo_content_vote",
+  "default": 0,
+  "dependencies": [
+    "codec2_native_backpressure"
+  ],
+  "scope": "same valid HEVC Surface, renderer stop context only; actual Surface changes, resume and forced updates preserved",
+  "original_content_FPS_preserved": true,
+  "global_FPS_lock": false,
+  "QMS_implemented": false,
+  "true_HDMI_timing_blank_fixed": false,
+  "controls_android_assertions": 25,
+  "browser_assertions": 83,
+  "client_frame_vote_unit_tests": 4,
+  "actual_device_acceptance": false,
+  "existing_seek_candidate_currently_under_user_trial": "LSPosed0.3.7-test2 original-entry seek accepted; retained in test3",
+  "Frame_Guard": "off",
+  "installation": {
+    "same_signer": true,
+    "P010_assets_identical": 5,
+    "existing_component_ELFs_identical": 40,
+    "previous_selections_retained": true,
+    "trial_exo_content_vote": 1,
+    "boot_partition_modified": false,
+    "boot_receipt_active": true,
+    "pending_reboot": false,
+    "external_Zygisk_LSPosed_health": "PASS"
+  },
+  "withdrawal": {
+    "user_requires_system_wide_Exo_HDMI_fix": true,
+    "user_HDMI_blackout_not_visible_in_ADB": true,
+    "feature_off_reboot_verified": true,
+    "client_restored": "0.3.7-test2 seek-only; package data and scope retained",
+    "Decode_restored": "0.8.4-test3; exact previous selections",
+    "production_bridge_and_switches_removed": true,
+    "new_user_interaction_acceptance": false
+  }
+}

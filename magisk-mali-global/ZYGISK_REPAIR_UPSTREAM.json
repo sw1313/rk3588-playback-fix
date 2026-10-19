@@ -1,0 +1,30 @@
+{
+  "component": "Mali cold-start Zygisk compatibility",
+  "local_version": "0.4.1-test2",
+  "upstream_reference": {
+    "project": "topjohnwu/Magisk",
+    "tag": "v30.7",
+    "commit": "e8a58776f1d7bdf852072ad0baa6eceb9a1e4aac",
+    "files": [
+      "native/src/init/rootdir.cpp",
+      "native/src/init/rootdir.rs",
+      "native/src/core/bootstages.rs"
+    ]
+  },
+  "mechanisms_reused": [
+    "custom rc precedes injected Magisk post-fs-data action",
+    "PostFsDataDone serializes and skips repeated dispatch",
+    "preserve Magisk-patched Zygote onrestart definition"
+  ],
+  "backported_upstream_GPU_changes": [],
+  "local_changes": [
+    "remove all Zygote service overrides and SIGSTOP",
+    "early rollback preflight before external injectors start",
+    "post-mount init action barrier with control-message handling preserved",
+    "own-state injection intent snapshot and mandatory both-ABI Zygisk/LSPosed qualification"
+  ],
+  "target_magisk_api": 30700,
+  "installed_variant_source_identity_claimed": false,
+  "target_dispatch_idempotence_checked": true,
+  "external_Zygisk_database_or_selection_modified": false
+}

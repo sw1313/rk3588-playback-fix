@@ -25,6 +25,17 @@ if [ "$mode" = on ]; then
   ln "$MODDIR/$file" "$target"
   printf '%s  /vendor/%s\n' "$hash" "$relative" >> "$MODDIR/active.next.sha256"
  done < payload.sha256
+ if [ "$(cat "$STATE/cold-mode" 2>/dev/null)" = on ];then
+  read -r csf_bytes csf_hash csf_url < contracts/csf-source.txt
+  cache="$STATE/cache/$csf_hash.bin"
+  [ "$(wc -c < "$cache" | tr -d ' ')" = "$csf_bytes" ]
+  [ "$(sha256sum "$cache" | cut -d ' ' -f 1)" = "$csf_hash" ]
+  mkdir -p "$MODDIR/system.next/vendor/etc/firmware"
+  # Never hardlink a permissive cache into the verified overlay.
+  cp "$cache" "$MODDIR/system.next/vendor/etc/firmware/rk_next_csffw.bin"
+  chmod 0644 "$MODDIR/system.next/vendor/etc/firmware/rk_next_csffw.bin"
+  printf '%s  /vendor/etc/firmware/rk_next_csffw.bin\n' "$csf_hash" >> "$MODDIR/active.next.sha256"
+ fi
  echo "$boot" > "$STATE/boot-pending"
 elif [ "$mode" != off ]; then
  exit 1

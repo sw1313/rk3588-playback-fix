@@ -1,0 +1,120 @@
+{
+  "date": "2026-10-19",
+  "status": "DIAGNOSTIC_CAPTURE_COMPLETE_PHYSICAL_BLACKOUT_PERSISTS",
+  "version": "0.8.6-qms-test17-ddc1",
+  "mali_pairing_only_version": "0.4.2-qms-test19",
+  "diagnostic_only": true,
+  "short_blackout_fixed": false,
+  "release_accepted": false,
+  "preserves_test16": true,
+  "runtime_protocol_changes": false,
+  "boot_flash": false,
+  "diagnostic": {
+    "default_enabled": false,
+    "root_parameter": "owner_boundary_limit",
+    "per_boot_hard_limit": 1024,
+    "trial_limit": 96,
+    "added_fields": [
+      "VOP control and active region",
+      "VOP scan line",
+      "packet-word write timestamp/frame/scan-line"
+    ],
+    "steady_frame_logging": false,
+    "transmitted_packet_or_receiver_acknowledgement": false
+  },
+  "checks": {
+    "Android_native_register_lifecycle_cases": 54,
+    "exact_pair_cases": 15,
+    "native_import_CRCs": 74,
+    "unrelated_QMS_core_session_sources_unchanged": true
+  },
+  "physical": "User: playback, pause and stepping still black",
+  "frame_guard": "disabled and paused",
+  "boot_health": {
+    "exact_component": true,
+    "QMS_active": true,
+    "Mali_g18_KMD_DVFS_active": true,
+    "external_Zygisk_LSPosed_both_ABIs": true,
+    "Auto_HDR_preserved": true,
+    "DDC_active": true,
+    "boot_unchanged": true,
+    "module_flags_and_component_choices_preserved": true,
+    "frame_errors": 0,
+    "diagnostic_limit": 0,
+    "diagnostic_records": 0
+  },
+  "results": {
+    "boundary_records": 96,
+    "fully_recorded_serials": [
+      26,
+      27,
+      28,
+      29,
+      30,
+      31,
+      32,
+      33,
+      34,
+      35,
+      36,
+      37,
+      38,
+      39,
+      40,
+      41,
+      42,
+      43,
+      44,
+      45,
+      46,
+      47,
+      48,
+      49
+    ],
+    "DSP_control_values": [
+      "1000e/1000e"
+    ],
+    "VACT_values": [
+      "5208c2/5208c2"
+    ],
+    "standby_seen": false,
+    "notice_write_lines": [
+      48,
+      125,
+      20,
+      28,
+      21,
+      25,
+      51,
+      46,
+      44,
+      45,
+      48,
+      54,
+      30,
+      23,
+      23,
+      20,
+      41,
+      42,
+      42,
+      46,
+      45,
+      38,
+      27,
+      22
+    ],
+    "notice_writes_before_active_start": 23,
+    "notice_writes_at_or_after_active_start": 1,
+    "GCP_values": [
+      "0/0"
+    ],
+    "HDCP2_values": [
+      "1/1"
+    ],
+    "claim_limit": "Register write location, not transmitted VTEM timing or received packet acknowledgement. Boundary cap reached; serials after recorded coverage excluded."
+  },
+  "frame_errors_at_window_end": 0,
+  "diagnostic_disarmed_at_end": true,
+  "runtime_late_latch_observations_at_end": 1
+}

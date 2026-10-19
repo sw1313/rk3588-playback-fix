@@ -1,3 +1,52 @@
+# Release v0.8.6 / 正式版源码与构建
+
+Release components: Decode Stack 0.8.6, Mali Global 0.4.2, LSPosed 0.3.7. The accepted system refresh policy lives in `magisk-hdr/src/refresh_session.cpp`; `tools/build_refresh_session.py` builds its exact-firmware loader chain and `tools/build_decode_stack.py --refresh-session <component>` integrates it. `docs/validation/decode-refresh-session-086.json` records the tested binary SHA and bounded physical feedback.
+
+Use the existing component builders with hash-pinned private firmware as link/patch inputs. Public installers contain source-built shims, patches and contracts; original SF/HWUI/HWC, services.jar/OAT, boot images, closed Mali/CSF blobs, device logs and signing keys are excluded. Installers generate the firmware variants locally. QMS and private first-binding preparation are independently gated; a release package is not a universal boot adaptation.
+
+The release retains the accepted executable code and regenerates version, bilingual UI, provenance and integrity manifests. FFmpeg build-directory strings are redacted only in readonly configuration data; executable bytes and ELF offsets remain unchanged, and the payload/source contracts are regenerated. `tools/verify_open_source.py` verifies license documents and nested checksums. The source archive includes the local GPL kernel changes and FFmpeg patch/source obligations; external BSP/link inputs remain separate. New source-rate combinations, all TVs and complete HDR calibration are not newly certified.
+
+以下保留历史构建步骤和阶段记录。旧版本“候选／未发布”仅指当时状态，不覆盖上方正式版与当前验收记录。
+
+---
+
+# Working-tree Decode Stack 0.7.9 / LSPosed 0.3.6 candidates
+
+HWUI mapping and selective HWC mode-cache repair are integrated into Decode
+Stack; full HDR remains gated inactive. Rebuild using `tools/build_hdr.py` and
+the existing Decode Stack combiner with private hash-pinned firmware link inputs.
+Only source-built adapters, guards and recipes belong in an installer, never
+private full HWUI/HWC copies. See [current evidence](docs/decode-hwui-rgb10-079.zh-CN.md).
+The optional LSPosed FFmpeg client uses public revision `bf4d5037b4`, its local
+patch and static dav1d 1.5.3; [staging/build instructions](lsposed/patches/README.md)
+describe its contract, accompanying source/licenses and pending player acceptance.
+These are unreleased worktree candidates; older release links below do not
+contain these changes.
+
+# Working-tree Mali Global 0.4.2-test1
+
+Selective Rockchip CSF fence metadata initialization backport (`194a7d5a7567395d37e11ffa9014589b83ba8aad`), independently selected at first binding. Full frozen source, original upstream patch, read-only KMD parameter, private boot builder and module WebUI are included. Rebuild with the same Linux 5.10.66 headers / pinned CRC inputs using the existing commands below; prepare a new private boot for the rebuilt KMD and keeper hashes. Installer excludes proprietary Mali libraries, CSF, private boot and device data. See [scope and validation](docs/mali-csf-fence-042.zh-CN.md).
+
+---
+
+# Working-tree Decode Stack 0.7.4-test1
+
+This local experimental snapshot selectively backports paired Rockchip output-buffer configuration notifications while retaining existing buffer counts and pixel/fence paths. See [scope and bounded device evidence](docs/decode-output-delay-074.zh-CN.md). Original tested installer bytes are preserved; private diagnostics and signing inputs are excluded.
+
+---
+
+# Working-tree Decode Stack 0.7.3-test1
+
+This local experimental snapshot adds the independently selectable Gralloc HDR transfer ownership optimization. See [scope and device validation](docs/decode-gralloc-transfer-073.zh-CN.md); original API32/firmware contracts and reboot rollback remain required. It does not replace Gralloc or claim a newer vendor SDK.
+
+---
+
+# Working-tree Mali Global 0.4.1-test2 repair
+
+This unpublished snapshot includes the Zygisk startup repair, its source pins and bounded on-device rollback/injection results. The tested installer bytes are preserved; see [repair validation](docs/mali-zygisk-repair-041.zh-CN.md). Private boot/profile inputs are excluded. Older release instructions below remain historical.
+
+---
+
 # v0.6.9 optional 应用内 PanVK driver / 可选 应用内驱动
 
 Checkout `v0.6.9` for `panvk/` and `tools/build_panvk.py`. The new driver is
@@ -209,7 +258,58 @@ SHA256SUMS together. Never overwrite an older immutable package with new bytes.
 
 ## Licensing boundaries
 
+Decode Stack 0.7.6-test1 applies `hevc-native-surface.patch` after the output
+delay patch in the fixed next Codec2 core. This local API32 guard correction
+retains upstream native HEVC composer output across late ten-bit discovery;
+it does not force FBC changes or replace the SDK baseline. The independent
+default-off `hevc_native_surface` option requires `codec2_sdk_next` and
+`hdr_static`. New acceptance and rollback records are in
+`docs/decode-hevc-native-076.zh-CN.md` and its validation JSON. Optional test
+sources/builders are in `tools/decode-performance/` and `tools/hevc-native-test/`;
+private media, raw output, keys and test APKs are excluded from delivery.
+
+Decode Stack 0.7.5-test1 additionally builds `magisk-hdr/src/plane_probe.c`.
+`overlay-scale.sh` generates a private factory-HWC variant at install only for
+the exact original hash, implementing the two removed scaling restrictions in
+Rockchip commit e3e3d168e524da25620ef55da734e48c8e56afe6. Four bytes differ;
+the original companion is retained. This is not a full latest-HWC rebuild or
+VOP2 kernel update. Preserve the patch and `LICENSES/hwc/` notices. Never copy
+the generated `components/hdr/variants/` or factory companion into a public
+source/installer. The tested installer remains immutable; the device validation
+and legal addendum accompany it separately. See
+`docs/decode-hwc-overlay-075.zh-CN.md` and its structured validation JSON.
+
 MIT applies to original project code. Preserve upstream notices and the
 licenses/patent grants in LICENSES and component directories. Upstream source
 links do not grant permission to redistribute proprietary Mali or firmware.
-No boot image is flashed. The optional kernel module pair is described above; no Dolby or player changes are introduced.
+The default-off cold-binding candidate adds a statically built native keeper and private exact-root boot preparation (`tools/cold-boot/prepare.py`). Selecting that backend writes boot; private images and root profiles are never part of the source or installer. See `magisk-mali-global/boot/README.md`. The legacy backend does not flash boot. No Dolby or player changes are introduced.
+
+
+Decode Stack 0.7.7-test1 selectively backports the remaining HEVC EOS pending-input completion from Lineage-Rockchip e577f69d04d7435a8e4a1088337ff2ed92a3a7e1. The API32 adaptation batches callbacks outside internal locks and keeps a default-off reboot-latched independent option. Scope/results: docs/decode-hevc-eos-077.zh-CN.md. Rebuildable diagnostic sources/builders: tools/decode-lifecycle/eos_pending_probe.cpp and build_eos_pending_probe.py. No media or private link inputs are included.
+
+
+Decode Stack 0.7.8-test1 adds local MIT NV15-to-P010 NEON pair-gather optimization. It is not a direct new upstream backport or a newer complete SDK/library. Canonical source and independent bounds/precision test are in tools/pixel-conversion; the pinned next-core builder verifies the applied new header. Scope, installed CPU results, two-level rollback and explicit-P010 HDMI HDR limitation: docs/decode-p010-pairs-078.zh-CN.md.
+
+
+Decode Stack 0.8.2-test1 adds the internal MIT source `magisk-hdmi-event/src/` and `tools/build_hdmi_event.py`. Build with `--ndk`, exact private `--runtime` and `--hardware-legacy` inputs, and fresh `--work`; pass its clean package as `--hdmi-event` to `tools/build_decode_stack.py`. Inputs stay private; only source, checked byte recipes and newly built helper/probes are packaged. This is a local compatibility repair, not a newer kernel or Composer driver.
+
+
+The private Decode Stack 0.8.4 candidate adds native-backpressure.patch on the pinned next-core: actual native Surface prefetch deferral and MPP BUFFER_FULL flow control. AOSP V4L2 b/184020290 and the pinned MPP implementation are mechanism references, not direct backports or buffer-count transplants. Watchdog, fences and genuine work completion remain intact. Test1 failed actual Exo; test2 passed a bounded user trial; test3 tightens copy/tunnel exclusion and has separate acceptance. See docs/decode-native-backpressure-084.zh-CN.md and tools/decode-lifecycle/native_backpressure_probe.cpp. This is not a public release or a complete SDK upgrade.
+
+The in-progress Decode Stack QMS kernel core is GPL-2.0-only, under
+`decode-kernel/qms/`, with selective Rockchip d0e8f558 timing data and 5a89a1cb
+VTEM/state-machine semantics. Exact scope and two local timing-data corrections
+are recorded in its UPSTREAM.json. Builders/tests are in tools/qms/ and
+tools/build_display_probe.py. Session/UAPI source now includes separate MIT HWC
+frontend and pre-exec rendezvous candidates. Their compile gates are off in
+normal builds; no functional hardware binding, kernel endpoint, display loader
+or installable QMS upgrade is delivered yet. Private Image/ELF/contracts/logs remain
+excluded. GPL source is not covered by the original adapters' default MIT grant.
+
+`decode-kernel/qms/uapi.h` uses GPL-2.0-only WITH Linux-syscall-note. The MIT
+frontend includes only this syscall header, not GPL implementation code.
+Reproduce the new isolated checks with `tools/qms/test_session.py`,
+`tools/build_hdr.py --qms-candidate --qms-frontend-test`, and
+`tools/tests/test_qms_cold_stage.py`; read each tool's help for private build
+inputs. These checks do not perform real QMS or qualify a boot image. The Decode
+builder refuses the frontend-only component until a functional backend exists.

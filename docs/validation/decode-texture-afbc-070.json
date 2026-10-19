@@ -1,0 +1,137 @@
+{
+  "component": "decode-stack",
+  "version": "0.7.0-test2",
+  "date": "2026-10-18",
+  "status": "experimental-bounded-validation-complete-player-uhd-pacing-unresolved",
+  "public_release": false,
+  "source_ref": "working-tree",
+  "core_sha256": "a4190727f6cbe0a867d05f45c52cb8ef08c99da63bd11dc3fc53678de6012f74",
+  "environment": {
+    "soc": "RK3588",
+    "android_api": 32,
+    "kernel": "5.10.66",
+    "graphics": "Mali Global 0.3.0 g18 userspace plus paired next kernel/CSF"
+  },
+  "switch": {
+    "name": "av1_texture_afbc",
+    "default": 0,
+    "reboot_required": true,
+    "parent": "av1_afbc",
+    "disabled_policy": "Prior P010 texture selection"
+  },
+  "allocation": {
+    "p010_output_allocation_bytes": 24883200,
+    "afbc_output_allocation_bytes": 17362944,
+    "reduction_bytes": 7520256,
+    "reduction_percent": 30.222,
+    "scope": "Single 3840x2160 ten-bit decoder output allocation; not total process RSS or measured memory-bus bandwidth"
+  },
+  "pixel_precision": {
+    "frames": 21,
+    "samples": 151787520,
+    "all_exact": true,
+    "method": "GPU-only PRIVATE AImageReader, per-buffer codec crop matched by PTS, synchronous RGA AFBC decompression and DMA read sync, visible planar YUV against FFmpeg software reference",
+    "cases": [
+      {
+        "name": "1080p 10-bit grain",
+        "bits": 10,
+        "frames": 12,
+        "samples": 37324800,
+        "actual_samples": 37324800,
+        "all_samples_exact": true,
+        "source_low_two_nonzero": 27977201,
+        "actual_min": 0,
+        "actual_max": 1023
+      },
+      {
+        "name": "UHD 10-bit PQ HDR",
+        "bits": 10,
+        "frames": 6,
+        "samples": 74649600,
+        "actual_samples": 74649600,
+        "all_samples_exact": true,
+        "low_two_nonzero_observed": true
+      },
+      {
+        "name": "4096x2160 8-bit",
+        "bits": 8,
+        "frames": 3,
+        "samples": 39813120,
+        "actual_samples": 39813120,
+        "all_samples_exact": true,
+        "min": 12,
+        "max": 242
+      }
+    ]
+  },
+  "new_route_delivery": {
+    "texture_uhd": {
+      "decoded": 3597,
+      "eos": true,
+      "stop_success": true,
+      "delivery_late_gt20ms": 0,
+      "source_span_seconds": 59.993,
+      "elapsed_seconds": 60.821
+    },
+    "adaptive_nonaligned": {
+      "configured": [
+        1920,
+        1080
+      ],
+      "actual": [
+        854,
+        480
+      ],
+      "decoded": 240,
+      "eos": true,
+      "stop_success": true,
+      "explicit_full_precision_fallback_logged": true
+    },
+    "eight_bit_start": {
+      "dimensions": [
+        4096,
+        2160
+      ],
+      "decoded": 360,
+      "eos": true,
+      "stop_success": true
+    }
+  },
+  "original_player": {
+    "application_libraries_unchanged": true,
+    "grain_1080p_eos": true,
+    "uhd_hdr": {
+      "new_file_seek_zero_confirmed": true,
+      "capture_seconds": 20,
+      "hardware_decode_and_texture_import": true,
+      "acquisition_timeout_observed": true,
+      "present_window_gaps_observed": true,
+      "smooth_playback_acceptance": false
+    }
+  },
+  "rollback": {
+    "off_reboot_actual_format": "P010 0x36",
+    "on_reboot_actual_format": "AFBC 0x1b",
+    "same_core_binary": true,
+    "both_mali_ready_properties_active": true
+  },
+  "controls": {
+    "new_option_android_shell_assertions_passed": 17,
+    "live_module_modified_by_fixture": false,
+    "parser_tests_passed": 5,
+    "javascript_syntax_passed": true,
+    "full_webui_suite_claimed": false,
+    "localization_check": "Blocked by pre-existing unchanged Mali Chinese strings; no full localization pass claim"
+  },
+  "previous_runtime_validation": "docs/validation/decode-0.6.3.json",
+  "limitations": [
+    "Experimental default-off candidate; original-player UHD HDR capture includes image acquisition timeout and present-window gaps; smooth playback acceptance remains unresolved.",
+    "Allocation reduction is per output DMA-BUF, not total process RAM, measured bus bandwidth or FPS improvement.",
+    "Initial before/after timing runs differ in mirroring and temperature; no strict causal performance A/B.",
+    "Zero decode deadline lateness is not zero physical display drops; vendor callbacks may echo scheduled times; SF windows overlap.",
+    "Pixel comparisons cover bounded decoded frames, not all sources, player tone mapping or full HDMI precision.",
+    "Only Mali Global 0.3.0 g18 userspace plus paired next kernel/CSF combination was verified.",
+    "Other pre-existing codec/display paths were not exhaustively revalidated for this candidate; previous reports remain historical."
+  ],
+  "report_source_tree": "docs/decode-texture-afbc-070.zh-CN.md"
+}

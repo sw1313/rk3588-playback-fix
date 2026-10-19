@@ -1,0 +1,79 @@
+{
+  "date": "2026-10-19",
+  "component": "Decode Stack QMS system display path",
+  "version": "0.8.6-qms-test12",
+  "status": "TEST12_PHYSICAL_BLACKOUT_PERSISTS_WITH_NO_OBSERVED_FRAME_FAULT_OR_LINK_REBUILD",
+  "physical_HDMI_blackout_fixed": false,
+  "release_accepted": false,
+  "upstream_basis": [
+    "https://github.com/rockchip-linux/kernel/blob/77168c8d5ab82399f65a80e9f807b50ba37cf483/drivers/gpu/drm/rockchip/dw_hdmi_qp-rockchip.c"
+  ],
+  "backport_scope": "local native-binding adaptation of delayed observation handling; not a verbatim upstream patch",
+  "behavior": "verify repeated integer notice packet/timing under original native locks, then execute one action at actual sampled frame; never synthesize intermediate frames or complete tickets on reanchor",
+  "preserved": [
+    "fractional cadence strict sequence",
+    "pending latch strict sequence",
+    "native completion strict +1 and real timing latch",
+    "fences",
+    "full format/HDR/link identity",
+    "hardware packet fields",
+    "HWC implementation",
+    "boot image",
+    "test11 ART cache and settings repair",
+    "all component selections",
+    "Frame Guard disabled and paused",
+    "Zygisk Next and both ABI LSPosed"
+  ],
+  "pairing": {
+    "profile_id": "2de153df39ad38de1a1ba31455713f44fafe4728ca74d0e65534caa187391447",
+    "helper_sha256": "269e10f99a7bcdeb35df73e07d4e0fef495d29aedc4c6d1713980277f8fdd6a3",
+    "module_sha256": "d0dec51c8153f4370abeaf571e5b03a1d3438f513dda95c3bf8d63a40cf33c48",
+    "hwc_sha256": "b34b647f6664de292c5f10d3d75b1a0bb5ae69c33960e088530ecb8ad96102e9",
+    "image_sha256": "d9b764ad8342ce71ddde45bc0978e548ae636ce6d01fb4bf3f426eba5fff0740"
+  },
+  "Mali_version": "0.4.2-qms-test14",
+  "Mali_change": "exact compatible QMS tuple only; g18 KMD userspace and DVFS unchanged",
+  "tests": {
+    "session_policy_cases": 90,
+    "engine_publication_cases": 33,
+    "native_register_lifecycle_injected_device_cases": 45,
+    "controller_injected_device_cases": 19,
+    "endpoint_injected_device_cases": 11,
+    "exact_pair_isolated_device_cases": 15
+  },
+  "real_boot": {
+    "Decode_QMS_qualified": true,
+    "Mali_userspace_KMD_DVFS_active": true,
+    "both_ABI_Zygisk_Next_LSPosed_healthy": true,
+    "module_flags_unchanged": true,
+    "boot_hash_unchanged": true,
+    "display_policy_qualified": true,
+    "saved_resolution": "Auto",
+    "HDR_menu_enabled": true,
+    "initial_frame_errors": 0,
+    "physical_blackout_acceptance": false
+  },
+  "rollback": "full known-good private module backups retained; existing QMS off or module disable reboot path preserved; new candidate-specific off reboot not yet repeated",
+  "remaining": [
+    "user Exo operation and physical HDMI blackout assessment",
+    "correlate any remaining original phase/final-latch/fractional faults",
+    "QMS lifecycle restore reasons",
+    "no-rebuild VTEM/AVMUTE/HDR/HDCP blackouts",
+    "complete HDR output acceptance",
+    "actual CPU overhead measurement"
+  ],
+  "user_playback": {
+    "user_report": "brief black on playback, pause and frame stepping",
+    "physical_blackout_acceptance": false,
+    "QMS_serial_completed": 8,
+    "frame_errors": 0,
+    "notice_reanchors": 0,
+    "constant_command_reanchors": 8,
+    "constant_observations": 555,
+    "final_state": "QMS ACTIVE at base60, same generation and cookie",
+    "new_VOP_PHY_rebuild_observed": false,
+    "physical_connection_events_observed": false,
+    "logical_modes": "eight 24/60 transitions",
+    "limitation": "notice-gap candidate branch was not exercised in this sample; cannot claim that path fixed from zero errors"
+  }
+}

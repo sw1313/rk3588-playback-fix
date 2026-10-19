@@ -16,5 +16,14 @@
   ],
   "closed_firmware_redistributed": false,
   "kernel_config_and_generated_headers_included": true,
-  "license": "File-level GPL-2.0 terms and Linux syscall exception retained; Rockchip overlay GPL-2.0-or-later"
+  "license": "File-level GPL-2.0 terms and Linux syscall exception retained; Rockchip overlay GPL-2.0-or-later",
+  "selective_backports": [
+    {
+      "commit": "194a7d5a7567395d37e11ffa9014589b83ba8aad",
+      "url": "https://github.com/rockchip-linux/kernel/commit/194a7d5a7567395d37e11ffa9014589b83ba8aad",
+      "file": "csf/mali_kbase_csf_kcpu.c",
+      "scope": "Initialize and retain KCPU fence metadata before dma_fence_init invokes trace callbacks. All sync_file error cleanup and fence waits retained.",
+      "local_changes": "Default-off read-only csf_fence_safe module parameter; exact-root first-binding keeper latches root-owned independent selection before graphics exec. Off preserves original initialization order."
+    }
+  ]
 }

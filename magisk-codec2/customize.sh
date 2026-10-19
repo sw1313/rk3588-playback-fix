@@ -17,8 +17,9 @@ set_perm "$MODPATH/bin/patcher" 0 0 0755
 sha() { value=$(sha256sum "$1") || return 1; echo "${value%% *}"; }
 service_hash=$(sha /vendor/bin/hw/android.hardware.media.c2@1.1-service) || abort "Cannot read service."
 payload_hash=$(sha "$MODPATH/system/vendor/bin/hw/android.hardware.media.c2@1.1-service")
-[ "$service_hash" = 4c3586e5b54b67f98eb15772ef215380d51f34b52efd8dca80a2f17bad124746 ] || [ "$service_hash" = "$payload_hash" ] || [ "$service_hash" = de4f3941ad3065659465fd10078fea6e6e7dece72677c942eebafb1ab52aa134 ] || [ "$service_hash" = c170706afa98ff9f0545d3db01e2049f592f55a413c2130e97868d178846239f ] || [ "$service_hash" = 796d3ac07a1341e8bca0551132b0c844ee37572b9bbeb20571b12bcc5e58b9a3 ] || [ "$service_hash" = f07d9c70d10f2157aaef3db4ca6cf2858bfdeb8f286190467c0a639c4bd07d84 ] || abort "Unknown service baseline."
-# The final alternative is our earlier locally tested service, permitting an
+[ "$service_hash" = 4c3586e5b54b67f98eb15772ef215380d51f34b52efd8dca80a2f17bad124746 ] || [ "$service_hash" = "$payload_hash" ] || [ "$service_hash" = de4f3941ad3065659465fd10078fea6e6e7dece72677c942eebafb1ab52aa134 ] || [ "$service_hash" = c170706afa98ff9f0545d3db01e2049f592f55a413c2130e97868d178846239f ] || [ "$service_hash" = 796d3ac07a1341e8bca0551132b0c844ee37572b9bbeb20571b12bcc5e58b9a3 ] || [ "$service_hash" = f07d9c70d10f2157aaef3db4ca6cf2858bfdeb8f286190467c0a639c4bd07d84 ] || [ "$service_hash" = 86e44cdce7b54f1ff07ef8e76f0e947f34cb5557fbfcba2a6471bf7b6e92a753 ] || abort "Unknown service baseline."
+# The final alternatives are hash-pinned previously tested services (including
+# the immutable 0.8.2 payload 86e44cdc), permitting an
 # upgrade without weakening the pinned original HIDL and platform ABI checks.
 ui_print "Generating narrow P010 fixes from this device's verified original files..."
 while read -r target destination original patched recipe; do
@@ -29,6 +30,12 @@ while read -r target destination original patched recipe; do
   "$MODPATH/bin/patcher" binary "$target" "$MODPATH/$destination" "$MODPATH/$recipe" || abort "Exact byte check failed: $target"
  elif [ "$current" = "$patched" ]; then
   cp "$target" "$MODPATH/$destination" || abort "Cannot copy verified active fix."
+ elif [ "$target" = /system/lib64/libsfplugin_ccodec.so ] && [ "$current" = f9e01d5ff014ab42a40ddaafee6f3df8122502dd1f0641de58ae75b1b96610dd ]; then
+  # This is the exact independently selected P010 pool variant. Reuse only
+  # its preceding verified base kept by Decode Stack, never an unknown file.
+  prior=/data/adb/modules/rk3588_decode_stack/components/codec2/$destination
+  [ "$(sha "$prior")" = "$patched" ] || abort "Missing verified pre-pool framework base."
+  cp "$prior" "$MODPATH/$destination" || abort "Cannot preserve pre-pool framework base."
  else
   abort "Unrecognized library: $target"
  fi

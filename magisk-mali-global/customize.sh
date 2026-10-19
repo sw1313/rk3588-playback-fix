@@ -3,7 +3,7 @@
 [ "$(getprop ro.board.platform)" = rk3588 ] && [ "$(uname -r)" = 5.10.66 ] || abort "Unsupported platform/kernel"
 cd "$MODPATH" || abort "Module directory unavailable"
 sha256sum -c checksums.sha256 >/dev/null 2>&1 || abort "Package integrity differs"
-sha256sum -c contracts/unchanged-platform.sha256 >/dev/null 2>&1 || abort "Original graphics dependencies differ"
+sh "$MODPATH/platform-check.sh" >/dev/null 2>&1 || abort "Original graphics dependencies or exact Decode SF pair differ"
 STATE=/data/adb/rk3588-mali-global
 mkdir -p "$STATE/cache" "$STATE/original/lib/egl" "$STATE/original/lib64/egl" || abort "Cannot create private rollback/cache state"
 chmod 700 "$STATE"
@@ -39,9 +39,13 @@ fi
 [ "$(sha "$cache")" = "$expected" ] || abort "CSF hash differs"
 sha256sum -c kernel.sha256 >/dev/null 2>&1 || abort "Kernel upgrade payload differs"
 [ -f "$STATE/kernel-mode" ] || printf 'stock\n' > "$STATE/kernel-mode"
+[ -f "$STATE/dvfs-mode" ] || printf 'off\n' > "$STATE/dvfs-mode"
+[ -f "$STATE/cold-mode" ] || printf 'off\n' > "$STATE/cold-mode"
+[ -f "$STATE/fence-mode" ] || printf 'off\n' > "$STATE/fence-mode"
 sha256sum -c payload.sha256 >/dev/null 2>&1 || abort "Complete GPU payload differs"
 set_perm_recursive "$MODPATH" 0 0 0755 0644
-for f in mode-control.sh action.sh assemble.sh post-fs-data.sh service.sh uninstall.sh webui.sh kernel-state.sh kernel-boot.sh kernel-transition.sh kernel-verify.sh bin/graphics_probe32 bin/graphics_probe64 bin/kernel_controller bin/kernel_health bin/kernel_scan; do set_perm "$MODPATH/$f" 0 0 0755; done
+set_perm "$MODPATH/boot-stage.sh" 0 0 0755
+for f in mode-control.sh action.sh assemble.sh post-fs-data.sh service.sh uninstall.sh webui.sh kernel-state.sh kernel-boot.sh kernel-transition.sh kernel-verify.sh dvfs-state.sh dvfs-boot.sh cold-state.sh cold-verify.sh bin/cold_boot64 bin/graphics_probe32 bin/graphics_probe64 bin/kernel_controller bin/kernel_health bin/kernel_scan; do set_perm "$MODPATH/$f" 0 0 0755; done
 for abi in 32 64; do
  [ "$abi" = 64 ] && dir=lib64 || dir=lib
  prefix="$MODPATH/payload/$dir:/vendor/$dir:/system/$dir:/apex/com.android.vndk.v32/$dir"
@@ -62,4 +66,4 @@ fi
 sh "$MODPATH/assemble.sh" || abort "Cannot assemble global GPU overlay"
 # Installation is not a boot attempt; the first real boot sets this marker.
 rm -f "$STATE/boot-pending"
-ui_print "Global g18p0 prepared. Optional kernel + CSF pair is controlled in WebUI. Default: original kernel/CSF. Reboot applies settings; no boot flashing."
+ui_print "Global g18p0 prepared. Cold binding is OFF by default; requires a separately prepared private exact-root boot profile. Selecting cold binding writes and verifies boot. Reboot applies settings."

@@ -1,0 +1,81 @@
+{
+  "date": "2026-10-19",
+  "version": "0.8.6-qms-test14-ddc1",
+  "status": "DIRECT_HDMI_STARTUP_AUTO_PAUSE_AND_SOUND_USER_ACCEPTED_SHORT_BLACKOUT_REMAINS",
+  "public_release": false,
+  "upstream": {
+    "vendor_commit": "cdc0984c90dc",
+    "reference": "https://lkml.iu.edu/2406.0/06496.html",
+    "scope": [
+      "Correct E-DDC segment pointer shift7",
+      "Use EXT_READ for segmented transactions"
+    ],
+    "local_adaptation": "Exact-image per-adapter algorithm wrapper and original DRM initialization; no executable text patch, EDID override or complete HDMI driver replacement"
+  },
+  "integration": {
+    "module": "Decode Stack",
+    "switch": "display_ddc",
+    "shutdown": "disable switch and reboot; module is pinned until reboot",
+    "DDC_module_SHA256": "9989645960508f9712f04d13b004fe62ec8f4b8d50dfa5cca71f4eed1e9d1807",
+    "recovery_module_SHA256": "7fa4541d87c1ebb85eb66f66cade958e8d8f84afcbc39336056396ae0a19c65b"
+  },
+  "checks": {
+    "DDC_canonical_CRCs": 18,
+    "recovery_canonical_CRCs": 46,
+    "inspect_load_and_unload": true,
+    "native_and_i2cdev_full_EDID_capture": true,
+    "four_blocks_valid_not_repeated": true,
+    "failed_unqualified_start_disables_only_this_feature": true,
+    "automatic_boot_load": true,
+    "automatic_native_recovery_commit_result": 0,
+    "automatic_native_recovery_preserved_logical_mode_and_buffers": true,
+    "automatic_native_recovery_verified": true,
+    "recovery_component_unloaded": true,
+    "native_scheduler_before": "0x00000000",
+    "native_scheduler_after": "0x00002008",
+    "VTEM_enabled": false,
+    "SCDC_clock_detected": true,
+    "SCDC_channel_locks": [
+      true,
+      true,
+      true
+    ],
+    "boot_unchanged_from_start_of_DDC_work": true,
+    "Frame_Guard_disable_and_paused_preserved": true,
+    "Zygisk_Next_and_LSPosed_both_ABIs_injected": true
+  },
+  "physical": {
+    "user_confirmed_direct_HDMI1_picture_after_manual_native_recovery": true,
+    "automatic_reboot_picture_user_acceptance": true,
+    "current_native_output": "3840x2160p60 YUV420 8-bit SDR, selected by factory negotiation",
+    "forced_quality_reduction": false,
+    "HDR_accepted": false,
+    "QMS_accepted": false,
+    "blackout_fixed": false,
+    "user_feedback": "Only short blackouts remain; everything else normal"
+  },
+  "audio_regression": {
+    "user_report": "Automatic pause and no sound after opening Exo; short blackouts remain",
+    "observed_cause_of_pause": "Repeated extcon false/true -> ACTION_AUDIO_BECOMING_NOISY; audio focus retained",
+    "sound_cause_exclusive_proof": false,
+    "action": "Restore existing system-level hdmi_audio_guard; not Frame Guard or refresh lock",
+    "new_upgrade_credit": false,
+    "active": true,
+    "physical_acceptance": "User reports no automatic pause and normal sound"
+  },
+  "current_boot": {
+    "display_ddc": 1,
+    "hdmi_audio_guard": 1,
+    "display_policy": 1,
+    "display_qms": 0,
+    "QMS_module_loaded": false,
+    "requested_next_boot_QMS": 1,
+    "note": "Selections changed during work; preserve current requested selections. Original GPU KMD boot has no QMS cold barrier, so saved QMS request does not establish active QMS."
+  },
+  "private_inputs_in_public_package": false,
+  "postboot_log_counts": {
+    "coalesced_transient_events": 1,
+    "NOISY_broadcasts": 0,
+    "fatal_Exo_errors": 0
+  }
+}

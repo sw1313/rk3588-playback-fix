@@ -1,0 +1,192 @@
+{
+  "component": "decode-stack-hdmi-transient-event-guard",
+  "version": "0.8.2-test1",
+  "date": "2026-10-19",
+  "status": "BOUNDED_HDMI_TRANSIENT_EVENT_REPAIR_AND_REBOOT_ROLLBACK_PASSED_EXO_SEEK_AND_TIMING_BLANKS_REMAIN",
+  "public_release": false,
+  "tested_installer_immutable": true,
+  "installer_sha256": "5ce50cf47a5e815415aabce15a29c0fceb29e8edf40518ba74a6c492d82eb287",
+  "metadata_note": "Later upstream references and acceptance are external/source addenda; tested ZIP embedded pre-device metadata was not rewritten.",
+  "scope": "Pinned API32 ARM64 system_server UEventObserver, exact HDMI extcon endpoint, independent DRM connected state, maximum 400ms; not direct kernel backport or whole Composer upgrade",
+  "switch": {
+    "name": "hdmi_audio_guard",
+    "default": 0,
+    "independent": true,
+    "requires_reboot": true,
+    "exact_firmware_and_import_ABI": true,
+    "startup_process_mapping_readiness": true
+  },
+  "upstream_kernel_references": [
+    {
+      "commit": "b84c5d0c819a3b544738cf00a79cc496917bb767",
+      "url": "https://github.com/rockchip-linux/kernel/commit/b84c5d0c819a3b544738cf00a79cc496917bb767",
+      "direct_backport": false
+    },
+    {
+      "commit": "48498c68b5da4c658d7c363dfbbfb6632ca1d324",
+      "url": "https://github.com/rockchip-linux/kernel/commit/48498c68b5da4c658d7c363dfbbfb6632ca1d324",
+      "direct_backport": false
+    }
+  ],
+  "observed_root_chain": [
+    "HDMI mode change emits extcon off/on while independent DRM remains connected",
+    "AudioService broadcasts ACTION_AUDIO_BECOMING_NOISY",
+    "Exo auto-pauses and drops content frame-rate vote",
+    "Display returns to default timing, producing repeated timing blanks; queue fatal observed in prior failing runs"
+  ],
+  "isolated_checks": {
+    "state_machine_and_exact_runtime_import_cases": 57,
+    "Android_control_assertions": 11,
+    "browser_assertions": 73,
+    "isolated_tests_not_device_acceptance": true
+  },
+  "actual_Exo": {
+    "entry": "Real application ExoPlayer entry, asynchronous MediaCodec, original HEVC Main10 AFBC path",
+    "Frame_Guard_temporarily_disabled": true,
+    "effective_match_content_frame_rate_during_test": 1,
+    "startup_pause_resume_modes": [
+      "3840x2160p24",
+      "3840x2160p60",
+      "3840x2160p24"
+    ],
+    "transient_resets_coalesced": 9,
+    "no_spurious_pause_in_bounded_play_resume": true,
+    "new_queue_watchdog_errors": 0,
+    "new_codec_reported_errors": 0,
+    "full_historical_fault_fixed": false,
+    "physical_timing_blank_eliminated": false,
+    "precise_seek_accepted": false,
+    "seek_limitation": "seekTo(60000) and one UI drag reported near-zero position rather than requested position; no new fatal in those runs. Not counted passed; cause and ON/OFF comparison pending.",
+    "fast_forward_rewind_keys_not_precise_seek_evidence": true,
+    "post_real_replug_playback_state_and_image_restored": true
+  },
+  "real_hotplug": {
+    "DRM_disconnected_then_connected": true,
+    "original_off_then_on_delivered": true,
+    "Android_HDMI_callbacks_preserved": true,
+    "real_disconnect_NOISY_preserved": true,
+    "actual_replug_HDMI_audio_output_device_present": true,
+    "real_hotplug_not_coalesced": true,
+    "subjective_listening_or_wire_analyzer_acceptance": false
+  },
+  "new_runtime_HDR_compatibility": {
+    "actual_new_version_test": true,
+    "source_dimensions": [
+      1280,
+      720
+    ],
+    "physical_target_dimensions": [
+      3840,
+      2160
+    ],
+    "actual_P010_PQ_frames": 100,
+    "actual_P010_HLG_frames": 190,
+    "scanout": "AB30 AFBC",
+    "PQ_EOTF": 2,
+    "HLG_EOTF": 3,
+    "PQ_static_metadata_equal_decoder": true,
+    "HLG_PQ_static_fields_all_zero": true,
+    "mixed_SDR_UI": true,
+    "SDR_virtual_display_passed": true,
+    "SDR_exit_AB24": true,
+    "HDMI_packet_register_checksum_valid": true,
+    "wire_measurement": false,
+    "repeated_full_queued_target_precision_test": false,
+    "unchanged_pixel_component_precision_reference": "docs/validation/decode-physical-hdr-081.json",
+    "full_colorimetric_acceptance": false
+  },
+  "rollback": {
+    "this_version_item_off_reboot": true,
+    "item_off_runtime_factory_hash": true,
+    "item_off_helper_absent_and_not_mapped": true,
+    "other_Decode_items_retained": true,
+    "this_version_whole_off_reboot": true,
+    "verified_factory_paths": [
+      "/system/lib64/libandroid_runtime.so",
+      "/system/bin/surfaceflinger",
+      "/vendor/lib64/hw/android.hardware.graphics.allocator@4.0-impl-bifrost.so",
+      "/vendor/lib64/hw/hwcomposer.rk30board.so",
+      "/system/lib64/libhwui.so",
+      "/system/lib64/libsfplugin_ccodec.so"
+    ],
+    "new_helpers_absent_when_whole_off": true,
+    "same_candidate_restored_on_reboot": true,
+    "final_system_server_helper_mapped_and_active": true,
+    "both_ABI_Zygisk_and_LSPosed_passed_all_phases": true
+  },
+  "integrity": {
+    "installer_sha256": "5ce50cf47a5e815415aabce15a29c0fceb29e8edf40518ba74a6c492d82eb287",
+    "package_checksum_files_checked": 302,
+    "old_component_binaries_identical": 37,
+    "private_generated_firmware_absent": true,
+    "text_private_input_scan_passed": true,
+    "source_metadata_addendum_outside_tested_zip": true
+  },
+  "preserved": {
+    "GPU_KMD_CSF_binary_changes": false,
+    "Mali_Global_version": "0.4.2-test9",
+    "g18_first_binding": true,
+    "KMD_CSF_fence_fix": true,
+    "DVFS20ms": true,
+    "Zygisk_Next_LSPosed": true,
+    "Frame_Guard_final": [
+      0,
+      60,
+      60
+    ],
+    "fences_waits_and_watchdogs_unchanged": true,
+    "source_bitdepth_resolution_frame_rate_preserved": true,
+    "statistics_unmodified": true,
+    "boot_written_this_validation": false
+  },
+  "remaining": [
+    "Prioritize upgrade-associated Exo/CCodec errors; current failure acceptance keeps Frame Guard disabled. Timing blanks are deferred.",
+    "Historical UHD pacing and other HLG seek/EOS paths",
+    "Full calibrated HDR colorimetry; earlier queued-target reference max RGB delta 3/3/4",
+    "Actual game sustained frame-time, thermal/power gains; Eden geometryStreams compatibility",
+    "Complete HWC/Composer and VOP2/HDMI/VPU/DMC kernel upgrades not delivered"
+  ],
+  "private_artifacts_in_public_package": false,
+  "current_regression_addendum": {
+    "date": "2026-10-19",
+    "status": "EXO_ERRORS_UNRESOLVED_REGRESSION_ISOLATION_IN_PROGRESS",
+    "supersedes_bounded_no_error_as_general_acceptance": true,
+    "Frame_Guard_disabled_for_all_current_trials": true,
+    "no_automatic_Frame_Guard_reenable": true,
+    "current_operation_policy": "User performs playback, pause and seek; assistant reads logs/state only, no screenshots or input events.",
+    "baseline_correction": "Old LSPosed test6 with Decode upgrades enabled is not a firmware baseline.",
+    "rejected_client_candidate": "Frame-rate-hold client test1 was reverted to test6; no Decode integration or release.",
+    "latest_core_actual_Exo": {
+      "queue_fatal": true,
+      "codec_error": true,
+      "pause_output_thread_stack": "ensureDecoderState waits for BufferQueue block; input thread retries sendpacket"
+    },
+    "whole_Decode_off_bounded_pause_resume": {
+      "queue_fatal": false,
+      "codec_error": false,
+      "long_pause_resumed": true,
+      "scope": "Mali and LSPosed retained; no claim of fast-forward acceptance"
+    },
+    "sdk_next_off_user_seek": {
+      "sdk": "1.14.3_[2]",
+      "queue_fatal": false,
+      "codec_error": true,
+      "error": "0xe after packet submission retries exhausted",
+      "user_report": "Seek returned near beginning; not accepted"
+    },
+    "conclusion": "Regression is not repaired. Disabling SDK-next alone is insufficient. No new core patch is deployed.",
+    "whole_Decode_off_user_seek": {
+      "user_operations": true,
+      "queue_fatal": false,
+      "codec_error": false,
+      "seek_returns_to_start": true
+    },
+    "MPP_RGA_on_Codec2_HDR_off_user_seek": {
+      "user_operations": true,
+      "queue_fatal": false,
+      "codec_error": false,
+      "seek_returns_to_start": true
+    },
+    "new_route_candidate": "docs/validation/decode-surface-route-083.json"
+  }
+}

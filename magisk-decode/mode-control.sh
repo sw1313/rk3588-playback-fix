@@ -1,5 +1,6 @@
 #!/system/bin/sh
 MODROOT=${0%/*}
+umask 077
 CURRENTROOT=$MODROOT
 NEXTROOT=/data/adb/modules_update/${MODROOT##*/}
 if [ "$MODROOT" = "/data/adb/modules/${MODROOT##*/}" ] && [ -f "$NEXTROOT/config" ]; then
@@ -12,6 +13,17 @@ sync_selection() {
  if [ -e "$MODROOT/disable" ]; then touch "$CURRENTROOT/disable"; else rm -f "$CURRENTROOT/disable"; fi
 }
 case "$1" in
+ bundle)
+  [ "$#" = 3 ] || exit 2
+  . "$MODROOT/bundles.sh"
+  bundle_members "$2" >/dev/null || exit 2
+  case "$3" in on|off) ;; *) exit 2 ;; esac
+  resolve || exit 1
+  . "$MODROOT/selection.sh"
+  apply_selection bundle "$2" "$3" || exit 1
+  sync_selection || exit 1
+  echo "Bundle $2=$3 saved atomically. Reboot to apply."
+  ;;
  codec2_backend)
   [ "$#" = 2 ] || exit 2
   case "$2" in legacy|simd|latest) ;; *) exit 2 ;; esac
@@ -23,7 +35,7 @@ case "$1" in
   ;;
  linked)
   [ "$#" = 3 ] || exit 2
-  case "$2" in mpp|rga|codec2|libyuv|software|hdr_static|hdr10plus|codec2_sdk|codec2_sdk_next|codec2_buffer|p010_fast|av1_native|av1_grain|av1_afbc) ;; *) exit 2 ;; esac
+  case "$2" in mpp|rga|codec2|libyuv|software|hdr_static|hdr10plus|codec2_sdk|codec2_sdk_next|codec2_buffer|p010_fast|av1_native|av1_grain|av1_afbc|av1_texture_afbc|codec2_lifecycle|hwui_rgb10|hwc_client_hdr10|hwc_mode_cache|hwc_scaled_overlay|hwc_metadata_reuse|gralloc_hdr_lease|codec2_surface|codec2_native_backpressure|hdmi_audio_guard|display_qms|display_policy|display_session|display_ddc|p010_copy_pool|p010_pairs|hevc_eos_pending|hevc_native_surface|codec2_delay_notify) ;; *) exit 2 ;; esac
   case "$3" in on|off) ;; *) exit 2 ;; esac
   resolve || exit 1
   . "$MODROOT/selection.sh"
@@ -35,7 +47,7 @@ case "$1" in
   if [ -e "$MODROOT/disable" ]; then echo "Whole module: disabled for next boot"; else echo "Whole module: enabled for next boot"; fi
   echo "Requested next boot:"; cat "$MODROOT/config"
   resolve || exit 1
-  echo "Effective next boot: mpp=$MPP rga=$RGA codec2=$C2 libyuv=$YUV software=$SOFT hdr_static=$HDR_STATIC hdr10plus=$HDR_PLUS codec2_sdk=$SDK codec2_sdk_next=$SDK_NEXT codec2_buffer=$BUFFER p010_fast=$P010_FAST av1_native=$AV1_NATIVE av1_grain=$AV1_GRAIN av1_afbc=$AV1_AFBC"
+  echo "Effective next boot: mpp=$MPP rga=$RGA codec2=$C2 libyuv=$YUV software=$SOFT hdr_static=$HDR_STATIC hdr10plus=$HDR_PLUS codec2_sdk=$SDK codec2_sdk_next=$SDK_NEXT codec2_surface=$SURFACE codec2_native_backpressure=$NATIVE_BP codec2_buffer=$BUFFER p010_fast=$P010_FAST av1_native=$AV1_NATIVE av1_grain=$AV1_GRAIN av1_afbc=$AV1_AFBC av1_texture_afbc=$AV1_TEXTURE_AFBC codec2_lifecycle=$LIFECYCLE hwc_metadata_reuse=$HWC_REUSE gralloc_hdr_lease=$GRALLOC_HDR_LEASE codec2_delay_notify=$DELAY_NOTIFY hevc_native_surface=$HEVC_NATIVE hevc_eos_pending=$HEVC_EOS p010_pairs=$P010_PAIRS p010_copy_pool=$P010_POOL"
   echo "Active boot:"; cat "$CURRENTROOT/active-config" 2>/dev/null
   cat "$CURRENTROOT/status.txt" 2>/dev/null
   ;;
@@ -47,7 +59,7 @@ case "$1" in
   esac
   sync_selection || exit 1
   ;;
- mpp|rga|codec2|libyuv|software|hdr_static|hdr10plus|codec2_sdk|codec2_sdk_next|codec2_buffer|p010_fast|av1_native|av1_grain|av1_afbc)
+ mpp|rga|codec2|libyuv|software|hdr_static|hdr10plus|codec2_sdk|codec2_sdk_next|codec2_buffer|p010_fast|av1_native|av1_grain|av1_afbc|av1_texture_afbc|codec2_lifecycle|hwui_rgb10|hwc_client_hdr10|hwc_mode_cache|hwc_scaled_overlay|hwc_metadata_reuse|gralloc_hdr_lease|codec2_surface|codec2_native_backpressure|hdmi_audio_guard|display_qms|display_policy|display_session|display_ddc|p010_copy_pool|p010_pairs|hevc_eos_pending|hevc_native_surface|codec2_delay_notify)
   case "$2" in on) value=1 ;; off) value=0 ;; *) exit 2 ;; esac
   resolve || exit 1
   sed "s/^$1=.*/$1=$value/" "$MODROOT/config" > "$MODROOT/config.next" || exit 1
@@ -55,5 +67,5 @@ case "$1" in
   sync_selection || exit 1
   echo "$1=$value saved. Reboot to apply. Codec2 requires MPP/RGA; software P010 requires Codec2. Selections are preserved when dependencies are off."
   ;;
- *) echo "Usage: sh mode-control.sh status | all on|off | codec2_backend legacy|simd|latest | mpp|rga|codec2|libyuv|software|hdr_static|hdr10plus|codec2_sdk|codec2_sdk_next|codec2_buffer|p010_fast|av1_native|av1_grain|av1_afbc on|off"; exit 2 ;;
+ *) echo "Usage: sh mode-control.sh status | all on|off | codec2_backend legacy|simd|latest | mpp|rga|codec2|libyuv|software|hdr_static|hdr10plus|codec2_sdk|codec2_sdk_next|codec2_buffer|p010_fast|av1_native|av1_grain|av1_afbc|av1_texture_afbc|codec2_lifecycle|hwui_rgb10|hwc_client_hdr10|hwc_mode_cache|hwc_scaled_overlay|hwc_metadata_reuse|gralloc_hdr_lease|codec2_surface|codec2_native_backpressure|hdmi_audio_guard|display_qms|display_policy|display_session|display_ddc|p010_copy_pool|p010_pairs|hevc_eos_pending|hevc_native_surface|codec2_delay_notify on|off"; exit 2 ;;
 esac

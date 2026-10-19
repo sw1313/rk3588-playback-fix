@@ -1,0 +1,71 @@
+From e3e3d168e524da25620ef55da734e48c8e56afe6 Mon Sep 17 00:00:00 2001
+From: libin <bin.li@rock-chips.com>
+Date: Thu, 25 Aug 2022 15:20:15 +0800
+Subject: [PATCH] DrmVop3588 : Remove Invalid restriction judgment.
+
+Version : 1.3.47
+
+Signed-off-by: libin <bin.li@rock-chips.com>
+Change-Id: I1f2001c7b96cf131a0246d86b8e31ae44d31d847
+---
+ include/rockchip/utils/drmdebug.h       |  2 +-
+ rockchip/platform/rk3588/drmvop3588.cpp | 30 ++++++++++++-------------
+ 2 files changed, 16 insertions(+), 16 deletions(-)
+
+diff --git a/include/rockchip/utils/drmdebug.h b/include/rockchip/utils/drmdebug.h
+index 1e2d6ae..feb1007 100755
+--- a/include/rockchip/utils/drmdebug.h
++++ b/include/rockchip/utils/drmdebug.h
+@@ -40,7 +40,7 @@
+ #include <utils/CallStack.h>
+ 
+ /*hwc version*/
+-#define GHWC_VERSION                    "HWC2-1.3.46"
++#define GHWC_VERSION                    "HWC2-1.3.47"
+ 
+ //Print call statck when you call ALOGD_CALLSTACK.
+ #define ALOGD_CALLSTACK(...)                             \
+diff --git a/rockchip/platform/rk3588/drmvop3588.cpp b/rockchip/platform/rk3588/drmvop3588.cpp
+index 90f592e..60429aa 100644
+--- a/rockchip/platform/rk3588/drmvop3588.cpp
++++ b/rockchip/platform/rk3588/drmvop3588.cpp
+@@ -2433,24 +2433,24 @@ bool Vop3588::CheckGLESLayer(DrmHwcLayer *layer){
+   }
+ 
+   // RK356x Esmart can't overlay act_w % 16 == 1 and fHScaleMul_ < 1.0 layer.
+-  if(!layer->bAfbcd_){
+-    if(act_w % 16 == 1 && layer->fHScaleMul_ < 1.0){
+-      HWC2_ALOGD_IF_DEBUG("[%s]：RK356x Esmart can't overlay act_w %% 16 == 1 and fHScaleMul_ < 1.0 layer.",
+-              layer->sLayerName_.c_str());
+-      return true;
+-    }
++  // if(!layer->bAfbcd_){
++  //   if(act_w % 16 == 1 && layer->fHScaleMul_ < 1.0){
++  //     HWC2_ALOGD_IF_DEBUG("[%s]：RK356x Esmart can't overlay act_w %% 16 == 1 and fHScaleMul_ < 1.0 layer.",
++  //             layer->sLayerName_.c_str());
++  //     return true;
++  //   }
+ 
+-    int dst_w = static_cast<int>(layer->display_frame.right - layer->display_frame.left);
+-    if(dst_w % 2 == 1 && layer->fHScaleMul_ < 1.0){
+-      HWC2_ALOGD_IF_DEBUG("[%s]：RK356x Esmart can't overlay dst_w %% 2 == 1 and fHScaleMul_ < 1.0 layer.",
+-              layer->sLayerName_.c_str());
+-      return true;
+-    }
+-  }
++  //   int dst_w = static_cast<int>(layer->display_frame.right - layer->display_frame.left);
++  //   if(dst_w % 2 == 1 && layer->fHScaleMul_ < 1.0){
++  //     HWC2_ALOGD_IF_DEBUG("[%s]：RK356x Esmart can't overlay dst_w %% 2 == 1 and fHScaleMul_ < 1.0 layer.",
++  //             layer->sLayerName_.c_str());
++  //     return true;
++  //   }
++  // }
+ 
+   if(layer->transform == -1){
+-    HWC2_ALOGD_IF_DEBUG("[%s]：RK356x Esmart can't overlay dst_w %% 2 == 1 and fHScaleMul_ < 1.0 layer.",
+-            layer->sLayerName_.c_str());
++    HWC2_ALOGD_IF_DEBUG("[%s]：layer->transform = %d is invalidate",
++            layer->sLayerName_.c_str(), layer->transform);
+     return true;
+   }
+ 

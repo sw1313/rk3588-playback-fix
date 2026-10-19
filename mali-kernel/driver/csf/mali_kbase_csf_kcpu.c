@@ -25,12 +25,18 @@
 #include "device/mali_kbase_device.h"
 #include "mali_kbase_csf.h"
 #include <linux/export.h>
+#include <linux/moduleparam.h>
 
 #if IS_ENABLED(CONFIG_SYNC_FILE)
 #include "mali_kbase_fence.h"
 #include "mali_kbase_sync.h"
 
 static DEFINE_SPINLOCK(kbase_csf_fence_lock);
+/* Selective backport of Rockchip 194a7d5a7567. Latched at first binding;
+ * 0444 intentionally forbids a live synchronization-policy change. */
+static bool csf_fence_safe;
+module_param(csf_fence_safe, bool, 0444);
+MODULE_PARM_DESC(csf_fence_safe, "Initialize KCPU fence metadata before dma_fence_init");
 #endif
 
 #ifdef CONFIG_MALI_BIFROST_FENCE_DEBUG
@@ -1604,6 +1610,12 @@ static int kbasep_kcpu_fence_signal_init(struct kbase_kcpu_command_queue *kcpu_q
 	if (!kcpu_fence)
 		return -ENOMEM;
 
+	if (csf_fence_safe) {
+		/* dma_fence_init trace callbacks can query the timeline name. */
+		kcpu_fence->metadata = kcpu_queue->metadata;
+		WARN_ON(!kbase_refcount_inc_not_zero(&kcpu_fence->metadata->refcount));
+	}
+
 #if (KERNEL_VERSION(4, 10, 0) > LINUX_VERSION_CODE)
 	fence_out = (struct fence *)kcpu_fence;
 #else
@@ -1626,8 +1638,10 @@ static int kbasep_kcpu_fence_signal_init(struct kbase_kcpu_command_queue *kcpu_q
 #endif
 
 	/* Set reference to KCPU metadata and increment refcount */
-	kcpu_fence->metadata = kcpu_queue->metadata;
-	WARN_ON(!kbase_refcount_inc_not_zero(&kcpu_fence->metadata->refcount));
+	if (!csf_fence_safe) {
+		kcpu_fence->metadata = kcpu_queue->metadata;
+		WARN_ON(!kbase_refcount_inc_not_zero(&kcpu_fence->metadata->refcount));
+	}
 
 	/* create a sync_file fd representing the fence */
 	*sync_file = sync_file_create(fence_out);

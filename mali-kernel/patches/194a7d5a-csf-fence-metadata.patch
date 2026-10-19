@@ -1,0 +1,59 @@
+From 194a7d5a7567395d37e11ffa9014589b83ba8aad Mon Sep 17 00:00:00 2001
+From: Zhen Chen <chenzhen@rock-chips.com>
+Date: Fri, 13 Oct 2023 15:37:30 +0800
+Subject: [PATCH] MALI: bifrost: Fix a null pointer exception when event
+ tracing is enabled
+
+The issue was reported in https://redmine.rock-chips.com/issues/442097.
+The kernel crash log:
+[   10.737137][ T1028] Unable to handle kernel NULL pointer dereference at virtual address 0000000000000010
+...
+[   10.747955][ T1028] pc : __pi_strlen+0x60/0x84
+[   10.748673][ T1028] lr : trace_event_raw_event_dma_fence+0xe0/0x1e8
+...
+[   10.761907][ T1028] Call trace:
+[   10.762198][ T1028]  __pi_strlen+0x60/0x84
+[   10.762561][ T1028]  dma_fence_init+0xd4/0xfc
+[   10.762951][ T1028]  kbasep_kcpu_fence_signal_init+0x6c/0x1b0
+[   10.763454][ T1028]  kbase_kcpu_fence_signal_prepare+0x6c/0x134
+[   10.763980][ T1028]  kbase_csf_kcpu_queue_enqueue+0x1d0/0x10ec
+[   10.764499][ T1028]  kbase_ioctl+0xa80/0xf78
+[   10.764890][ T1028]  __arm64_sys_ioctl+0x90/0xc8
+[   10.765296][ T1028]  el0_svc_common+0xac/0x1ac
+[   10.765691][ T1028]  do_el0_svc+0x1c/0x28
+[   10.766058][ T1028]  el0_svc+0x10/0x1c
+[   10.766389][ T1028]  el0_sync_handler+0x68/0xac
+[   10.766796][ T1028]  el0_sync+0x160/0x180
+
+Change-Id: I68739107dd9486b3a964746583c526a51f68e1ae
+Signed-off-by: Zhen Chen <chenzhen@rock-chips.com>
+---
+ drivers/gpu/arm/bifrost/csf/mali_kbase_csf_kcpu.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/gpu/arm/bifrost/csf/mali_kbase_csf_kcpu.c b/drivers/gpu/arm/bifrost/csf/mali_kbase_csf_kcpu.c
+index 2b4d4a4372138..da8dde2399720 100644
+--- a/drivers/gpu/arm/bifrost/csf/mali_kbase_csf_kcpu.c
++++ b/drivers/gpu/arm/bifrost/csf/mali_kbase_csf_kcpu.c
+@@ -1604,6 +1604,10 @@ static int kbasep_kcpu_fence_signal_init(struct kbase_kcpu_command_queue *kcpu_q
+ 	if (!kcpu_fence)
+ 		return -ENOMEM;
+ 
++	/* Set reference to KCPU metadata and increment refcount */
++	kcpu_fence->metadata = kcpu_queue->metadata;
++	WARN_ON(!kbase_refcount_inc_not_zero(&kcpu_fence->metadata->refcount));
++
+ #if (KERNEL_VERSION(4, 10, 0) > LINUX_VERSION_CODE)
+ 	fence_out = (struct fence *)kcpu_fence;
+ #else
+@@ -1625,10 +1629,6 @@ static int kbasep_kcpu_fence_signal_init(struct kbase_kcpu_command_queue *kcpu_q
+ 	dma_fence_get(fence_out);
+ #endif
+ 
+-	/* Set reference to KCPU metadata and increment refcount */
+-	kcpu_fence->metadata = kcpu_queue->metadata;
+-	WARN_ON(!kbase_refcount_inc_not_zero(&kcpu_fence->metadata->refcount));
+-
+ 	/* create a sync_file fd representing the fence */
+ 	*sync_file = sync_file_create(fence_out);
+ 	if (!(*sync_file)) {

@@ -1,0 +1,69 @@
+{
+  "license": "GPL-2.0-only",
+  "target_component": "Decode Stack system display extension",
+  "delivery_status": "PRIVATE_COLD_OWNER_ENABLED_PHYSICAL_BLACKOUT_UNRESOLVED",
+  "upstream": [
+    {
+      "repository": "https://github.com/rockchip-linux/kernel",
+      "commit": "d0e8f558bc58984f8f4508133143cc9ca77c8b0d",
+      "scope": "56 timing records and MSB-first fractional vtotal sequence semantics",
+      "local_changes": [
+        "Bounded keyed lookup; no unbounded sentinel pointer walks",
+        "VIC4/TFR4 first fractional byte 0x1f to 0x0f: exact 1501.5-line average",
+        "VIC63/TFR6 integer vtotal 2812 to 2815: exact 2815.3125-line average",
+        "Private module state; no extension of factory DRM object allocations"
+      ]
+    },
+    {
+      "repository": "https://github.com/rockchip-linux/kernel",
+      "commit": "5a89a1cb8b9c3cba5666151e838d2a3d760fe0ea",
+      "scope": "VTEM class1 packet layout and multi-frame enable/rate-change/disable protocol",
+      "local_changes": [
+        "Explicit real-vblank plan/complete state machine, hardware errors never count as completion",
+        "Exact 1000/1001 rational rates rather than decimal TFR labels",
+        "Generation/revision checks and controlled native-restore requirement on partial failure",
+        "No sleeping state machine in tracepoint/event_lock or hard IRQ",
+        "Backend must serialize with native atomic commit and preserve planes and fences"
+      ]
+    },
+    {
+      "source": "https://lists.openwall.net/linux-kernel/2026/09/21/2244",
+      "message_id": "20260921-vrr-limiter-uapi-v1-18-2fcd7d011646@collabora.com",
+      "status": "RFC; not claimed merged or validated on this sink",
+      "scope": "ongoing QMS VTEM data-set flags NEW=1, END=0, VFR=1, SYNC=1; header FIRST/LAST unchanged",
+      "local_changes": [
+        "QP register mapping retained; packet generator and exact read-only verifier share flags",
+        "does not alter Next_TFR, M_CONST phases, native commit/fence or HDR metadata",
+        "one field change against installed test12 for physical sink A/B"
+      ]
+    }
+  ],
+  "not_implemented_yet": [
+    "Complete physical HDMI no-black acceptance, including Auto play/pause/seek/exit",
+    "Complete HDR/ten-bit qualification on this QMS path; FRL/422/DSC only after compatible profiles and recovery validation",
+    "Sustained fractional deadline and general physical hotplug/power lifecycle acceptance under compositor traffic",
+    "Measured real runtime CPU cost and candidate-specific disable/reboot rollback acceptance"
+  ],
+  "release_accepted": false,
+  "port_map": "PORTING.json",
+  "current_private_status": "test12 boot qualified; user still observes Auto blackouts; eight QMS switches complete with no frame faults or physical events; continuous VTEM END=0 candidate under construction",
+  "scheduler_boundary_test14": {
+    "status": "Actual boot qualified; all play/pause/step physical blackouts persist; no source mute/HDCP boundary changes observed",
+    "upstream_reference": "https://github.com/rockchip-linux/kernel/tree/77168c8d5ab82399f65a80e9f807b50ba37cf483",
+    "local_changes": [
+      "Narrow passive lifetime scheduler check to owned VTEM; retain full commit preservation checks",
+      "Withdraw failed END=0 trial",
+      "Bounded read-only native transition boundary evidence; pin factory QP register table"
+    ],
+    "physical_accepted": false,
+    "details": "docs/validation/qms-scheduler-boundary-086.json"
+  },
+  "notice_window_test15": {
+    "source": "https://github.com/CoreELEC/common_drivers/blob/8a89a9aae1cb7c7993cc20b943491af435b31801/drivers/media/vout/hdmitx21/hdmi_tx_vrr.c",
+    "scope": "vrr_init_para fapa_early_cnt=4; hold target notice for four real frame actions only; no Amlogic register/EMP/MDelta transplant",
+    "status": "User no improvement; four-frame delay withdrawn from source/device; actual test14 rollback boot qualified",
+    "details": "docs/validation/qms-notice-window-086.json",
+    "physical_accepted": false,
+    "tradeoff": "3 extra old-rate frames per transition; withdraw if no HDMI benefit"
+  }
+}

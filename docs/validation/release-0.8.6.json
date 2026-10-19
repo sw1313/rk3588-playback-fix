@@ -1,0 +1,100 @@
+{
+  "project_release": "v0.8.6",
+  "date": "2026-10-20",
+  "status": "COMPLETE_FIRMWARE_PINNED_FORMAL_RELEASE_VERIFIED",
+  "all_installer_checks_passed": true,
+  "installers": [
+    {
+      "component": "decode-stack",
+      "version": "0.8.6",
+      "documents": 7,
+      "license_texts_checked": 23,
+      "checksum_entries_checked": 622,
+      "passed": true
+    },
+    {
+      "component": "mali-global",
+      "version": "0.4.2",
+      "documents": 7,
+      "license_texts_checked": 1,
+      "checksum_entries_checked": 128,
+      "passed": true
+    },
+    {
+      "component": "yamby-mpv-plugin",
+      "version": "0.3.7",
+      "documents": 7,
+      "license_texts_checked": 1,
+      "checksum_entries_checked": 0,
+      "passed": true
+    },
+    {
+      "component": "frameguard",
+      "version": "0.1.1",
+      "documents": 7,
+      "license_texts_checked": 1,
+      "checksum_entries_checked": 0,
+      "passed": true
+    },
+    {
+      "component": "panvk-app",
+      "version": "0.1.0-rc3-rk3588-a12-test8.1",
+      "documents": 7,
+      "license_texts_checked": 1,
+      "checksum_entries_checked": 50,
+      "passed": true
+    }
+  ],
+  "actual_full_installers": {
+    "decode": true,
+    "mali": true,
+    "client": true
+  },
+  "actual_release_reboot_health": {
+    "passed": true,
+    "module_flags_preserved": true,
+    "existing_selections_preserved": true,
+    "auto_hdr_preserved": true,
+    "frame_guard": "disabled and paused",
+    "trace": "off",
+    "boot_unchanged": true,
+    "mali_g18_kernel_dvfs": true,
+    "external_zygisk_both_abis_lsposed": true,
+    "webui_state_valid": true,
+    "webui_pending_reboot": false
+  },
+  "physical_acceptance": "User accepted the specified test20 Exo scenario. Other rates, receivers, real resolution/HDR changes and game gains remain separately scoped.",
+  "runtime_policy_sha256": "dc6f5d29a9590a3e65e1808aadcd80da3d13809b1ed05aeefd94ef9e9477e054",
+  "p010_release_metadata": {
+    "accepted_executable_sections_unchanged": true,
+    "ELF_offsets_unchanged": true,
+    "build_directory_strings_redacted": 2,
+    "contract_hashes_updated": true,
+    "other_source_license_assets_unchanged": 3,
+    "release_payload_sha256": "fbf1f6ed9b3ffd4dc763966f3637283ed1cc9da0976f061a427123a1daf0d8c9"
+  },
+  "apk_existing_certificate": true,
+  "apk_debuggable": false,
+  "checks": {
+    "actual_native_arm64_policy": 110,
+    "actual_mali_pair_fixture": 23,
+    "actual_upgrade_original_guard": 6,
+    "decode_browser": 94,
+    "mali_browser": 39,
+    "client_unit": 12
+  },
+  "public_private_material_scan": "passed, including embedded FFmpeg source; OpenSSL parser header literals are source text, not private keys",
+  "carried_unchanged": [
+    "frameguard 0.1.1",
+    "panvk Test8.1"
+  ],
+  "ui": "Bilingual formal descriptions and cache versions match all formal components",
+  "source_archive_excludes": [
+    "private boot and firmware",
+    "proprietary Mali and CSF",
+    "device endpoints",
+    "raw logs and media",
+    "signing keys",
+    "local AGENTS session guidance"
+  ]
+}

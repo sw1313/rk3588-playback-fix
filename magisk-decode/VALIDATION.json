@@ -1,19 +1,264 @@
 {
   "component": "decode-stack",
-  "version": "0.6.7",
-  "project_release": "v0.6.7",
-  "scope": "license, source/build documentation and version metadata only",
-  "runtime_rebuilt": false,
-  "previous_release": "v0.6.6",
-  "previous_asset": {
-    "id": "decode-stack",
-    "version": "0.6.6",
-    "filename": "rk3588-decode-stack-0.6.6.zip",
-    "status": "experimental",
-    "sha256": "164b5f754db7560ef79a3473b4dcd55432ca7dd31ba305612322a4a086736012",
-    "url": "https://github.com/sw1313/rk3588-playback-fix/releases/download/v0.6.6/rk3588-decode-stack-0.6.6.zip"
+  "version": "0.8.6",
+  "date": "2026-10-19",
+  "status": "FIRMWARE_PINNED_RELEASE_BOUNDED_EXO_SESSION_ACCEPTED",
+  "public_release": true,
+  "previous_verified": "docs/validation/decode-hdmi-event-082.json",
+  "switches": {
+    "hwc_mode_cache": {
+      "default": 0,
+      "dependencies": [
+        "hdr_static"
+      ]
+    },
+    "hwc_client_hdr10": {
+      "default": 0,
+      "dependencies": [
+        "hdr_static",
+        "hwui_rgb10"
+      ],
+      "gated_inactive": false,
+      "status": "test7 real PQ/HLG AB30 AFBC scan, actual queued 4K ten-bit target readback, mixed SDR/virtual display and two-level reboot rollback passed; RGB maximum reference delta 3/3/4, no full colorimetry acceptance",
+      "isolated_actual_SF_cases": 321,
+      "isolated_HWC_callback_cases": 71,
+      "allocator_isolated_cases": 768,
+      "depends_on_first_binding_barrier": true,
+      "HDR_target_linear_AB30": false,
+      "actual_factory_plan_cases": 32,
+      "installed_HDR_accepted": true,
+      "HDR_target_AFBC_AB30": true,
+      "validation_error_callback_cases": 128,
+      "requires_original_FB_AFBC_policy": true,
+      "mapper_import_cases": 24,
+      "mapper_layout_checks_retained": true,
+      "previous_test6_actual_AB30_AFBC_PQ_HLG": true,
+      "previous_test6_PQ_metadata_equal": true,
+      "acceptance_scope": "Pinned primary explicit P01054 to ten-bit HDR; not all applications or calibrated colorimetry",
+      "full_colorimetric_acceptance": false
+    },
+    "hwui_rgb10": {
+      "default": 0,
+      "dependencies": [
+        "hdr_static"
+      ],
+      "scope": "Local missing format 43 mapping in both exact HWUI ABIs",
+      "isolated_cases_each_ABI": 69
+    },
+    "p010_copy_pool": {
+      "default": 0,
+      "dependencies": [
+        "codec2_sdk_next",
+        "codec2_buffer"
+      ],
+      "abi": "arm64-v8a",
+      "actual_AllocateEmpty_cases_per_variant": 36,
+      "installed_acceptance": true,
+      "installed_version": "0.8.0-test1",
+      "component_and_whole_reboot_rollback": true,
+      "extra_installed_sample_cases": [
+        {
+          "width": 3840,
+          "height": 2160,
+          "frames": 3,
+          "samples": 37324800,
+          "all_bytes_equal_reference": true
+        },
+        {
+          "width": 1280,
+          "height": 720,
+          "transfer": "HLG",
+          "frames": 3,
+          "samples": 4147200,
+          "all_bytes_equal_reference": true
+        }
+      ],
+      "historical_standalone_client_precision": {
+        "isolated_framework_client_P010_frames": 90,
+        "samples": 124416000,
+        "full_sample_reference_equal": true
+      },
+      "current_framework_client_precision_frames": 6,
+      "current_framework_client_precision_samples": 41472000,
+      "current_framework_client_all_bytes_equal": true,
+      "final_client_acceptance_reference": "docs/validation/lsposed-p010-036.json"
+    },
+    "hdmi_audio_guard": {
+      "default": 0,
+      "dependencies": [],
+      "exact_runtime_and_legacy_ABI": true,
+      "kernel_pixel_codec_fence_changes": false,
+      "isolated_cases": 57,
+      "Android_shell_control_assertions": 11,
+      "device_acceptance": "BOUNDED_REAL_EXO_START_PAUSE_RESUME_PASSED_PRECISE_SEEK_AND_TIMING_BLANKS_REMAIN",
+      "real_physical_hotplug_acceptance": true,
+      "item_and_whole_reboot_rollback": true,
+      "restored_on_same_candidate": true,
+      "new_runtime_HDR_compatibility_passed": true,
+      "full_Exo_blackout_fix": false
+    },
+    "codec2_surface": {
+      "default": 0,
+      "dependencies": [
+        "codec2"
+      ],
+      "reboot_required": true,
+      "quality_decoder_for_non_P010_Surface_when_on": true,
+      "firmware_decoder_for_non_P010_Surface_when_off": true,
+      "explicit_P010_route_preserved": true,
+      "native_features_suppressed_when_off": [
+        "av1_native",
+        "hevc_native_surface"
+      ],
+      "device_acceptance": "pending",
+      "retained_P010_gate": "debug.rkcodec2.surface_upgrade",
+      "native_only_property": "debug.rkcodec2.native_surface_upgrade"
+    },
+    "codec2_native_backpressure": {
+      "default": 0,
+      "dependencies": [
+        "codec2_sdk_next",
+        "codec2_surface",
+        "codec2_lifecycle"
+      ],
+      "validation": "candidate, no actual Exo acceptance yet"
+    }
   },
-  "previous_validation": "Historical runtime tests remain with v0.6.6 and its cited records; no fresh playback claim.",
-  "licenses": "Original project MIT; upstream permissions, patent grants and notices retained.",
-  "preservation": "Executable payload and control scripts must match previous installer exactly; see release validation."
+  "pending": [
+    "Full generic WCG/HDR HWUI rendering and calibrated colorimetry",
+    "Actual HDMI timing blanks and pause clearing frame-rate vote; Frame Guard disabled for diagnosis and acceptance",
+    "Long-duration and broader application compatibility",
+    "System-wide HDMI blackout repair; app-specific content-vote candidate withdrawn; actual sink observation required"
+  ],
+  "frame_guard_changed": false,
+  "rejected_test1_HDR_global_format_without_HWUI": "Launcher RenderThread unsupported format 43; disabled and rebooted back before proceeding",
+  "post_install_addendum": "docs/validation/decode-surface-route-083.json",
+  "bounded_actual_Exo_mode_switch_and_two_level_rollback_passed": true,
+  "bounded_acceptance_scope": "New HDMI event guard startup/pause/resume, real hotplug, HDR compatibility and this version reboot rollback; precise seek and all blackouts NOT accepted",
+  "current_regression_addendum": "docs/validation/decode-hdmi-event-082.json#current_regression_addendum",
+  "current_Exo_error_acceptance": "FAILED_LATEST_CORE_QUEUE_FATAL_AND_PRIOR_SDK_SEEK_CODEC_ERROR",
+  "current_Frame_Guard_policy": "disabled throughout diagnosis and acceptance; no automatic re-enable",
+  "historical_082_status": "BOUNDED_HDMI_TRANSIENT_EVENT_REPAIR_AND_REBOOT_ROLLBACK_PASSED_EXO_SEEK_AND_TIMING_BLANKS_REMAIN",
+  "current_candidate_evidence": "docs/validation/decode-native-backpressure-084.json",
+  "synthetic_probe_reproduced_original_failure": false,
+  "actual_Exo_acceptance": false,
+  "test1_failure": "MPP retry exhausted / codec err0xe, no queue watchdog in captured run",
+  "test2_input_full_probe": "16 output-delay slots, 8 sec hold, 150/150 exact PTS/EOS zero error; not actual Exo acceptance",
+  "test2_bounded_user_Exo": {
+    "user_report": "no error, resumes",
+    "log_seconds": 122,
+    "codec_error": false,
+    "queue_watchdog": false,
+    "actual_MPP_BUFFER_FULL_branch": true,
+    "Frame_Guard_off": true
+  },
+  "test3_delta": "Gate new input flow control with !mBufferMode && !mTunneled as already used by output side; native path logic unchanged; copy/tunnel retain old input retry path.",
+  "installed_previous": "0.8.4-test3 restored after withdrawn display trial",
+  "withdrawn_display_candidate": "0.8.5-test1 app-specific bridge rejected by user; restore seek-only client and pursue system-wide HDMI display path",
+  "current_display_scope": "System-wide HDMI, no per-app LSPosed frame-vote bridge; candidate0.8.5 withdrawn; FrameGuardOFF",
+  "current_seek_acceptance": "Original source entry user reports seek normal; real Cues logged after correcting LSPosed redirected preference",
+  "current_private_trial": {
+    "version": "0.8.6-qms-test14",
+    "status": "restored after no-benefit test15; actual reboot/rollback qualified; physical blackouts remain",
+    "details": "docs/validation/qms-scheduler-boundary-086.json",
+    "Frame_Guard": "off",
+    "display_policy": "on and qualified"
+  },
+  "current_summary": {
+    "installed": "Decode 0.8.6-qms-test14 and Mali 0.4.2-qms-test16 restored and real boot qualified",
+    "source_candidate": "Exact test14 core/native source restored; no four-frame delay retained",
+    "historical_fields": "Older version-specific verdicts remain historical; use this summary for current scope.",
+    "Auto_selection_user_confirmed": true,
+    "HDR_default_display_user_confirmed": true,
+    "explicit_HDR_persistence_and_sustained_fixed_lock": "separate acceptance pending; settings switch and Auto accepted",
+    "QMS_test8": "five gate93 faults: sampled-previous=2 at stable 24Hz, matching timing, native_error=0",
+    "candidate": "hardware constant hold + event wake + 100ms read-only watchdog; transition/fractional strict synchronization retained",
+    "candidate_installed": true,
+    "new_UI_browser_assertions": 90,
+    "candidate_controller_cases": 19,
+    "candidate_endpoint_cases": 11,
+    "real_candidate_CPU_cost_measured": false,
+    "physical_HDMI_blackout_fixed": false,
+    "Frame_Guard": "disabled and paused",
+    "new_UI_installed": true,
+    "new_UI_real_Android_bundle_assertions": 41,
+    "UI_validation": "docs/validation/decode-controls-qms-cost-086.json",
+    "runtime_components_unchanged_by_UI": "UI-only installation preceded the later explicitly authorized QMS install/reboot",
+    "runtime_Mali": "0.4.2-qms-test16; g18 retained",
+    "current_boot_QMS_baseline_enable_restore": true,
+    "Mali_g18_kernel_DVFS_active": true,
+    "Zygisk_Next_and_LSPosed_both_ABIs": true,
+    "module_flags_preserved": true,
+    "current_primary_goal": "Unresolved HDMI physical blackout despite successful QMS commits; verify actual packet transmission/sink preparation rather than add blind waits",
+    "temporary_isolation": {
+      "hdmi_audio_guard": 0,
+      "display_policy": 1
+    },
+    "QMS_playback_test9": "user observed short black on play/pause and segment jumps; frame stepping does not trigger; physical HDMI blackout NOT fixed",
+    "QMS_real_playback_cost": "not yet measured",
+    "first_test9_startup_failure": "HDMI event framework adapter readiness failed; Decode disabled and Mali unqualified fallback restored original boot",
+    "retry_startup_failure": "display-policy fallback repeatedly replaced config with 0666, rejected by cold loader ownership check; fixed writer umask/chmod, actual device writer confirmed 0600 before successful boot",
+    "settings_two_real_boots_qualified": true,
+    "TV_QMS_VRR_user_observed": true,
+    "QMS_upstream_audit": "docs/validation/qms-upstream-audit-086.json",
+    "test11_QMS_fault": "observation gate93 skipped one observed frame at held24Hz followed by VOP2 and PHY rebuild; original phase not preserved",
+    "notice_reanchor_evidence": "docs/validation/qms-notice-reanchor-086.json",
+    "test12_physical_acceptance": false,
+    "test12_frame_faults": 0,
+    "test12_notice_reanchor_exercised": false,
+    "last_real_rollback_passed": true
+  },
+  "withdrawn_notice_candidate": {
+    "version": "0.8.6-qms-test15",
+    "Mali_version": "0.4.2-qms-test17; exact pair only",
+    "status": "No physical improvement; source and device withdrawn, actual test14 rollback boot qualified",
+    "details": "docs/validation/qms-notice-window-086.json",
+    "physical_HDMI_blackout_fixed": false
+  },
+  "ddc_direct_hdmi_086": {
+    "version": "0.8.6-qms-test14-ddc1",
+    "record": "docs/validation/decode-ddc-direct-hdmi-086.json",
+    "status": "DIRECT_HDMI_STARTUP_AND_AUDIO_USER_ACCEPTED_BLACKOUT_REMAINS",
+    "physical_audio_accepted": true,
+    "physical_QMS_blackout_fixed": false,
+    "automatic_picture_user_accepted": true
+  },
+  "qms_hdr_direct_enable_086": {
+    "record": "docs/validation/qms-hdr-direct-enable-086.json",
+    "QMS_actually_loaded": true,
+    "GPU_RGB10_path_actually_loaded": true,
+    "cold_start_qualified": true,
+    "HDR_HDMI_physical_accepted": false,
+    "blackout_fixed": false,
+    "latest_physical_result": "User corrected: Auto still blackouts on direct HDMI1"
+  },
+  "qms_late_integer_latch_test16": {
+    "record": "docs/validation/qms-late-latch-086.json",
+    "status": "PARTIAL_PHYSICAL_IMPROVEMENT_SHORT_BLACKOUT_PERSISTS",
+    "frame_guard": "disabled and paused",
+    "hardware_branch_hits_in_user_retest": 0,
+    "physical_blackout_fixed": false,
+    "release_accepted": false
+  },
+  "qms_scanout_test17": {
+    "record": "docs/validation/qms-scanout-086.json",
+    "diagnostic_default_off": true,
+    "physical_blackout_fixed": false
+  },
+  "qms_direct_END0_test18": {
+    "record": "docs/validation/qms-direct-end0-086.json",
+    "status": "BOOT_HEALTH_PASSED_PHYSICAL_COMPARE_PENDING",
+    "prior_negative_retest_not_new_upgrade": true,
+    "release_accepted": false
+  },
+  "latest_refresh_session_release": {
+    "record": "docs/validation/decode-refresh-session-086.json",
+    "decode_version": "0.8.6",
+    "mali_pair_version": "0.4.2",
+    "boot_health": true,
+    "bounded_exo_physical_user_acceptance": true,
+    "runtime_binary_sha256": "dc6f5d29a9590a3e65e1808aadcd80da3d13809b1ed05aeefd94ef9e9477e054",
+    "note": "Mali pairing only; no new per-game performance claim"
+  },
+  "previous_record_version": "0.8.4-test3"
 }

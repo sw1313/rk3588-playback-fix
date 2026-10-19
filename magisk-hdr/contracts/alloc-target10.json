@@ -1,0 +1,8 @@
+{
+  "factory_sha256": "78bd95f083a08bdf36ed266d9a9ae9923d4d3185e9d33dcaa1ddcbb7baa9fa3b",
+  "variant_sha256": "49a69a0601883b1bccf7d979e891a049c1a30a9a66596cb47a57fc903ac7bc58",
+  "helper_sha256": "59afdd3476d515669e05e866e7c801f4ca64c5054a3823e77c04c5a793b4166d",
+  "recipe": "alloc-target10-arm64.tsv",
+  "scope": "Preserve requested RGB10 and original AFBC modifier for pinned HW_FB forced8bit selector; usage, heaps, protections, allocation and fences unchanged",
+  "status": "ISOLATED_768_CASES_PASSED_AFBC_DEVICE_CHAIN_PENDING"
+}

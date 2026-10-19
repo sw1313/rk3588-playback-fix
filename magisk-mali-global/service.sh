@@ -1,7 +1,14 @@
 #!/system/bin/sh
 MODDIR=${0%/*}
 STATE=/data/adb/rk3588-mali-global
+. "$MODDIR/kernel-state.sh"
+. "$MODDIR/cold-state.sh"
 recover() {
+ if cold_booting;then
+  "$MODDIR/bin/cold_boot64" restore || { echo 'FAIL cold boot restore; manual recovery required' >> "$MODDIR/status.txt";exit 1; }
+  atomic_state cold-mode off
+  atomic_state kernel-mode stock
+ fi
  echo off > "$STATE/mode"
  touch "$MODDIR/disable"
  resetprop -n vendor.rkmaliglobal.ready failed
@@ -20,10 +27,11 @@ if [ "$(cat "$MODDIR/active-mode")" = off ]; then
  sed -n 's/^version=//p' "$MODDIR/module.prop" > "$MODDIR/active-version"
  resetprop -n vendor.rkmalikernel.ready stock
  echo "PASS original global GPU restored" >> "$MODDIR/status.txt"
+ sh "$MODDIR/dvfs-boot.sh"
  exit 0
 fi
 sha256sum -c "$MODDIR/active.sha256" >> "$MODDIR/status.txt" 2>&1 || recover "active GPU hashes differ"
-sha256sum -c "$MODDIR/contracts/unchanged-platform.sha256" >> "$MODDIR/status.txt" 2>&1 || recover "original platform differs"
+sh "$MODDIR/platform-check.sh" >> "$MODDIR/status.txt" 2>&1 || recover "original platform or exact Decode SF pair differs"
 # Let the existing decode stack finish its own guarded HWC startup first.
 decode=/data/adb/modules/rk3588_decode_stack
 if [ -f "$decode/service.sh" ] && [ ! -f "$decode/disable" ]; then
@@ -33,6 +41,7 @@ if [ -f "$decode/service.sh" ] && [ ! -f "$decode/disable" ]; then
 fi
 timeout 10 dumpsys SurfaceFlinger > "$MODDIR/compositor-status.txt" || recover "compositor unavailable"
 if ! grep '^GLES:.*g18p0' "$MODDIR/compositor-status.txt" >/dev/null; then
+ if cold_booting;then recover "cold compositor did not first-load g18";fi
  # Vendor display services may precede Magic Mount. Restart their consumers
  # once after both the decode and GPU overlays have been assembled.
  stop surfaceflinger;stop vendor.hwcomposer-2-1
@@ -62,4 +71,11 @@ echo "PASS global ARM32/ARM64 native Mali and compositor; app/video tests are se
 
 cat /proc/sys/kernel/random/boot_id > "$MODDIR/active-boot-id"
 sed -n 's/^version=//p' "$MODDIR/module.prop" > "$MODDIR/active-version"
-sh "$MODDIR/kernel-boot.sh"
+if cold_booting;then
+ sh "$MODDIR/cold-verify.sh" || recover "cold qualification failed"
+elif [ "$(read_cold)" != on ];then
+ sh "$MODDIR/kernel-boot.sh"
+else
+ resetprop -n vendor.rkmalikernel.ready stock
+fi
+sh "$MODDIR/dvfs-boot.sh"

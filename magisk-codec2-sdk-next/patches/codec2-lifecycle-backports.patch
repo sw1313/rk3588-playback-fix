@@ -1,0 +1,203 @@
+--- a/component/base/C2RKComponent.cpp
++++ b/component/base/C2RKComponent.cpp
+@@ -25,6 +25,8 @@
+ #include <C2PlatformSupport.h>
+ 
+ #include "C2RKComponent.h"
++#include "C2RKPoolRetry.h"
++#include <cutils/properties.h>
+ #include "C2RKLog.h"
+ 
+ namespace android {
+@@ -136,7 +138,9 @@
+ 
+ class C2RKComponent::BlockingBlockPool : public C2BlockPool {
+ public:
+-    BlockingBlockPool(const std::shared_ptr<C2BlockPool>& base): mBase{base} {}
++    BlockingBlockPool(const std::shared_ptr<C2BlockPool>& base,
++            std::weak_ptr<C2RKComponent> owner, bool cancelable)
++        : mBase{base}, mOwner{owner}, mCancelable{cancelable} {}
+ 
+     virtual local_id_t getLocalId() const override {
+         return mBase->getLocalId();
+@@ -150,38 +154,34 @@
+             uint32_t capacity,
+             C2MemoryUsage usage,
+             std::shared_ptr<C2LinearBlock>* block) {
+-        c2_status_t status;
+-        do {
+-            status = mBase->fetchLinearBlock(capacity, usage, block);
+-        } while (status == C2_BLOCKING);
+-        return status;
++        return rkCancelablePoolFetch(mCancelable,
++                [&] { return mBase->fetchLinearBlock(capacity, usage, block); },
++                [&] { auto owner = mOwner.lock(); return !owner || owner->isPendingFlushing(); });
+     }
+ 
+     virtual c2_status_t fetchCircularBlock(
+             uint32_t capacity,
+             C2MemoryUsage usage,
+             std::shared_ptr<C2CircularBlock>* block) {
+-        c2_status_t status;
+-        do {
+-            status = mBase->fetchCircularBlock(capacity, usage, block);
+-        } while (status == C2_BLOCKING);
+-        return status;
++        return rkCancelablePoolFetch(mCancelable,
++                [&] { return mBase->fetchCircularBlock(capacity, usage, block); },
++                [&] { auto owner = mOwner.lock(); return !owner || owner->isPendingFlushing(); });
+     }
+ 
+     virtual c2_status_t fetchGraphicBlock(
+             uint32_t width, uint32_t height, uint32_t format,
+             C2MemoryUsage usage,
+             std::shared_ptr<C2GraphicBlock>* block) {
+-        c2_status_t status;
+-        do {
+-            status = mBase->fetchGraphicBlock(width, height, format, usage,
+-                                              block);
+-        } while (status == C2_BLOCKING);
+-        return status;
++        return rkCancelablePoolFetch(mCancelable,
++                [&] { return mBase->fetchGraphicBlock(width, height, format, usage,
++                                              block); },
++                [&] { auto owner = mOwner.lock(); return !owner || owner->isPendingFlushing(); });
+     }
+ 
+ private:
+     std::shared_ptr<C2BlockPool> mBase;
++    std::weak_ptr<C2RKComponent> mOwner;
++    const bool mCancelable;
+ };
+ 
+ ////////////////////////////////////////////////////////////////////////////////
+@@ -197,6 +197,7 @@
+ C2RKComponent::C2RKComponent(
+         const std::shared_ptr<C2ComponentInterface> &intf)
+     : mDummyReadView(DummyReadView()),
++      mLifecycleFix(property_get_bool("debug.rkcodec2.lifecycle_fix", false)),
+       mIntf(intf),
+       mLooper(new ALooper),
+       mHandler(new WorkHandler) {
+@@ -275,9 +276,11 @@
+     {
+         // since flush process is time-consuming, set flushing state
+         // to discard all work output during process.
+-        setFlushingState();
++        if (!mLifecycleFix) setFlushingState();
+ 
+         Mutexed<WorkQueue>::Locked queue(mWorkQueue);
++        // Upstream f5e25f2: serialize the flush flag with pending-work removal.
++        if (mLifecycleFix) setFlushingState();
+         queue->incGeneration();
+         // TODO: queue->splicedBy(flushedWork, flushedWork->end());
+         while (!queue->empty()) {
+@@ -411,8 +414,10 @@
+ 
+ c2_status_t C2RKComponent::release() {
+     c2_trace_func_enter();
++    if (mLifecycleFix) setFlushingState();
+     sp<AMessage> reply;
+     (new AMessage(WorkHandler::kWhatRelease, mHandler))->postAndAwaitResponse(&reply);
++    if (mLifecycleFix) stopFlushingState();
+     return C2_OK;
+ }
+ 
+@@ -476,6 +481,7 @@
+ 
+     {
+         Mutexed<WorkQueue>::Locked queue(mWorkQueue);
++        if (mLifecycleFix && isPendingFlushing()) return;
+         if (queue->pending().count(frameIndex) == 0) {
+             c2_warn("unknown frame index: %" PRIu64, frameIndex);
+             return;
+@@ -595,7 +601,7 @@
+                             blockPool ? blockPool->getLocalId() : 111000111),
+                     err);
+             if (err == C2_OK) {
+-                mOutputBlockPool = std::make_shared<BlockingBlockPool>(blockPool);
++                mOutputBlockPool = std::make_shared<BlockingBlockPool>(blockPool, shared_from_this(), mLifecycleFix);
+             }
+             return err;
+         }();
+@@ -644,7 +650,7 @@
+     process(work, mOutputBlockPool);
+     c2_trace("processed frame #%" PRIu64, work->input.ordinal.frameIndex.peeku());
+     Mutexed<WorkQueue>::Locked queue(mWorkQueue);
+-    if (queue->generation() != generation) {
++    if (queue->generation() != generation || (mLifecycleFix && isPendingFlushing())) {
+         c2_info("work form old generation: was %" PRIu64 " now %" PRIu64,
+                 queue->generation(), generation);
+         work->result = C2_NOT_FOUND;
+--- a/component/base/include/C2RKComponent.h
++++ b/component/base/include/C2RKComponent.h
+@@ -114,6 +114,7 @@
+     void setFlushingState();
+     void stopFlushingState();
+     bool isPendingFlushing();
++    bool lifecycleFixEnabled() const { return mLifecycleFix; }
+ 
+     /**
+      * check is pending work with frameIndex exits
+@@ -177,6 +178,7 @@
+     static constexpr uint32_t NO_DRAIN = ~0u;
+ 
+     C2ReadView mDummyReadView;
++    const bool mLifecycleFix;
+ 
+ private:
+     struct WorkInfo {
+--- a/component/video/C2RKMpiDec.cpp
++++ b/component/video/C2RKMpiDec.cpp
+@@ -2158,7 +2158,8 @@
+ 
+     if (mInputEOS) {
+         drainEOS(work);
+-    } else if (!mStandardWorkFlow || (flags & C2FrameData::FLAG_CODEC_CONFIG)) {
++    } else if (!mStandardWorkFlow || (flags & C2FrameData::FLAG_CODEC_CONFIG) ||
++            (lifecycleFixEnabled() && !inSize)) {
+         fillEmptyWork(work);
+     }
+ 
+@@ -2531,6 +2532,10 @@
+     return C2_OK;
+ 
+ error:
++    if (lifecycleFixEnabled() && isPendingFlushing()) {
++        c2_info("pool lifecycle wait canceled");
++        return C2_OK;
++    }
+     c2_err("signalling error");
+     mSignalledError = true;
+ 
+@@ -2570,6 +2575,10 @@
+     uint32_t retry = 0;
+ 
+     while (true) {
++        if (lifecycleFixEnabled() && isPendingFlushing()) {
++            ret = C2_BAD_STATE;
++            break;
++        }
+         MPP_RET err = mMppMpi->decode_put_packet(mMppCtx, packet);
+         if (err == MPP_OK) {
+             c2_trace("send packet pts %lld size %d", pts, size);
+@@ -2948,7 +2957,8 @@
+             ret = C2_CORRUPTED; goto cleanUp;
+         }
+     }
+-    entry->block = mBufferMode ? std::move(mOutBlock) : std::move(outBuffer->getBlock());
++    entry->block = mBufferMode ? std::move(mOutBlock) :
++            (lifecycleFixEnabled() ? outBuffer->takeBlock() : std::move(outBuffer->getBlock()));
+ 
+ cleanUp:
+     entry->flags |= flags;
+--- a/component/video/C2RKMpiDec.h
++++ b/component/video/C2RKMpiDec.h
+@@ -102,6 +102,7 @@
+ 
+         void updateBlock(std::shared_ptr<C2GraphicBlock> block) { mBlock = block; }
+         std::shared_ptr<C2GraphicBlock> getBlock() { return mBlock; }
++        std::shared_ptr<C2GraphicBlock> takeBlock() { return std::move(mBlock); }
+         int32_t getSize() { return mSize; }
+ 
+         void submitToDecoder();

@@ -21,3 +21,16 @@ permission and run them there. Each covers 140 cases for both conversion paths,
 including an independent bit-level reference, all 1024 sample values, widths and
 tails, strides, unaligned output, guard pages, untouched padding and invalid inputs.
 The cached-memory timing is a microbenchmark; it is not end-to-end playback speed.
+
+`RKPacked10Wide.h` is the separately selected pair-gather candidate for the next
+core. It gathers adjacent bytes directly into halfword lanes, replacing the
+original widen/OR operations and combining the shift/mask. It reads exactly
+twenty bytes per sixteen samples, retains scalar tails and the same aligned
+row/memcpy, and does not change format or fence handling. The original header
+remains unchanged. The next-core builder verifies the new applied header too.
+
+Build `packed10_test.cpp` with `-DRK_TEST_P010_PAIRS` to run the same independent
+bit-level, padding, guard-page and invalid-input cases against this candidate.
+`packed10_pairs_bench.cpp` alternates old/new order across eight batches at each
+size and compares complete outputs. Its cached-memory measurements alone do not
+validate actual Codec2/mapper performance or authorize enabling the module item.

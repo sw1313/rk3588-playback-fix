@@ -23,6 +23,16 @@ run('git','-C',S,'--git-dir='+str(a.upstream.resolve()/'.git'),'--work-tree='+st
 if a.sdk_next:
  run('git','-C',S,'--git-dir='+str(a.upstream.resolve()/'.git'),'--work-tree='+str(S),'apply',M/'patches/av1-native-surface.patch')
  run('git','-C',S,'--git-dir='+str(a.upstream.resolve()/'.git'),'--work-tree='+str(S),'apply',M/'patches/av1-afbc-surface.patch')
+ run('git','-C',S,'--git-dir='+str(a.upstream.resolve()/'.git'),'--work-tree='+str(S),'apply',M/'patches/av1-texture-afbc.patch')
+ run('git','-C',S,'--git-dir='+str(a.upstream.resolve()/'.git'),'--work-tree='+str(S),'apply',M/'patches/codec2-lifecycle-backports.patch')
+ run('git','-C',S,'--git-dir='+str(a.upstream.resolve()/'.git'),'--work-tree='+str(S),'apply',M/'patches/gralloc-hdr-lease.patch')
+ run('git','-C',S,'--git-dir='+str(a.upstream.resolve()/'.git'),'--work-tree='+str(S),'apply',M/'patches/codec2-delay-notify.patch')
+ run('git','-C',S,'--git-dir='+str(a.upstream.resolve()/'.git'),'--work-tree='+str(S),'apply',M/'patches/hevc-native-surface.patch')
+ run('git','-C',S,'--git-dir='+str(a.upstream.resolve()/'.git'),'--work-tree='+str(S),'apply',M/'patches/hevc-eos-pending.patch')
+ run('git','-C',S,'--git-dir='+str(a.upstream.resolve()/'.git'),'--work-tree='+str(S),'apply',M/'patches/p010-pairs.patch')
+ run('git','-C',S,'--git-dir='+str(a.upstream.resolve()/'.git'),'--work-tree='+str(S),'apply',M/'patches/native-backpressure.patch')
+ if (S/'component/osal/include/RKPacked10Wide.h').read_bytes().replace(b'\r\n',b'\n') != (R/'tools/pixel-conversion/RKPacked10Wide.h').read_bytes().replace(b'\r\n',b'\n'):raise SystemExit('Pair-gather header differs from canonical source')
+ shutil.copyfile(M/'include/C2RKPoolRetry.h',S/'component/base/include/C2RKPoolRetry.h')
 if (S/'component/osal/include/RKPacked10.h').read_bytes().replace(b'\r\n',b'\n') != (R/'tools/pixel-conversion/RKPacked10.h').read_bytes().replace(b'\r\n',b'\n'):
  raise SystemExit('Packed-ten-bit patch differs from the tested canonical header')
 def q(p):return '"'+Path(p).as_posix()+'"'

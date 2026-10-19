@@ -12,12 +12,15 @@ SOURCE_CODE.md and component UPSTREAM.json/SOURCE.json files.
 | Rockchip librga 1.10.6 [3] | Decode Stack | Apache-2.0, `LICENSES/rga/Apache-2.0`; original COPYING retained |
 | Rockchip Codec2 API32, SDK 1.14.3 and SDK 1.14.16 | Decode Stack | Apache-2.0, `LICENSES/codec2*/Apache-2.0`; original Rockchip notices retained |
 | AOSP Codec2 wrappers, Android platform interfaces and derived service code | Decode Stack | Apache-2.0; original notices in source/patches and `LICENSES/codec2/Apache-2.0` |
+| Rockchip RK3588 HWC scaling policy reference patch e3e3d168e524da25620ef55da734e48c8e56afe6 | Decode Stack HDR component and source | Apache-2.0; upstream patch authorship retained; `LICENSES/hwc/Apache-2.0.txt` and `LICENSES/hwc/NOTICE.txt`. Factory HWC binaries are excluded and are not relicensed. |
 | libyuv 1974 and isolated Android 12 compatibility objects | Decode Stack | BSD-style license for each source tree and PATENTS in `LICENSES/libyuv/` |
 | libvpx 1.17.0 decoder code | Decode Stack | BSD-style license and PATENTS in `LICENSES/software/libvpx-*` |
 | libgav1 AV1 decoder | Decode Stack | Apache-2.0 with AUTHORS in `LICENSES/software/libgav1-*` |
 | LLVM/libc++ portions and Android NDK headers/runtime | Decode Stack | License depends on source/runtime version; preserve `LICENSES/rga/LLVM-libcxx.txt` and complete NDK notices in `LICENSES/ndk/` rather than applying project MIT terms to all portions |
 | AOSP common V2, graphics.common V3, allocator V1 frozen AIDL, Binder C++ support and Vulkan HAL header | Mali Global | Apache-2.0; `LICENSES/Apache-2.0.txt`, original file notices in `src/` and NOTICE.txt |
-| Original plugin source/resources | LSPosed plugin | Project MIT; no Xposed/LSPosed framework classes or player libraries bundled |
+| Original plugin source/resources | LSPosed plugin | Project MIT; no Xposed/LSPosed framework classes bundled. Optional source-built FFmpeg payload is separately licensed below. |
+| FFmpeg bf4d5037b4 and local RK Main10 P010 patch | Optional LSPosed experimental payload | LGPL-3.0-or-later build; full corresponding FFmpeg source archive, original COPYING files and local patch accompany the payload in `assets/p010/`. Original Yamby/mpv/FFmpeg binaries are not redistributed. |
+| dav1d 1.5.3, statically linked into the optional FFmpeg payload | Optional LSPosed experimental payload | BSD-2-Clause; `LICENSES/dav1d/COPYING`, also staged as `assets/p010/dav1d-COPYING`; source at https://code.videolan.org/videolan/dav1d/-/tree/1.5.3 |
 | Original refresh policy/installer scripts | Frame Guard | Project MIT; no separately compiled third-party payload |
 
 Copyright holders include Rockchip Electronics Co. LTD, The Android Open
@@ -85,3 +88,29 @@ game material, user configuration, keys, raw logs or device identifiers ship.
 Test8.1 runtime matches local Test8; documentation/metadata only changed.
 Unchanged installers carry the original v0.6.7 or v0.6.8 source/license metadata
 as identified by release-manifest.json; they are not silently repackaged.
+
+
+The HDMI transient event adapter is original MIT project code. It references AOSP UEventObserver/WiredAccessoryManager interfaces, uses the firmware libhardware_legacy only as a private link/runtime dependency, and redistributes no firmware library. Its check executable statically links the Android NDK libc++ runtime under the LLVM license retained in LICENSES.
+
+The developing QMS kernel core (`decode-kernel/qms/`) is GPL-2.0-only. Timing
+data derives from Rockchip kernel commit d0e8f558bc58984f8f4508133143cc9ca77c8b0d;
+VTEM layout and multi-frame protocol reference commit
+5a89a1cb8b9c3cba5666151e838d2a3d760fe0ea (Algea Cao / Rockchip). Preserve the
+file notices, UPSTREAM.json, and LICENSES/GPL-2.0-only.txt. Local bounded lookup,
+exact-rate corrections, transactional error handling and native ABI adaptation
+do not relicense upstream material. Original firmware, generated private ABI
+contracts and raw device inputs are excluded from public source/packages.
+
+QMS UAPI `decode-kernel/qms/uapi.h` carries the Linux-syscall-note exception;
+retain LICENSES/Linux-syscall-note.txt. The new session implementation remains
+GPL-2.0-only. The original HWC frontend and Decode pre-exec rendezvous are MIT
+project code and include no GPL implementation. Their isolated test results
+do not constitute delivery or acceptance of a functional display driver.
+
+
+The optional source-only system display-policy component uses dexlib2 2.5.2
+(https://github.com/JesusFreke/smali, BSD terms in the upstream NOTICE), Guava
+27.1-android and failureaccess 1.0.1 (https://github.com/google/guava,
+Apache-2.0). Its builder pins dependency hashes and bundles the corresponding
+notices. Annotation-only jsr305 is not packaged. Android framework firmware
+inputs and generated services.jar variants are not redistributed.

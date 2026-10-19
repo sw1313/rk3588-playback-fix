@@ -1,0 +1,101 @@
+{
+  "component": "decode-stack",
+  "version": "0.7.9-test4",
+  "date": "2026-10-18",
+  "status": "EXPERIMENTAL_MAPPING_BOOT_AND_ROLLBACK_PASSED_FULL_HDR_REJECTED",
+  "public_release": false,
+  "installer_sha256": "410ee3cda61d5548734b0f9df80cc51fdbd066f9acc7762ab20f265caea7da9f",
+  "tested_installer_immutable": true,
+  "full_HWUI_rendering_acceptance": false,
+  "hwui": {
+    "change": "Local DeviceInfo format 43 to Skia color type 7 missing-case repair",
+    "abis": [
+      "arm64-v8a",
+      "armeabi-v7a"
+    ],
+    "case_count_each_ABI_each_variant": 69,
+    "actual_format43_boot_no_original_abort": true,
+    "final_installed_hashes_match_contract": true,
+    "independent_off_reboot_original_hashes": true,
+    "whole_off_reboot_original_hashes": true,
+    "generic_WCG_EGL_config_selection_pending": true
+  },
+  "hwc_mode_cache": {
+    "upstream_commit": "de31070c66c61ee2bd90c42c6877d26c4c5d7c24",
+    "selective_scope": "GetDisplayAttribute/SetActiveConfig advertised sf_modes_ lookup only; not count change",
+    "isolated_cases_per_HWC_variant": 9808,
+    "original_defect_control_cases_per_variant": 15,
+    "actual_ExoPlayer_version": "2.19.1",
+    "actual_mode_rates": [
+      24,
+      60,
+      30,
+      60,
+      24,
+      60
+    ],
+    "actual_all_requested_modes_observed": true,
+    "rendered_counters": [
+      189,
+      352,
+      517,
+      682,
+      817,
+      979
+    ],
+    "dropped_counters": [
+      0,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    "actual_cached_raw_mismatch_in_run": false,
+    "screen_pixel_acceptance": false,
+    "historical_black_screen_fully_fixed": false
+  },
+  "hdr_client": {
+    "effective": false,
+    "gated_inactive": true,
+    "gate_marker_shipped": false,
+    "failed_candidate_reason": "Actual client/scanning buffer AB24 eight-bit despite HDMI ten-bit PQ; SF RenderSurface.initialize hardcodes RGBA8888",
+    "SF_target_scoped_adapter_implemented": false,
+    "full_ten_bit_HDR_acceptance": false
+  },
+  "control_tests": {
+    "hwui_android_shell_assertions": 14,
+    "client_HDR_android_shell_assertions": 16,
+    "browser_mock_assertions": 69,
+    "isolated_fixtures_do_not_mutate_live_module": true
+  },
+  "rollback": {
+    "individual_reboot": true,
+    "whole_module_reboot": true,
+    "restored_final_on": true,
+    "launcher_healthy_each_stage": true,
+    "Zygisk_Next_LSPosed_healthy_each_stage": true
+  },
+  "final_selection": {
+    "hwui_rgb10": 1,
+    "hwc_mode_cache": 1,
+    "hwc_client_hdr10": 0
+  },
+  "frame_guard_settings": [
+    0,
+    60,
+    60
+  ],
+  "boot_written": false,
+  "mali_changed": false,
+  "pending": [
+    "Full generic WCG/HDR HWUI window rendering and precision",
+    "Physical HDR target-scoped SF buffer format and complete HDR acceptance",
+    "Original Exo failure reproduction/live mismatch and screen pixel acceptance",
+    "Yamby original HW-menu playback/seek/application rollback"
+  ],
+  "private_inputs_or_logs_in_record": false,
+  "historical_record": true,
+  "subsequent_status_reference": "docs/decode-physical-hdr-081.zh-CN.md",
+  "subsequent_correction": "RGBA8888 is the original physical initialization, not a permanent SF format lock. Scoped PQ/HLG format43 requests work; allocator and actual scanout remain separate contracts."
+}

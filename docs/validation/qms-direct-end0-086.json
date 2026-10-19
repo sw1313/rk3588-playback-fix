@@ -1,0 +1,57 @@
+{
+  "date": "2026-10-19",
+  "status": "PHYSICAL_NO_IMPROVEMENT_OR_WORSE_WITHDRAWN_REBOOT_ROLLBACK_VERIFIED",
+  "version": "0.8.6-qms-test18-ddc1",
+  "mali_pairing_only_version": "0.4.2-qms-test20",
+  "release_accepted": false,
+  "physical_blackout_fixed": false,
+  "protocol_delta": "dataset END 1->0, 0xc6->0x86 only",
+  "prior_negative_trial_preserved": "test13 through HDMI matrix, no improvement; withdrawn",
+  "reason_for_controlled_retest": "Current direct DDC repair and software recovery corrections provide a distinct comparison condition; test17 still black without corresponding source control changes",
+  "sources": [
+    "https://lkml.iu.edu/2609.2/14407.html",
+    "https://cdn.teledynelecroy.com/files/manuals/m42h_atp_user_guide.pdf"
+  ],
+  "source_limits": "RFC plus equipment example; not proof of this sink root cause",
+  "checks": {
+    "core_switch_restore_cases": 738,
+    "exact_cycle_cases": 66,
+    "native_injected_cases": 54,
+    "pair_cases": 15,
+    "native_import_CRCs": 74
+  },
+  "boot_flash": false,
+  "frame_guard": "disabled and paused",
+  "physical": "User: same or worse compared with test17",
+  "rollback": "Restored complete pre-trial Decode test17 and Mali test19 backups, rebooted; original boot unchanged",
+  "boot_health": {
+    "exact_component": true,
+    "QMS_active": true,
+    "Mali_g18_KMD_DVFS_active": true,
+    "external_Zygisk_LSPosed_both_ABIs": true,
+    "Auto_HDR_preserved": true,
+    "DDC_active": true,
+    "boot_unchanged": true,
+    "module_flags_and_component_choices_preserved": true,
+    "frame_errors": 0,
+    "diagnostic_default_off": true
+  },
+  "rollback_health": {
+    "exact_versions_verified": true,
+    "QMS_active": true,
+    "Mali_g18_KMD_DVFS_active": true,
+    "external_Zygisk_LSPosed_both_ABIs": true,
+    "Auto_HDR_preserved": true,
+    "module_flags_and_component_choices_preserved": true,
+    "original_boot_hash_unchanged": true,
+    "frame_guard": "disabled and paused",
+    "diagnostic_limit": 0
+  },
+  "capture_end": {
+    "cumulative_completed_serial": 48,
+    "frame_errors": 0,
+    "diagnostic_limit": 0,
+    "temporary_trace_removed": true,
+    "serial_is_window_switch_count": false
+  }
+}

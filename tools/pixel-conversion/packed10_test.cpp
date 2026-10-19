@@ -1,5 +1,10 @@
 // SPDX-License-Identifier: MIT
+#ifdef RK_TEST_P010_PAIRS
+#include "RKPacked10Wide.h"
+#define rkPacked10ToP010 rkPacked10ToP010Wide
+#else
 #include "RKPacked10.h"
+#endif
 #include <stdio.h>
 #include <stdlib.h>
 #include <vector>

@@ -1,0 +1,487 @@
+{
+  "component": "mali-global",
+  "version": "0.3.1-test1",
+  "date": "2026-10-18",
+  "status": "experimental-bounded-response-validation",
+  "public_release": false,
+  "source_ref": "working-tree",
+  "switch": {
+    "name": "dvfs",
+    "default": "off",
+    "reboot_required": true,
+    "dependencies": [
+      "global g18 userspace",
+      "paired next kernel and CSF"
+    ],
+    "policy": "simple_ondemand polling 100ms -> 20ms",
+    "one_shot_boot_only": true
+  },
+  "platform": {
+    "soc": "RK3588",
+    "android_api": 32,
+    "kernel": "5.10.66",
+    "userspace_kernel_pair": "g18p0",
+    "governor": "simple_ondemand",
+    "observed_min_max_hz": [
+      300000000,
+      900000000
+    ]
+  },
+  "runtime_changes": {
+    "gpu_libraries_and_kernel_modules_identical_to_030": true,
+    "frequency_caps_changed": false,
+    "opp_voltage_thermal_changed": false,
+    "decode_core_unchanged_sha256": "a4190727f6cbe0a867d05f45c52cb8ef08c99da63bd11dc3fc53678de6012f74"
+  },
+  "new_policy_checks": {
+    "android_shell_fixture_checks": 37,
+    "webui_interaction_checks": 22,
+    "fixture_modifies_live_module": false,
+    "actual_20ms_render_checks": [
+      "ARM32 GLES shader exact RGBA",
+      "ARM64 GLES shader exact RGBA",
+      "ARM32 Vulkan exact 4096-byte buffer",
+      "ARM64 Vulkan exact 4096-byte buffer"
+    ]
+  },
+  "installed_burst_measurements": {
+    "off_100ms": {
+      "bursts": [
+        {
+          "burst": 0,
+          "frames": 12,
+          "start_frequency_hz": 300000000,
+          "draw_finish_sum_ms": 181.604225,
+          "wall_ms": 182.697101,
+          "first_frame_ms": 16.883126
+        },
+        {
+          "burst": 1,
+          "frames": 12,
+          "start_frequency_hz": 300000000,
+          "draw_finish_sum_ms": 134.29239,
+          "wall_ms": 134.99443,
+          "first_frame_ms": 16.58271
+        },
+        {
+          "burst": 2,
+          "frames": 12,
+          "start_frequency_hz": 900000000,
+          "draw_finish_sum_ms": 68.233386,
+          "wall_ms": 69.377882,
+          "first_frame_ms": 7.100334
+        },
+        {
+          "burst": 3,
+          "frames": 12,
+          "start_frequency_hz": 300000000,
+          "draw_finish_sum_ms": 181.197353,
+          "wall_ms": 185.530936,
+          "first_frame_ms": 16.896544
+        },
+        {
+          "burst": 4,
+          "frames": 12,
+          "start_frequency_hz": 300000000,
+          "draw_finish_sum_ms": 180.636769,
+          "wall_ms": 183.578518,
+          "first_frame_ms": 16.744877
+        },
+        {
+          "burst": 5,
+          "frames": 12,
+          "start_frequency_hz": 300000000,
+          "draw_finish_sum_ms": 181.974646,
+          "wall_ms": 183.119144,
+          "first_frame_ms": 16.789502
+        },
+        {
+          "burst": 6,
+          "frames": 12,
+          "start_frequency_hz": 300000000,
+          "draw_finish_sum_ms": 152.392929,
+          "wall_ms": 153.341432,
+          "first_frame_ms": 15.803668
+        },
+        {
+          "burst": 7,
+          "frames": 12,
+          "start_frequency_hz": 600000000,
+          "draw_finish_sum_ms": 98.13651,
+          "wall_ms": 99.786469,
+          "first_frame_ms": 9.53546
+        },
+        {
+          "burst": 8,
+          "frames": 12,
+          "start_frequency_hz": 300000000,
+          "draw_finish_sum_ms": 181.917183,
+          "wall_ms": 183.00131,
+          "first_frame_ms": 16.711626
+        },
+        {
+          "burst": 9,
+          "frames": 12,
+          "start_frequency_hz": 300000000,
+          "draw_finish_sum_ms": 181.818603,
+          "wall_ms": 182.931019,
+          "first_frame_ms": 16.651544
+        },
+        {
+          "burst": 10,
+          "frames": 12,
+          "start_frequency_hz": 300000000,
+          "draw_finish_sum_ms": 181.593142,
+          "wall_ms": 182.665893,
+          "first_frame_ms": 16.705793
+        },
+        {
+          "burst": 11,
+          "frames": 12,
+          "start_frequency_hz": 300000000,
+          "draw_finish_sum_ms": 181.367685,
+          "wall_ms": 182.226935,
+          "first_frame_ms": 16.746627
+        },
+        {
+          "burst": 12,
+          "frames": 12,
+          "start_frequency_hz": 300000000,
+          "draw_finish_sum_ms": 181.101101,
+          "wall_ms": 181.905518,
+          "first_frame_ms": 16.697335
+        },
+        {
+          "burst": 13,
+          "frames": 12,
+          "start_frequency_hz": 300000000,
+          "draw_finish_sum_ms": 181.464518,
+          "wall_ms": 182.478644,
+          "first_frame_ms": 16.706377
+        },
+        {
+          "burst": 14,
+          "frames": 12,
+          "start_frequency_hz": 300000000,
+          "draw_finish_sum_ms": 180.912977,
+          "wall_ms": 181.997394,
+          "first_frame_ms": 16.707835
+        },
+        {
+          "burst": 15,
+          "frames": 12,
+          "start_frequency_hz": 300000000,
+          "draw_finish_sum_ms": 182.109686,
+          "wall_ms": 183.392144,
+          "first_frame_ms": 16.736419
+        },
+        {
+          "burst": 16,
+          "frames": 12,
+          "start_frequency_hz": 300000000,
+          "draw_finish_sum_ms": 181.589935,
+          "wall_ms": 182.74406,
+          "first_frame_ms": 16.717168
+        },
+        {
+          "burst": 17,
+          "frames": 12,
+          "start_frequency_hz": 300000000,
+          "draw_finish_sum_ms": 181.747433,
+          "wall_ms": 182.953185,
+          "first_frame_ms": 16.73146
+        },
+        {
+          "burst": 18,
+          "frames": 12,
+          "start_frequency_hz": 300000000,
+          "draw_finish_sum_ms": 181.71506,
+          "wall_ms": 182.838268,
+          "first_frame_ms": 16.76471
+        },
+        {
+          "burst": 19,
+          "frames": 12,
+          "start_frequency_hz": 300000000,
+          "draw_finish_sum_ms": 182.818435,
+          "wall_ms": 184.248186,
+          "first_frame_ms": 16.814877
+        },
+        {
+          "burst": 20,
+          "frames": 12,
+          "start_frequency_hz": 300000000,
+          "draw_finish_sum_ms": 181.55056,
+          "wall_ms": 186.87581,
+          "first_frame_ms": 16.790668
+        },
+        {
+          "burst": 21,
+          "frames": 12,
+          "start_frequency_hz": 900000000,
+          "draw_finish_sum_ms": 67.320463,
+          "wall_ms": 71.023173,
+          "first_frame_ms": 7.151084
+        },
+        {
+          "burst": 22,
+          "frames": 12,
+          "start_frequency_hz": 300000000,
+          "draw_finish_sum_ms": 181.878977,
+          "wall_ms": 182.964269,
+          "first_frame_ms": 16.741377
+        },
+        {
+          "burst": 23,
+          "frames": 12,
+          "start_frequency_hz": 300000000,
+          "draw_finish_sum_ms": 181.708642,
+          "wall_ms": 182.799185,
+          "first_frame_ms": 16.734085
+        }
+      ],
+      "total_frames": 288,
+      "draw_finish_sum_p50_ms": 181.5702475,
+      "burst_wall_p50_ms": 182.77162249999998,
+      "first_frame_p50_ms": 16.724314,
+      "pixel_hash": 2464417444,
+      "scope": "Offscreen synthetic GLES bursts; no game FPS or display pacing claim"
+    },
+    "on_20ms": {
+      "bursts": [
+        {
+          "burst": 0,
+          "frames": 12,
+          "start_frequency_hz": 300000000,
+          "draw_finish_sum_ms": 101.957344,
+          "wall_ms": 102.733177,
+          "first_frame_ms": 16.91171
+        },
+        {
+          "burst": 1,
+          "frames": 12,
+          "start_frequency_hz": 300000000,
+          "draw_finish_sum_ms": 96.986175,
+          "wall_ms": 97.680343,
+          "first_frame_ms": 16.757418
+        },
+        {
+          "burst": 2,
+          "frames": 12,
+          "start_frequency_hz": 300000000,
+          "draw_finish_sum_ms": 96.439593,
+          "wall_ms": 97.113343,
+          "first_frame_ms": 16.756835
+        },
+        {
+          "burst": 3,
+          "frames": 12,
+          "start_frequency_hz": 300000000,
+          "draw_finish_sum_ms": 98.836803,
+          "wall_ms": 101.078552,
+          "first_frame_ms": 16.63696
+        },
+        {
+          "burst": 4,
+          "frames": 12,
+          "start_frequency_hz": 300000000,
+          "draw_finish_sum_ms": 181.700185,
+          "wall_ms": 182.693893,
+          "first_frame_ms": 16.596127
+        },
+        {
+          "burst": 5,
+          "frames": 12,
+          "start_frequency_hz": 900000000,
+          "draw_finish_sum_ms": 83.295051,
+          "wall_ms": 84.337467,
+          "first_frame_ms": 7.07146
+        },
+        {
+          "burst": 6,
+          "frames": 12,
+          "start_frequency_hz": 300000000,
+          "draw_finish_sum_ms": 76.685301,
+          "wall_ms": 77.757758,
+          "first_frame_ms": 14.149043
+        },
+        {
+          "burst": 7,
+          "frames": 12,
+          "start_frequency_hz": 300000000,
+          "draw_finish_sum_ms": 97.022341,
+          "wall_ms": 97.648259,
+          "first_frame_ms": 16.657376
+        },
+        {
+          "burst": 8,
+          "frames": 12,
+          "start_frequency_hz": 300000000,
+          "draw_finish_sum_ms": 96.405468,
+          "wall_ms": 97.414052,
+          "first_frame_ms": 16.733502
+        },
+        {
+          "burst": 9,
+          "frames": 12,
+          "start_frequency_hz": 300000000,
+          "draw_finish_sum_ms": 81.160051,
+          "wall_ms": 81.761759,
+          "first_frame_ms": 15.857627
+        },
+        {
+          "burst": 10,
+          "frames": 12,
+          "start_frequency_hz": 300000000,
+          "draw_finish_sum_ms": 101.053466,
+          "wall_ms": 101.733635,
+          "first_frame_ms": 16.926585
+        },
+        {
+          "burst": 11,
+          "frames": 12,
+          "start_frequency_hz": 300000000,
+          "draw_finish_sum_ms": 102.070801,
+          "wall_ms": 102.989844,
+          "first_frame_ms": 16.65096
+        },
+        {
+          "burst": 12,
+          "frames": 12,
+          "start_frequency_hz": 300000000,
+          "draw_finish_sum_ms": 99.957093,
+          "wall_ms": 100.671677,
+          "first_frame_ms": 16.770252
+        },
+        {
+          "burst": 13,
+          "frames": 12,
+          "start_frequency_hz": 300000000,
+          "draw_finish_sum_ms": 84.419423,
+          "wall_ms": 85.246008,
+          "first_frame_ms": 15.794043
+        },
+        {
+          "burst": 14,
+          "frames": 12,
+          "start_frequency_hz": 300000000,
+          "draw_finish_sum_ms": 95.879009,
+          "wall_ms": 96.687802,
+          "first_frame_ms": 16.690919
+        },
+        {
+          "burst": 15,
+          "frames": 12,
+          "start_frequency_hz": 300000000,
+          "draw_finish_sum_ms": 118.734887,
+          "wall_ms": 119.306554,
+          "first_frame_ms": 16.742543
+        },
+        {
+          "burst": 16,
+          "frames": 12,
+          "start_frequency_hz": 300000000,
+          "draw_finish_sum_ms": 96.712009,
+          "wall_ms": 98.12251,
+          "first_frame_ms": 16.58446
+        },
+        {
+          "burst": 17,
+          "frames": 12,
+          "start_frequency_hz": 300000000,
+          "draw_finish_sum_ms": 181.362437,
+          "wall_ms": 181.990393,
+          "first_frame_ms": 16.747793
+        },
+        {
+          "burst": 18,
+          "frames": 12,
+          "start_frequency_hz": 300000000,
+          "draw_finish_sum_ms": 97.462178,
+          "wall_ms": 98.351468,
+          "first_frame_ms": 16.745752
+        },
+        {
+          "burst": 19,
+          "frames": 12,
+          "start_frequency_hz": 300000000,
+          "draw_finish_sum_ms": 102.746887,
+          "wall_ms": 103.612261,
+          "first_frame_ms": 16.82771
+        },
+        {
+          "burst": 20,
+          "frames": 12,
+          "start_frequency_hz": 300000000,
+          "draw_finish_sum_ms": 96.368134,
+          "wall_ms": 97.41201,
+          "first_frame_ms": 16.765585
+        },
+        {
+          "burst": 21,
+          "frames": 12,
+          "start_frequency_hz": 300000000,
+          "draw_finish_sum_ms": 98.272425,
+          "wall_ms": 101.126968,
+          "first_frame_ms": 16.69121
+        },
+        {
+          "burst": 22,
+          "frames": 12,
+          "start_frequency_hz": 300000000,
+          "draw_finish_sum_ms": 182.107645,
+          "wall_ms": 184.678686,
+          "first_frame_ms": 16.706377
+        },
+        {
+          "burst": 23,
+          "frames": 12,
+          "start_frequency_hz": 300000000,
+          "draw_finish_sum_ms": 95.79822,
+          "wall_ms": 96.918218,
+          "first_frame_ms": 16.752752
+        }
+      ],
+      "total_frames": 288,
+      "draw_finish_sum_p50_ms": 97.24225949999999,
+      "burst_wall_p50_ms": 98.236989,
+      "first_frame_p50_ms": 16.719939500000002,
+      "pixel_hash": 2464417444,
+      "scope": "Offscreen synthetic GLES bursts; no game FPS or display pacing claim"
+    },
+    "draw_finish_median_reduction_percent": 46.44372586428291,
+    "all_bursts_included": true,
+    "same_300mhz_start_only_medians_ms": {
+      "off": 181.593142,
+      "on": 97.462178
+    },
+    "gpu_temperatures_c": {
+      "off_before": 42.538,
+      "off_after": 41.615,
+      "on_before": 41.615,
+      "on_after": 41.615
+    }
+  },
+  "rollback": {
+    "off_reboot_actual_interval_ms": 100,
+    "userspace_and_next_kernel_retained": true,
+    "off_no_pending_reboot": true,
+    "on_reboot_verified": true
+  },
+  "previous_driver_validation": "docs/mali-kernel-068-validation.json",
+  "limitations": [
+    "Synthetic offscreen GPU workload only; no game FPS, physical display or video pacing uplift established.",
+    "First frame did not materially improve; outlier burst durations remain, including an approximately 182ms on-mode burst.",
+    "draw+finish timing includes driver and CPU scheduling, not GPU hardware timestamps.",
+    "Higher possible polling activity; no direct energy or long-duration thermal measurement.",
+    "Other firmware, governors, kernel/CSF combinations and external tuning policies unverified.",
+    "No new video precision or HDMI wire claim; decoding code and original applications retained.",
+    "Old player UHD image acquisition timeouts remain unresolved."
+  ],
+  "final_state": {
+    "dvfs": "on",
+    "polling_interval_ms": 20,
+    "kernel": "next",
+    "pending_reboot": false
+  }
+}

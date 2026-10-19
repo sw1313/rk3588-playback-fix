@@ -17,6 +17,21 @@ static void *array(uint32_t n, size_t size) {
     if (!p) exit(2);
     return p;
 }
+static void formats(int fd, uint32_t id) {
+    struct drm_mode_get_plane p={.plane_id=id};
+    if (ioctl(fd,DRM_IOCTL_MODE_GETPLANE,&p)) return;
+    uint32_t capacity=p.count_format_types;
+    uint32_t *f=array(capacity,sizeof(*f));p.format_type_ptr=(uintptr_t)f;
+    if (!ioctl(fd,DRM_IOCTL_MODE_GETPLANE,&p)) {
+        printf("PLANE_FORMATS %u possible_crtcs=0x%x",id,p.possible_crtcs);
+        for (uint32_t i=0;i<p.count_format_types && i<capacity;i++) {
+            char name[5]={f[i]&255,(f[i]>>8)&255,(f[i]>>16)&255,(f[i]>>24)&255,0};
+            printf(" %s(0x%08x)",name,f[i]);
+        }
+        printf("\n");
+    }
+    free(f);
+}
 static void properties(int fd, uint32_t id, uint32_t type, const char *kind) {
     struct drm_mode_obj_get_properties o = { .obj_id=id, .obj_type=type };
     if (ioctl(fd, DRM_IOCTL_MODE_OBJ_GETPROPERTIES, &o)) {
@@ -92,7 +107,10 @@ int main(void) {
         uint32_t np=planes.count_planes;
         uint32_t *ids=array(np,sizeof(uint32_t)); planes.plane_id_ptr=(uintptr_t)ids;
         if (!ioctl(fd,DRM_IOCTL_MODE_GETPLANERESOURCES,&planes))
-            for (uint32_t i=0;i<planes.count_planes && i<np;i++) properties(fd,ids[i],DRM_MODE_OBJECT_PLANE,"plane");
+            for (uint32_t i=0;i<planes.count_planes && i<np;i++) {
+                formats(fd,ids[i]);
+                properties(fd,ids[i],DRM_MODE_OBJECT_PLANE,"plane");
+            }
         free(ids);
     }
     free(connectors);free(crtcs);free(fbs);free(encoders);close(fd);return 0;

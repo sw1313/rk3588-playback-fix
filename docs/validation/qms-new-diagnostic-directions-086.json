@@ -1,0 +1,92 @@
+{
+  "date": "2026-10-19",
+  "status": "RESEARCH_AND_READ_ONLY_INTERFACE_QUALIFICATION_NOT_BLACKOUT_FIX",
+  "sink": {
+    "family": "LG C5",
+    "size_inches": 42,
+    "connection": "Earlier test14/test15 path used HDMI matrix (user correction); now direct HDMI1, TV foreground verified and user reports no signal",
+    "prior_direct_connection_claim_withdrawn": true
+  },
+  "runtime_changes": {
+    "module_changes": false,
+    "reboot": false,
+    "TV_settings_changes": false,
+    "player_input": false,
+    "screenshots": false,
+    "Frame_Guard_changed": false
+  },
+  "prioritized_directions": [
+    {
+      "priority": 1,
+      "direction": "Receiver SCDC clock/channel-lock and scrambling state",
+      "source": "https://lists.infradead.org/pipermail/linux-arm-kernel/2026-July/1154094.html",
+      "source_status": "v9 patch reference, not claimed merged into this factory kernel",
+      "can_distinguish": "Source PHY ready versus receiver losing TMDS lock; scrambling configuration versus receiver detection",
+      "local_feasibility": "Native HDMI DDC adapter exposed as i2c-dev and parent identity verified; stock scdc_status debugfs absent",
+      "implementation": "tools/qms/scdc_readonly_probe.c compiled and one native-HDMI-DDC sample executed; no SCDC configuration writes",
+      "limits": "Lock bits and sampled status are not QMS acknowledgement. Unsupported/invalid readings or missed transients cannot be counted healthy. CED reads clear counters, so this probe deliberately excludes them.",
+      "next_dependency": "Restore valid direct EDID/HDMI output before normal-link baseline and physical blackout correlation"
+    },
+    {
+      "priority": 2,
+      "direction": "TV-side SSAP input/picture-mode event correlation",
+      "sources": [
+        "https://github.com/Maassoft/ColorControl/blob/d0d3bb4682c483b0b2c14a794958abf2d142100e/ColorControl/lgtv/LgTvApi.cs",
+        "https://github.com/home-assistant-libs/aiowebostv/blob/main/aiowebostv/webos_client.py",
+        "https://forum.webostv.developer.lge.com/t/get-input-signal-format/6803"
+      ],
+      "local_results": {
+        "model_identity_matches_user_C5": true,
+        "read_permissions_only_pairing_accepted": true,
+        "foreground_input_read_and_subscription": true,
+        "external_input_connection_list_read_and_subscription": true,
+        "picture_mode_read_and_subscription": true,
+        "firmware_read": "401 insufficient permissions",
+        "power_read": "401 insufficient permissions",
+        "legacy_dimensionInfo_keys": "unsupported on this TV; 500 response",
+        "TV_TLS_SSAP_reachable": true
+      },
+      "can_distinguish": "TV frontend/input selection or picture-preset changes around blackout, versus unchanged UI context",
+      "limits": "No raw received VTEM, HDMI lock, M_CONST, active signal rate or panel mute exposed by these successful endpoints. Input connected flags do not prove link lock. Subscription smoke run was not a coordinated blackout test.",
+      "implementation": "tools/qms/webos_readonly_probe.py; no CONTROL/WRITE permissions, no Luna notification callback bridge, no input/power/settings commands",
+      "credential_policy": "Pair key and raw responses kept only in git-ignored private dist output; no address, serial or key in this record"
+    },
+    {
+      "priority": 3,
+      "direction": "VOP plane state, FIFO/bus/IOMMU error and real-vblank correlation",
+      "source": "https://www.kernel.org/doc/html/latest/gpu/drm-uapi.html#display-crc-support",
+      "local_results": "summary/state interfaces present; retained test14/test15 logs have no matching FIFO/underflow/bus/IOMMU errors",
+      "CRC_limit": "CRC control/data files exist but control source lists are empty; exact factory set_crc_source calls analogix_dp_start_crc/stop_crc, no get_crc_sources function. Do not treat this as usable HDMI output CRC.",
+      "can_distinguish": "Video plane disappears/changes buffer or scanout faults while HDMI remains connected; pipeline-level black versus receiver resync remains unproven without a qualified output sampling point"
+    },
+    {
+      "priority": 4,
+      "direction": "VTEM packet update atomicity / transmitted-packet integrity",
+      "source": "https://www.mail-archive.com/dri-devel@lists.freedesktop.org/msg637964.html",
+      "source_status": "Sashiko automated RFC review; no maintainer-confirmed defect or accepted repair established",
+      "local_audit": "Writer updates eight words while VTEM enabled. But normal staged M_CONST and Next_TFR changes occur separately: all 34 test14 transition records show zero simultaneous changes of both variable words, lowering applicability of the generic multi-field tearing concern.",
+      "next_evidence": "Hardware packet-latch/scheduler semantics or qualified HDMI analyzer; final register readback is insufficient",
+      "do_not": "Blindly disable/re-enable VTEM each update; that can itself interrupt QMS signaling"
+    }
+  ],
+  "rejected_generic_lead": {
+    "source": "https://lists.infradead.org/pipermail/linux-arm-kernel/2025-August/1055755.html",
+    "reason": "Timer-base patch addresses RK3576 reference-clock difference affecting CEC; it explicitly identifies old constant as matching RK3588. No evidence it fixes this QMS blackout."
+  },
+  "physical_HDMI_blackout_fixed": false,
+  "new_blackout_acceptance_performed": false,
+  "direct_HDMI1_audit": {
+    "EDID_sysfs_matches_native_DDC_four_blocks": true,
+    "EDID_blocks_2_3_repeat_0_1": true,
+    "all_block_checksums_valid": true,
+    "block_map_declared_extensions_missing": true,
+    "factory_status": "DVI at 4K60 RGB8",
+    "original_Image_QP_code": "Segment pointer lacks shift7; read command lacks is_segment selection of EXT_READ",
+    "upstream_reference": "https://lkml.iu.edu/2406.0/06496.html",
+    "vendor_commit_identified_in_developer_email": "cdc0984c90dc",
+    "repair_installed": false,
+    "direct_picture_restored": false,
+    "relation_to_prior_matrix_blackout": "Not established",
+    "runtime_state": "QMS and display_policy config off; factory Mali KMD; differs from previous qualified boot; not changed by this read-only investigation"
+  }
+}

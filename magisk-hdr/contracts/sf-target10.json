@@ -1,0 +1,10 @@
+{
+  "status": "EXPERIMENTAL_NOT_YET_INSTALLED",
+  "factory_sha256": "fddde345b957a0898c44cf1c62d23e9736d98d246e46bb3f39244c0e7d6b0d1a",
+  "candidate_sha256": "a6f27121a627b42f53066756262312b3afe80800271afe14e57923081a72929f",
+  "recipe": "sf-target10-arm64.tsv",
+  "SF_ABI": "API32 ARM64 pinned RenderSurface dataspace virtual slot; original physical initialization format1; Composer2.1",
+  "source": "Local physical target format adaptation; not whole SF or Composer upgrade",
+  "reference": "https://android.googlesource.com/platform/frameworks/native/+/android-12.1.0_r11/services/surfaceflinger/CompositionEngine/src/RenderSurface.cpp",
+  "scope": "PQ/HLG physical target RGBA1010102; SDR restores pinned originalRGBA8888; virtual windows unchanged; original window calls, ownership and fences retained"
+}
