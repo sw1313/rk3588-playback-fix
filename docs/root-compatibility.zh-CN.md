@@ -1,6 +1,6 @@
 # Root 兼容策略：按接口能力，不按版本名单
 
-当前工作区候选为 **Mali Global 0.4.4-compat2**。普通 Decode／Mali 用户态继续无 root 品牌／版本白名单；首次绑定也已移除逐版本及官方 root 二进制哈希准入。稳定版、测试版、Canary 和本机重编译版本使用同一套接口／布局检查，不需要登记版本号。
+当前正式版为 **Mali Global 0.4.4（项目 v0.8.8）**。普通 Decode／Mali 用户态继续无 root 品牌／版本白名单；首次绑定也已移除逐版本及官方 root 二进制哈希准入。稳定版、测试版、Canary 和本机重编译版本使用同一套接口／布局检查，不需要登记版本号。
 
 ## 检查什么
 
@@ -30,4 +30,4 @@ CLI 输出和 ELF 标记只验证启动所需前提，不能静态证明所有�
 - [AnyKernel3](https://github.com/osm0sis/AnyKernel3)：基于本机 boot／ramdisk 最小修改并保留本机内容。
 - [Magisk 启动／overlay 文档](https://topjohnwu.github.io/Magisk/guides.html#boot-scripts)：启动阶段与动态 MAGISKTMP 路径。当前内部回调依赖仍需首次启动实际验收。
 
-本地仅参考接口与设计，没有复制这些项目代码。官方载荷的固定摘要现仅放在 `tools/tests/data/magisk-upstream-fixtures.json`，用于可复现回归输入，模块和准备工具均不读取这份测试数据。验证结果与边界见 `docs/validation/root-interface-compat-044.json`；正式 v0.8.7 附件不被候选覆盖。
+本地仅参考接口与设计，没有复制这些项目代码。官方载荷的固定摘要现仅放在 `tools/tests/data/magisk-upstream-fixtures.json`，用于可复现回归输入，模块和准备工具均不读取这份测试数据。验证结果与边界见 `docs/validation/root-interface-compat-044.json`，其中版本号及未发布标记保留测试当时的历史状态。正式化仅更新版本、文档和来源元数据，运行文件保持原字节；发布对照见 `docs/validation/release-0.8.8.json`。历史 v0.8.7 附件保留。

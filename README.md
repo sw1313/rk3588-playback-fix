@@ -1,4 +1,4 @@
-# RK3588 Playback Fix · v0.8.7
+# RK3588 Playback Fix · v0.8.8
 
 **RK3588 playback, display and game graphics upgrades — per-feature controls and rollback.**
 
@@ -6,11 +6,13 @@ Reversible upgrades for **RK3588 playback and game graphics**: a system decode/d
 
 The project has grown from a Yamby HW+ helper and fixed-60Hz workaround into coordinated system modules: Decode Stack handles decoding, buffer transfer and HDMI/HDR; Mali Global handles GPU userspace, matched kernel/CSF and response/stability policies. The LSPosed client remains responsible for supported app-specific format and seek repairs. System modules target exact firmware, with independent selections and reboot rollback. The repository name is retained for existing links and updates.
 
+**0.8.8 updates Mali Global to 0.4.4: root compatibility checks actual interfaces and local boot layout, without root-version or official binary-hash whitelists.** Firmware/ABI and per-user boot backup/rollback guards remain. Existing Magisk 30.7 passed physical installation and reboot; other variants have offline coverage only. KernelSU/APatch first-binding adapters are not implemented. [Compatibility scope](docs/root-compatibility.zh-CN.md). Decode and the client retain their prior packages.
+
 **0.8.7 updates Mali Global to 0.4.3: strict firmware-component boot checks accept supported local root packaging differences while preserving per-device backups and rollback guards. Target first binding, full-module rollback and re-enable passed.** [Compatibility boundaries](magisk-mali-global/boot/README.md). Decode and the client retain their prior packages.
 
 **The main 0.8.6 change keeps the matched video frame-rate request across pause, resume and same-video seeking in Auto**, avoiding unnecessary returns to the desktop refresh rate. The specified Exo scenario passed user feedback on the physical HDMI display. Native queue errors and MKV seeking back to the beginning have separate repairs and acceptance records.
 
-[Downloads and SHA256](DOWNLOADS.md) · [Release](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.8.7) · [详细中文说明](README.zh-CN.md) · [Release notes](docs/release-0.8.7.zh-CN.md)
+[Downloads and SHA256](DOWNLOADS.md) · [Release](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.8.8) · [详细中文说明](README.zh-CN.md) · [Release notes](docs/release-0.8.8.zh-CN.md)
 
 ## Supported hardware and prerequisites
 
@@ -28,7 +30,7 @@ Ordinary installers do not whitelist a root brand/version. The current pre-graph
 | Component | Included version | Purpose and installation |
 | --- | --- | --- |
 | [Decode Stack](magisk-decode/README.md) | **0.8.6** | Magisk system module: decoding, buffer transfer, ten-bit/HDR, display compatibility, matched-rate retention and optional QMS |
-| [Mali Global](magisk-mali-global/README.md) | **0.4.3** | Magisk GPU module: global ARM32/ARM64 g18p0 userspace, optional paired kernel/CSF, DVFS and synchronization stability |
+| [Mali Global](magisk-mali-global/README.md) | **0.4.4** | Magisk GPU module: global ARM32/ARM64 g18p0 userspace, optional paired kernel/CSF, DVFS and synchronization stability |
 | Yamby/mpv LSPosed client | **0.3.7** | APK: HW+ settings, optional edge compensation, guarded Main10 HW copy-back and MKV seek-index repair |
 | [PanVK in-app driver](panvk/README.md) | **RC3 Test8.1, optional experimental** | Import in the supported application's driver manager; not a Magisk module or global Mali replacement |
 

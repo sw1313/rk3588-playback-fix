@@ -1,6 +1,6 @@
 id=rk3588_mali_global
 name=RK3588 Native Mali Global Upgrade
-version=0.4.4-compat2
-versionCode=429
+version=0.4.4
+versionCode=430
 author=sw1313
-description=Firmware-specific RK3588 g18 upgrade. Root compatibility candidate: ordinary features have no root-brand/version whitelist; first-binding checks local layout and required startup interfaces without root version or binary-hash whitelists. Other root boot backends remain separate.
+description=Firmware-specific RK3588 g18 GPU/KMD/CSF upgrade. Root compatibility uses actual interfaces and local boot layout, without root version or official binary-hash whitelists. Firmware/ABI and per-device rollback guards remain. First binding uses the qualified Magisk adapter; other root boot backends are not included.

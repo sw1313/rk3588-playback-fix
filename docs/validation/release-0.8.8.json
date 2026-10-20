@@ -1,0 +1,123 @@
+{
+  "project_release": "v0.8.8",
+  "component": "Mali Global 0.4.4",
+  "date": "2026-10-21",
+  "status": "FORMAL_FIRMWARE_PINNED_ROOT_INTERFACE_RELEASE",
+  "public_release": true,
+  "root_admission": "interface_and_local_layout",
+  "root_version_whitelist": false,
+  "root_binary_hash_whitelist": false,
+  "tested_input": {
+    "version": "0.4.4-compat2",
+    "sha256": "b249a792052d6dba716009261f6f424408846499b772f949f8732a738ffd3ca8",
+    "evidence": "docs/validation/root-interface-compat-044.json"
+  },
+  "formal_package": {
+    "filename": "rk3588-mali-global-0.4.4.zip",
+    "sha256": "5a966f361265672c87f031f03b2f5d13f3d5b3e188418d3f05d4a0b49c16430a",
+    "changed_files": [
+      "OPEN_SOURCE.json",
+      "README.md",
+      "SOURCE_CODE.md",
+      "SOURCE_CODE.zh-CN.md",
+      "VALIDATION.json",
+      "boot/README.md",
+      "checksums.sha256",
+      "module.prop",
+      "webroot/index.html"
+    ],
+    "runtime_files_compared": 36,
+    "all_runtime_files_byte_identical": true,
+    "package_checksum_entries": 133,
+    "version_code": 430,
+    "source_ref": "v0.8.8"
+  },
+  "actual_device_acceptance_inherited_from_identical_runtime": {
+    "root": "existing Magisk 30.7; not changed",
+    "candidate_full_installer": true,
+    "arm32_arm64_gles_vulkan_readback": true,
+    "candidate_reboot_first_binding_and_qualification": true,
+    "boot_partition_unchanged": true,
+    "native_keeper_gpu_kmd_csf_bytes_unchanged": true,
+    "mali_csf_fence_dvfs_qms_refresh_session_active": true,
+    "external_zygisk_both_abis_lsposed_preserved": true,
+    "all_original_module_flags_and_selections_preserved": true,
+    "auto_hdr_preserved": true,
+    "webui_pending_reboot": false,
+    "frame_guard": "disabled and paused",
+    "player_input_or_capture": false
+  },
+  "metadata_only_formalization": true,
+  "additional_formal_package_device_reboot": false,
+  "native_keeper_sha256": "ba28daffe3cd1fc6511d0d132c07b16e39546eb52ccde12b9d0fd35a2b9f2eac",
+  "offline_checks": {
+    "upstream_and_local_root_cases": 44,
+    "upstream_input_versions": [
+      "26.4",
+      "27.0",
+      "28.1",
+      "29.0",
+      "30.6",
+      "30.7",
+      "31.0 prerelease"
+    ],
+    "existing_real_image_regression_cases": 37,
+    "native_sha256_vectors": 13,
+    "android_inert_staging_cases": 14,
+    "android_inert_state_cases": 64,
+    "browser_cases": 41,
+    "actual_live_readonly_interface_probe": true
+  },
+  "all_installer_checks_passed": true,
+  "installers": [
+    {
+      "component": "decode-stack",
+      "version": "0.8.6",
+      "documents": 7,
+      "license_texts_checked": 23,
+      "checksum_entries_checked": 622,
+      "passed": true
+    },
+    {
+      "component": "mali-global",
+      "version": "0.4.4",
+      "documents": 7,
+      "license_texts_checked": 1,
+      "checksum_entries_checked": 133,
+      "passed": true
+    },
+    {
+      "component": "yamby-mpv-plugin",
+      "version": "0.3.7",
+      "documents": 7,
+      "license_texts_checked": 1,
+      "checksum_entries_checked": 0,
+      "passed": true
+    },
+    {
+      "component": "panvk-app",
+      "version": "0.1.0-rc3-rk3588-a12-test8.1",
+      "documents": 7,
+      "license_texts_checked": 1,
+      "checksum_entries_checked": 50,
+      "passed": true
+    }
+  ],
+  "new_root_variants_physically_booted": false,
+  "kernelsu_apatch_first_binding_backend_implemented": false,
+  "carried_unchanged": {
+    "decode-stack": "v0.8.6 / 0.8.6",
+    "yamby-mpv-plugin": "v0.8.6 / 0.3.7",
+    "panvk-app": "v0.6.9 / Test8.1"
+  },
+  "frameguard": "Omitted; remains disabled and paused on accepted target",
+  "new_playback_game_hdr_or_blackout_acceptance": false,
+  "source_archive": "Tracked source at release commit only; excludes AGENTS.md and dist/private inputs",
+  "limitations": [
+    "ELF/CLI indicators establish prerequisites, not proof of all future boot-stage semantics",
+    "Each first-binding private image still requires actual boot qualification and rollback preparation",
+    "KernelSU/APatch ordinary module admission is root-neutral; actual mounting and ABI remain required",
+    "Unknown early root hooks and recovery/vendor_boot layouts require separate adaptation",
+    "No new gameplay/HDR/HDMI blackout certification"
+  ]
+}

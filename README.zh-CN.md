@@ -1,4 +1,4 @@
-# RK3588 Playback Fix · v0.8.7
+# RK3588 Playback Fix · v0.8.8
 
 **RK3588 播放、显示与游戏图形升级——分项控制，可回退。**
 
@@ -6,11 +6,13 @@
 
 项目已从早期的 Yamby HW+ 设置补全和固定 60Hz 规避，发展为系统组件协同升级：Decode Stack 负责解码、缓冲传递、HDMI／HDR；Mali Global 负责 GPU 用户态、配套内核／CSF 和响应／稳定性优化；LSPosed 客户端负责已适配应用的格式与索引修复。系统模块严格匹配固件，保留独立选择及重启回退。仓库名称沿用，方便旧链接和更新继续使用。
 
+**0.8.8 正式版更新 Mali Global 0.4.4：root 兼容改按实际接口与本机启动布局判断，不再依赖版本号或官方 root 二进制哈希白名单。** 保留固件／ABI、个人 boot 备份与回退保护。当前 Magisk 30.7 已实机安装重启；其他版本仅离线回归，KernelSU／APatch 专用首次绑定后端尚未实现。[兼容范围](docs/root-compatibility.zh-CN.md)。Decode 与客户端保持原包。
+
 **0.8.7 正式版更新 Mali Global 0.4.3：启动适配按固件组件严格验证，允许受支持的本机 root 打包差异，保留个人原 boot 和回退保护。实机首次绑定、整包回退与重新启用已通过。** [验证边界](magisk-mali-global/boot/README.md)。Decode 与客户端保持原包。
 
 **0.8.6 正式版的主要变化：Auto 下保留已匹配的视频帧率，减少 Exo 播放器暂停、恢复、同片快进时不必要的显示模式切换。** 指定 Exo 场景已由用户在 HDMI 实际显示器上确认通过。原生队列报错与 MKV 快进回片头另有独立修复，三项不混算。
 
-[下载与 SHA256](DOWNLOADS.md) · [正式发布页](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.8.7) · [English](README.md) · [版本说明](docs/release-0.8.7.zh-CN.md)
+[下载与 SHA256](DOWNLOADS.md) · [正式发布页](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.8.8) · [English](README.md) · [版本说明](docs/release-0.8.8.zh-CN.md)
 
 ## 适用设备与安装前提
 
@@ -28,7 +30,7 @@
 | 组件 | 正式版内版本 | 用途与安装位置 |
 | --- | --- | --- |
 | [Decode Stack](magisk-decode/README.md) | **0.8.6** | Magisk 系统模块：解码、缓冲传递、十位／HDR、显示兼容、帧率保留及可选 QMS |
-| [Mali Global](magisk-mali-global/README.md) | **0.4.3** | Magisk 全局 GPU 模块：32／64 位 g18p0 用户态，可选配套内核／CSF、DVFS 与同步稳定性 |
+| [Mali Global](magisk-mali-global/README.md) | **0.4.4** | Magisk 全局 GPU 模块：32／64 位 g18p0 用户态，可选配套内核／CSF、DVFS 与同步稳定性 |
 | Yamby／mpv LSPosed 客户端 | **0.3.7** | APK：HW+ 设置补全、可选灰边修正、匹配客户端的 Main10 HW 回读及 MKV 快进索引修复 |
 | [PanVK 应用内驱动](panvk/README.md) | **RC3 Test8.1，实验可选** | 在已适配应用的驱动管理器导入 ZIP；不在 Magisk 安装，不替换全局 Mali |
 

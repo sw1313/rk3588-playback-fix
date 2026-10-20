@@ -51,10 +51,13 @@ def main():
     stage_licenses(out,'mali-global',source_ref=a.source_ref)
     version=dict(line.split('=',1) for line in (out/'module.prop').read_text().splitlines() if '=' in line)['version']
     evidence=json.loads((ROOT/'docs/validation/mali-boot-compat-043.json').read_text(encoding='utf-8'))
+    root_evidence=json.loads((ROOT/'docs/validation/root-interface-compat-044.json').read_text(encoding='utf-8'))
     formal=a.source_ref!='working-tree'
     if formal:
-        require(a.source_ref=='v0.8.7' and version=='0.4.3','Formal source tag/version differs')
+        require(a.source_ref=='v0.8.8' and version=='0.4.4','Formal source tag/version differs')
         require(evidence['new_first_binding_acceptance'] is True,'Actual first-binding acceptance missing')
+        require(root_evidence['actual_device']['candidate_full_installer'] is True,'Root-interface installer acceptance missing')
+        require(root_evidence['actual_device']['candidate_reboot_first_binding_and_qualification'] is True,'Root-interface reboot acceptance missing')
         require(sha(out/'bin/cold_boot64')==evidence['tested_qms_keeper_sha256'],'Formal keeper differs from actual tested keeper')
         require(a.qms_barrier,'The accepted formal package includes Decode startup coordination')
     validation={'component':'mali-global','version':version,
@@ -63,7 +66,7 @@ def main():
                 'new_first_binding_acceptance':evidence['new_first_binding_acceptance'] if formal else False,
                 'native_keeper_prior_hardware_acceptance':sha(out/'bin/cold_boot64')==evidence['tested_qms_keeper_sha256'],
                 'hardware_scope':'See version-specific evidence; existing keeper hardware acceptance does not certify new root implementations',
-                'evidence':'docs/validation/mali-boot-compat-043.json' if formal else 'docs/validation/root-interface-compat-044.json',
+                'evidence':'docs/validation/release-0.8.8.json' if formal else 'docs/validation/root-interface-compat-044.json',
                 'qms_barrier_included':a.qms_barrier,'keeper_sha256':sha(out/'bin/cold_boot64'),'source_ref':a.source_ref}
     validation.update(root_admission='interface_and_local_layout',root_version_whitelist=False,
                       root_binary_hash_whitelist=False,new_root_variant_hardware_acceptance=False,
