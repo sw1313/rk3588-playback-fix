@@ -1,5 +1,9 @@
 # RK3588 Decode Stack 0.8.6
 
+项目的系统播放与显示升级模块，负责 Codec2／MPP／RGA 配套、AFBC 与缓冲传递、十位 HDR 合成输出、HDMI 兼容和内容帧率管理。按固件精确适配、分项选择、重启应用及回退；GPU 驱动升级归 Mali Global，应用特定的格式／索引修复归 LSPosed 客户端。[完整安装与功能说明](../README.zh-CN.md)。
+
+System playback/display upgrades: codec and buffer paths, AFBC, ten-bit HDR, HDMI compatibility and content-rate management. Exact firmware required, with per-feature reboot rollback. GPU drivers and app-specific repairs are managed by the separate Mali Global and LSPosed components. [Full English guide](../README.md).
+
 按用途提供“播放基础、原生播放稳定性、AV1、十位画质与 HDR、显示兼容与合成”组合，也可展开逐项选择。保留既有配置，启用时补齐依赖，修改后重启。关闭分项恢复对应旧路径，关闭整包并重启恢复原固件。
 
 本版在 Auto 下保留已匹配的片源帧率，避免同一视频暂停／恢复／快进时反复切回桌面刷新率。实现位于系统 SurfaceFlinger 图层入口，覆盖旧 Binder 与 BLAST 事务；不是某个播放器的 LSPosed 帧率钩子。指定 Exo 场景的实际命中和 HDMI 实屏已由用户确认。新的正数片源请求仍更新，隐藏或删除图层不再参与原生选模。[验收与适用范围](../docs/decode-refresh-session-086.zh-CN.md)。

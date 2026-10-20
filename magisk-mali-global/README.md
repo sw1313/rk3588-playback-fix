@@ -1,4 +1,10 @@
-# 当前功能与验证范围
+# Mali Global 0.4.2 · GPU 驱动与游戏图形升级
+
+项目的全局 GPU 升级模块，负责 32／64 位 Mali g18p0 用户态、匹配内核／CSF、图形服务前首次绑定、DVFS 响应和 CSF 同步稳定性。严格匹配固件并保留分项控制与重启回退。系统解码、HDR 和 HDMI 修复归 Decode Stack；游戏收益按具体场景验收。[完整安装与功能说明](../README.zh-CN.md)。
+
+Global GPU upgrades: ARM32/ARM64 Mali g18p0 userspace, paired kernel/CSF, pre-graphics first binding, DVFS response and synchronization stability. Exact firmware required, with independent controls and reboot rollback. Per-game performance remains separately measured; Decode Stack manages playback/display repairs. [Full English guide](../README.md).
+
+## 当前功能与验证范围
 
 当前设备保持 g18 用户态／配套内核与 CSF，首次绑定在图形服务前完成；DVFS、Zygisk Next 和 LSPosed 双 ABI 正常。新版 WebUI 说明已按实际证据更新，不再用笼统“实验”代替范围：首次绑定有匹配固件启动／回退记录，CSF fence 有追踪与回退记录，DVFS 有有界 GLES 负载和回退记录。《传奇四叶草》与 Eden 的持续帧时间、功耗和温度仍需实际对照，不能承诺所有游戏提升。
 

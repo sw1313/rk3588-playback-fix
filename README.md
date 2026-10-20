@@ -1,6 +1,10 @@
 # RK3588 Playback Fix · v0.8.6
 
+**RK3588 playback, display and game graphics upgrades — per-feature controls and rollback.**
+
 Reversible upgrades for **RK3588 playback and game graphics**: a system decode/display stack, global Mali driver module, LSPosed player client, and optional refresh-rate workaround and in-app Vulkan driver. Install the components you need; enabling everything is not required.
+
+The project has grown from a Yamby HW+ helper and fixed-60Hz workaround into coordinated system modules: Decode Stack handles decoding, buffer transfer and HDMI/HDR; Mali Global handles GPU userspace, matched kernel/CSF and response/stability policies. The LSPosed client remains responsible for supported app-specific format and seek repairs. System modules target exact firmware, with independent selections and reboot rollback. The repository name is retained for existing links and updates.
 
 **The main 0.8.6 change keeps the matched video frame-rate request across pause, resume and same-video seeking in Auto**, avoiding unnecessary returns to the desktop refresh rate. The specified Exo scenario passed user feedback on the physical HDMI display. Native queue errors and MKV seeking back to the beginning have separate repairs and acceptance records.
 
