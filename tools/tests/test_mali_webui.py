@@ -3,8 +3,8 @@ from pathlib import Path
 import argparse,json,shlex,subprocess,tempfile
 ROOT=Path(__file__).resolve().parents[2]
 def main():
- p=argparse.ArgumentParser();p.add_argument('--adb',default='adb');p.add_argument('--serial');a=p.parse_args()
- adb=[a.adb]+(['-s',a.serial] if a.serial else [])
+ p=argparse.ArgumentParser();p.add_argument('--adb',default='adb');p.add_argument('--serial');p.add_argument('--adb-port',default='5037');a=p.parse_args()
+ adb=[a.adb,'-P',a.adb_port]+(['-s',a.serial] if a.serial else [])
  fixture='/data/local/tmp/rk-mali-ui-test068';current=fixture+'/modules/rk3588_mali_global';staged=fixture+'/modules_update/rk3588_mali_global';state=fixture+'/state'
  def shell(s):return subprocess.run(adb+['shell',s],capture_output=True,text=True,encoding='utf-8',errors='replace',check=True).stdout
  def put(path,text):
@@ -19,12 +19,17 @@ def main():
  def invoke(*args):return json.loads(shell('sh '+current+'/webui.sh '+' '.join(shlex.quote(x) for x in args)))
  shell('test ! -e '+fixture+' && mkdir -p '+current+' '+staged+' '+state)
  try:
-  for name in ['kernel-state.sh','cold-state.sh','dvfs-state.sh','fence-state.sh','dvfs-boot.sh','mode-control.sh','webui.sh','module.prop']:
+  for name in ['kernel-state.sh','cold-state.sh','root-startup.sh','dvfs-state.sh','fence-state.sh','dvfs-boot.sh','mode-control.sh','webui.sh','module.prop']:
    text=(ROOT/'magisk-mali-global'/name).read_text(encoding='utf-8')
    text=text.replace('/data/adb/modules_update',fixture+'/modules_update').replace('/data/adb/modules',fixture+'/modules').replace('/data/adb/rk3588-mali-global',state)
    text=text.replace('/sys/class/devfreq/fb000000.gpu',fixture+'/devfreq').replace('/sys/module/rk_mali_next/parameters/csf_fence_safe',state+'/fence-actual')
    if name=='kernel-state.sh':text+='\nkernel_supported(){ [ "$(cat '+state+'/supported)" = yes ]; }\nkernel_active(){ cat '+state+'/actual-kernel; }\n'
+   if name=='root-startup.sh':text+='\ntimeout(){ shift; \"$@\"; }\nmagisk(){ case \"$1\" in --help) cat '+state+'/root-help;; --path) echo '+state+'/root-tmp;; *) return 1;; esac; }\n'
    put(current+'/'+name,text)
+  shell('mkdir -p '+state+'/root-tmp')
+  put(state+'/root-tmp/magisk','#!/system/bin/sh\nexit 0\n');shell('chmod 0700 '+state+'/root-tmp/magisk')
+  put(state+'/root-help','--post-fs-data --path\n')
+  put(state+'/root-api','30700\n')
   put(state+'/supported','yes\n');put(state+'/actual-kernel','stock\n');put(state+'/mode','on\n');put(state+'/kernel-mode','stock\n')
   shell('mkdir -p '+fixture+'/devfreq')
   put(fixture+'/devfreq/governor','simple_ondemand\n');put(fixture+'/devfreq/polling_interval','100\n')
@@ -88,6 +93,16 @@ def main():
   expect(bad.returncode!=0 and invoke('status')['coldRequested']=='off','cold requires a private verified candidate')
   put(state+'/boot/profile','profile_id '+'a'*64+'\n');put(state+'/prepared','yes\n')
   s=invoke('cold','on');expect(s['coldPrepared'] and s['coldRequested']=='on' and s['kernelRequested']=='next' and s['requested']=='on','cold links userspace and KMD ancestors')
+  put(state+'/root-api','30600\n');expect(invoke('status')['coldPrepared'],'root version is never queried or matched to a whitelist')
+  put(state+'/root-api','30700\n')
+  put(state+'/root-help','--[init trigger] post-fs-data service --path\n')
+  expect(invoke('status')['coldPrepared'],'grouped callback help is compatible')
+  put(state+'/root-help','--path\n');missing=invoke('status')
+  expect(not missing['coldPrepared'] and missing['effective']=='on' and missing['rootStartup']=='startup_command_interfaces_missing','missing early interface isolates only its feature')
+  put(state+'/root-help','--post-fs-data --path\n')
+  for env in ['KSU=true','APATCH=true']:
+   other=json.loads(shell(env+' sh '+current+'/webui.sh status'))
+   expect(other['rootStartup']=='other_root_backend' and not other['coldPrepared'] and other['effective']=='on','other root isolates boot backend, retaining ordinary userspace')
   expect(s['coldActive']=='off' and s['coldEffective']=='on' and s['pendingReboot'],'cold save never changes current backend')
   s=invoke('cold','off');expect(s['coldRequested']=='off' and s['kernelRequested']=='stock','cold off restores original KMD selection')
   put(state+'/fail-apply','yes\n')
@@ -113,7 +128,7 @@ def main():
   put(state+'/fail-apply','yes\n');bad=subprocess.run(adb+['shell','sh '+current+'/webui.sh fence on'],capture_output=True)
   expect(bad.returncode!=0 and invoke('status')['fenceRequested']=='off','failed boot apply never enables fence leaf');shell('rm '+state+'/fail-apply')
   put(staged+'/module.prop','id=rk3588_mali_global\nversion=0.3.1\n')
-  for name in ['kernel-state.sh','cold-state.sh','dvfs-state.sh','fence-state.sh','mode-control.sh']:put(staged+'/'+name,shell('cat '+current+'/'+name))
+  for name in ['kernel-state.sh','cold-state.sh','root-startup.sh','dvfs-state.sh','fence-state.sh','mode-control.sh']:put(staged+'/'+name,shell('cat '+current+'/'+name))
   s=invoke('status');expect(s['staged'] and s['version']=='0.3.1' and s['activeVersion']==version and s['pendingReboot'],'staged update is distinguished from current boot')
   for args in [('fence','on;id'),('fence','on','extra'),('fence','bogus'),('kernel','next;id'),('cold','on;id'),('cold','on','extra'),('dvfs','on;id'),('dvfs','on','extra'),('set','on','extra'),('status','extra'),('unknown',)]:
    result=subprocess.run(adb+['shell','sh '+current+'/webui.sh '+' '.join(shlex.quote(x) for x in args)],capture_output=True)

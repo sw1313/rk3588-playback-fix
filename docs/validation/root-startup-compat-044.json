@@ -1,0 +1,51 @@
+{
+  "component": "mali-global",
+  "version": "0.4.4-compat1",
+  "date": "2026-10-21",
+  "status": "UNRELEASED_RELAXED_ROOT_COMPATIBILITY_CANDIDATE",
+  "ordinary_module_root_brand_or_version_gate": false,
+  "pregraphics_backend": "Recognized official Magisk implementation tuples with preserved local ramdisk",
+  "recognized_root_versions": [
+    "26.4",
+    "27.0",
+    "28.1",
+    "29.0",
+    "30.6",
+    "30.7"
+  ],
+  "changes": [
+    "Multiple complete upstream root implementation tuples instead of one personal root build",
+    "Old boot-root VENDORBOOT omission normalized for appropriate profiles",
+    "Legacy ARM32 root executable optional with ARM64 root retained",
+    "Other root backends isolate only first-binding availability",
+    "WebUI distinguishes missing backend from unprepared private image"
+  ],
+  "retained_guards": [
+    "firmware kernel and DTB identity",
+    "graphics and kernel ABI",
+    "native payload ownership and permissions",
+    "mixed/altered root payload refusal",
+    "original per-user backup identity",
+    "foreign boot overwrite refusal",
+    "no automatic late GPU handover"
+  ],
+  "checks": {
+    "official_payload_real_firmware_offline_cases": 20,
+    "existing_real_image_regression_cases": 37,
+    "native_sha_vectors": 13,
+    "actual_android_inert_staging_cases": 12,
+    "actual_android_shell_state_cases": 62,
+    "browser_cases": 41
+  },
+  "new_root_versions_physically_booted": false,
+  "kernelsu_apatch_first_binding_supported": false,
+  "native_keeper_unchanged": true,
+  "gpu_kmd_csf_execution_bytes_unchanged": true,
+  "original_device_root_unchanged": true,
+  "new_boot_write": false,
+  "actual_candidate_install_and_reboot": "passed on existing Magisk 30.7, with unchanged boot/root and preserved module selections",
+  "frameguard": "disabled and paused",
+  "privacy": "Official APK inputs and firmware are private; hashes and source references only in public material",
+  "policy_status": "VERSION_ALLOWLIST_APPROACH_SUPERSEDED_BY_USER_REQUEST_FOR_INTERFACE_BASED_COMPATIBILITY",
+  "public_release": false
+}

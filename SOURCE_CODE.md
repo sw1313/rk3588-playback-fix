@@ -1,3 +1,9 @@
+# Working-tree root interface candidate: Mali 0.4.4-compat2
+
+Root admission uses actual command/runtime interfaces and preserved local boot layout. There is no root version or upstream binary-hash whitelist in `root-startup.sh` or `tools/cold-boot/prepare.py`. Firmware/ABI, original-init and per-user rollback identity guards remain. Upstream APK hashes in `tools/tests/data/magisk-upstream-fixtures.json` are regression inputs only and are never read by runtime/preparation admission.
+
+The native keeper/GPU/KMD/CSF bytes remain unchanged. New root variants are not automatically hardware-qualified. Build the candidate with `tools/build_mali_boot_policy.py --qms-barrier` and default working-tree provenance; do not pass the v0.8.7 source tag for this candidate. See [compatibility boundaries](docs/root-compatibility.zh-CN.md) and `tools/tests/test_root_startup_compat.py --help`. Root/firmware inputs and generated boot images remain private; no root binaries are redistributed.
+
 # Release v0.8.7 · Mali Global 0.4.3 boot validation
 
 本版以固件组件检查代替个人整份 boot 哈希：`magisk-mali-global/contracts/boot-firmware.json` 固定内核、DTB 和关键启动契约，保留本机 root 与个人原件／候选完整性校验。允许差异及拒绝边界见 [启动文档](magisk-mali-global/boot/README.md)，真实安装、首次绑定、整包回退及重新启用见 [验收记录](docs/validation/mali-boot-compat-043.json)。未知内核、DTB、root 方案和冲突启动钩子仍拒绝。

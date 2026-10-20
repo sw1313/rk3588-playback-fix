@@ -69,44 +69,95 @@ def validate_root(records):
         require(name in records and stat.S_ISDIR(records[name][0][1]) and records[name][0][2:4]==[0,0]
                 and not records[name][0][1]&0o022,
                 'Required root directory differs: '+name)
-    for name,expected in CONTRACT['root_records'].items():
-        require(name in records,'Root component missing: '+name)
-        fields,data,_=records[name]
-        mode=fields[1]
-        require(stat.S_ISREG(mode) and fields[2:4]==[0,0] and not mode&0o7022
-                and mode&0o400 and (not expected['mode']&0o100 or mode&0o100),
-                'Root component ownership/mode differs: '+name)
-        if expected['xz']:
+    # Root is a local input, not a public binary/version whitelist. Preserve it
+    # verbatim and qualify the layout/interfaces used by this particular backend.
+    # ELF/string checks establish prerequisites only, never future boot success.
+    digests={}
+    def payload(name,required=True,executable=False):
+        choices=[n for n in (name,name+'.xz') if n in records]
+        require(len(choices)<=1,'Ambiguous root payload: '+name)
+        if not choices:
+            require(not required,'Root backend payload missing: '+name)
+            return None
+        chosen=choices[0];fields,data,_=records[chosen];mode=fields[1]
+        require(stat.S_ISREG(mode) and fields[2:4]==[0,0] and not mode&0o7022,
+                'Root component ownership/mode differs: '+chosen)
+        if chosen.endswith('.xz'):
             dec=lzma.LZMADecompressor()
             data=dec.decompress(data,max_length=64*1024*1024+1)
             require(dec.eof and not dec.unused_data and len(data)<=64*1024*1024,
-                    'Invalid root payload: '+name)
-        require(sha(data)==expected['sha256'],'Unsupported root implementation: '+name)
-    require('.backup/.magisk' in records,'Magisk configuration missing')
+                    'Invalid root payload: '+chosen)
+        elif executable:
+            require(bool(mode&0o100),'Root executable is not executable: '+chosen)
+        digests[chosen]=sha(data)
+        return data
+    def elf(data,label,bits=None):
+        require(data is not None and len(data)>=52 and data[:4]==b'\x7fELF' and
+                data[4] in (1,2) and data[5:7]==b'\x01\x01','Invalid root ELF: '+label)
+        width=data[4];machine=struct.unpack_from('<H',data,18)[0]
+        require(machine==(40 if width==1 else 183) and (bits is None or width==bits),
+                'Root architecture differs: '+label)
+        require(len(data)>=(52 if width==1 else 64) and struct.unpack_from('<H',data,16)[0] in (2,3),
+                'Invalid root ELF type: '+label)
+        phoff=struct.unpack_from('<I' if width==1 else '<Q',data,28 if width==1 else 32)[0]
+        entsize,count=struct.unpack_from('<HH',data,42 if width==1 else 54)
+        require(entsize==(32 if width==1 else 56) and count>0 and phoff>= (52 if width==1 else 64)
+                and phoff+entsize*count<=len(data),'Invalid root ELF program table: '+label)
+        executable_load=False
+        for index in range(count):
+            pos=phoff+index*entsize
+            if struct.unpack_from('<I',data,pos)[0]!=1:continue
+            if width==1:
+                offset,_,_,filesz,memsz,flags=struct.unpack_from('<IIIIII',data,pos+4)
+            else:
+                flags=struct.unpack_from('<I',data,pos+4)[0]
+                offset,_,_,filesz,memsz=struct.unpack_from('<QQQQQ',data,pos+8)
+            require(offset+filesz<=len(data) and memsz>=filesz,'Truncated root ELF segment: '+label)
+            executable_load|=bool(flags&1)
+        require(executable_load,'Root ELF has no executable segment: '+label)
+        return width
+    original_init=payload('.backup/init')
+    require(sha(original_init)==CONTRACT['original_init']['sha256'],
+            'Original firmware init differs')
+    init=payload('init',executable=True);elf(init,'init')
+    require(all(marker in init for marker in (b'overlay.d',b'${MAGISKTMP}',b'post-fs-data')),
+            'Root backend lacks required init overlay interfaces')
+    unified=payload('overlay.d/sbin/magisk',False,True)
+    split64=payload('overlay.d/sbin/magisk64',False,True)
+    split32=payload('overlay.d/sbin/magisk32',False,True)
+    require((unified is None)!=(split64 is None and split32 is None),'Missing or ambiguous Magisk command layout')
+    core=unified if unified is not None else split64 if split64 is not None else split32
+    elf(core,'magisk command')
+    if split64 is not None:elf(split64,'magisk64',2)
+    if split32 is not None:elf(split32,'magisk32',1)
+    require(all(marker in core for marker in (b'post-fs-data',b'--path')),
+            'Root backend lacks required command interfaces')
+    loader=payload('overlay.d/sbin/init-ld',False,True)
+    if loader is not None:elf(loader,'init-ld')
+    require('.backup/.magisk' in records,'Magisk boot configuration missing')
     fields,data,_=records['.backup/.magisk']
-    require(stat.S_ISREG(fields[1]) and fields[2:4]==[0,0] and not fields[1]&0o022,
+    require(stat.S_ISREG(fields[1]) and fields[2:4]==[0,0] and not fields[1]&0o022 and len(data)<=65536,
             'Untrusted Magisk configuration')
     config={}
     for line in data.decode('ascii').splitlines():
+        if not line.strip() or line.lstrip().startswith('#'):continue
         require('=' in line,'Malformed Magisk configuration')
         key,value=line.split('=',1)
-        require(key not in config and key in ('KEEPVERITY','KEEPFORCEENCRYPT','RECOVERYMODE',
-                'VENDORBOOT','PREINITDEVICE','SHA1'),'Unknown/duplicate Magisk setting')
+        require(key not in config and re.fullmatch(r'[A-Z][A-Z0-9_]*',key) is not None,
+                'Malformed/duplicate Magisk setting')
+        require(all(32<=ord(c)<127 for c in value),'Invalid Magisk setting value')
         config[key]=value
+    # Unused new settings are preserved, not interpreted. Missing old flags use
+    # the boot-root defaults; only layouts this adapter cannot handle are refused.
     for key in ('KEEPVERITY','KEEPFORCEENCRYPT','RECOVERYMODE','VENDORBOOT'):
-        require(config.get(key) in ('true','false'),'Invalid Magisk boolean: '+key)
-    require(config['RECOVERYMODE']=='false' and config['VENDORBOOT']=='false',
+        require(config.get(key,'false') in ('true','false'),'Invalid Magisk boolean: '+key)
+    require(config.get('RECOVERYMODE','false')=='false' and config.get('VENDORBOOT','false')=='false',
             'Unsupported recovery/vendor_boot root layout')
-    require(re.fullmatch(r'[0-9a-f]{40}',config.get('SHA1','')) is not None,
-            'Invalid original Magisk SHA1')
-    require(re.fullmatch(r'[A-Za-z0-9_.-]*',config.get('PREINITDEVICE','')) is not None,
-            'Unsupported Magisk preinit device')
+    if 'SHA1' in config:
+        require(re.fullmatch(r'[0-9a-fA-F]{40}',config['SHA1']) is not None,'Invalid original Magisk SHA1')
     for name,(fields,data,_) in records.items():
         require(not name.startswith(('overlay.d/sbin/rk-mali-cold','overlay.d/rk-mali-cold')),
                 'Existing cold-binding overlay; restore it before preparing a new base')
-        require(name not in ('overlay.d/sbin/magisk','overlay.d/sbin/magisk32','overlay.d/sbin/magisk64',
-                             'overlay.d/sbin/magiskinit','overlay.d/sbin/init-ld','overlay.d/sbin/stub'),
-                'Overlay would shadow a supported root executable: '+name)
         require(not (name.endswith('.rc') and not name.startswith('overlay.d/')),
                 'Custom root init script requires separate adaptation: '+name)
         require(not (name.split('/')[0].startswith('fstab') and name not in CONTRACT['ramdisk_firmware_records']),
@@ -120,6 +171,8 @@ def validate_root(records):
                     'Custom early init action requires separate adaptation: '+name)
             require(not re.search(r'(zygote|surfaceflinger|hwcomposer|gralloc|magisk|rk-mali|/sys/.*gpu)',text),
                     'Conflicting graphics/root init hook: '+name)
+    return {'backend':'magisk-overlay-postfs','layout':'unified' if unified is not None else 'split',
+            'payload_digests':digests,'hardware_acceptance':False}
 
 def unpack_boot(b):
     require(b[:8] == b'ANDROID!' and len(b) == 50331648, 'Expected complete 48 MiB Android boot partition')
@@ -174,6 +227,8 @@ def gate(text, name, binary):
 def prepare(original, loader, module, sf, hwc, allocator, zygote, out):
     raw=normalize_boot_image(original.read_bytes())
     head,parts,cmd=validate_firmware(raw)
+    plain,compression=unpack_ramdisk(parts[1]);records,trailer=cpio_records(plain)
+    root=validate_root(records)
     for key,path in [('sf',sf),('hwc',hwc),('allocator',allocator),('zygote',zygote)]:
         require(sha(normalize_service(path.read_text(encoding='utf-8')).encode())==CONTRACT['services_sha256'][key],
                 'Unsupported graphics/zygote service definition: '+key)
@@ -197,7 +252,7 @@ def prepare(original, loader, module, sf, hwc, allocator, zygote, out):
     # and pre-exec SIGSTOP interferes with external Zygisk injection monitors.
     zygote_normalized=normalize_service(zygote.read_text(encoding='utf-8'))
     require('service zygote /system/bin/app_process64' in zygote_normalized and 'service zygote_secondary /system/bin/app_process32' in zygote_normalized,'Expected zygote64_32 definitions')
-    recipe={'profile':values,'keeper_sha256':sha(loader.read_bytes()),'sf':sf_gate,'hwc':hwc_gate,'allocator':allocator_gate,'zygote_definition_sha256':sha(zygote.read_bytes()),'magisk_stage_api':30700,'barrier':'after idempotent Magisk post-fs-data, before original zygote-start actions'}
+    recipe={'profile':values,'keeper_sha256':sha(loader.read_bytes()),'sf':sf_gate,'hwc':hwc_gate,'allocator':allocator_gate,'zygote_definition_sha256':sha(zygote.read_bytes()),'root_startup_contract':root['backend'],'root_layout':root['layout'],'barrier':'after idempotent Magisk post-fs-data, before original zygote-start actions'}
     identity=sha(json.dumps(recipe,sort_keys=True,separators=(',',':')).encode())
     profile='profile_id '+identity+'\n'+''.join(k+' '+v+'\n' for k,v in values.items())
     rc=allocator_gate+'\n'+hwc_gate+'\n'+sf_gate+'''\n# Magisk appends custom rc BEFORE its own post-fs-data action. Dispatch its
@@ -212,8 +267,6 @@ on post-fs-data
     exec_background u:r:magisk:s0 root root -- ${MAGISKTMP}/rk-mali-cold stage ${MAGISKTMP}/rk-mali-cold.profile
     exec u:r:magisk:s0 root root -- ${MAGISKTMP}/rk-mali-cold barrier ${MAGISKTMP}/rk-mali-cold.profile
 '''
-    plain,compression=unpack_ramdisk(parts[1]);records,trailer=cpio_records(plain)
-    validate_root(records)
     additions={'overlay.d/rk-mali-cold.rc':(rc.encode(),0o100644),
                'overlay.d/sbin/rk-mali-cold':(loader.read_bytes(),0o100700),
                'overlay.d/sbin/rk-mali-cold.profile':(profile.encode(),0o100600)}
@@ -244,7 +297,7 @@ on post-fs-data
     (out/'profile').write_text(profile,encoding='ascii',newline='\n')
     (out/'image.sha256').write_text(sha(candidate)+'\n',encoding='ascii')
     (out/'gates.rc').write_text(rc,encoding='ascii',newline='\n')
-    (out/'PREPARED.json').write_text(json.dumps({'status':'UNVALIDATED_PRIVATE_CANDIDATE','profile_id':identity,'candidate_sha256':sha(candidate),'original_sha256':sha(raw),'firmware_contract_sha256':sha(json.dumps(CONTRACT,sort_keys=True).encode()),'root_api':CONTRACT['root_api'],'ramdisk_compression':compression,'unchanged_components':['kernel','second','recovery_dtbo','dtb'],'original_cpio_records_preserved':len(records),'boot_write_performed':False},indent=2)+'\n')
+    (out/'PREPARED.json').write_text(json.dumps({'status':'UNVALIDATED_PRIVATE_CANDIDATE','profile_id':identity,'candidate_sha256':sha(candidate),'original_sha256':sha(raw),'firmware_contract_sha256':sha(json.dumps(CONTRACT,sort_keys=True).encode()),'root_backend':root['backend'],'root_layout':root['layout'],'root_payload_digests':root['payload_digests'],'root_hardware_acceptance':False,'ramdisk_compression':compression,'unchanged_components':['kernel','second','recovery_dtbo','dtb'],'original_cpio_records_preserved':len(records),'boot_write_performed':False},indent=2)+'\n')
     return identity
 
 if __name__=='__main__':

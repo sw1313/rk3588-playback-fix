@@ -11,7 +11,8 @@ for digest in "$1" "$2";do
 done
 [ ! -L "$STATE" ] && [ ! -L "$INPUT" ] && [ -d "$INPUT" ] || exit 3
 [ ! -e "$STATE/boot" ] || { echo 'Existing boot store retained; replacement requires explicit review.';exit 4; }
-[ "$(magisk -V)" = 30700 ] || { echo 'Unsupported root startup API';exit 5; }
+. "$MODDIR/root-startup.sh"
+root_startup_supported || { echo "First-binding backend unavailable: $(root_startup_reason). Ordinary module features remain separately available.";exit 5; }
 sh "$MODDIR/platform-check.sh" >/dev/null 2>&1 || { echo 'Firmware graphics dependencies differ';exit 5; }
 [ ! -L "$INPUT/profile" ] && [ -f "$INPUT/profile" ] || exit 5
 [ "$(sha256sum "$INPUT/profile" | cut -d ' ' -f 1)" = "$2" ] || exit 5

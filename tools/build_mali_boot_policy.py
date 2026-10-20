@@ -33,9 +33,9 @@ def main():
     for row in (out/'checksums.sha256').read_text().splitlines():
         expected,name=row.split(None,1);require(sha(out/name.strip())==expected,'Base package checksum differs')
     subprocess.run([sys.executable,ROOT/'tools/cold-boot/generate_contract.py','--check'],check=True)
-    changed=['module.prop','boot-stage.sh','boot/README.md','README.md','src/cold_boot.c',
+    changed=['module.prop','boot-stage.sh','cold-state.sh','root-startup.sh','boot/README.md','README.md','src/cold_boot.c',
              'src/cold_sha256.h','src/cold_firmware.h','src/cold_firmware_contract.h','contracts/boot-firmware.json',
-             'webroot/index.html','webroot/i18n.js']
+             'webui.sh','webroot/app.js','webroot/index.html','webroot/i18n.js']
     for name in changed:
         target=out/name;target.parent.mkdir(parents=True,exist_ok=True)
         target.write_bytes((ROOT/'magisk-mali-global'/name).read_bytes().replace(b'\r\n',b'\n'))
@@ -46,6 +46,7 @@ def main():
                     '-ffile-prefix-map='+ROOT.as_posix()+'=/src',str(ROOT/'magisk-mali-global/src/cold_boot.c'),
                     '-Wl,-z,relro,-z,now','-o',str(out/'bin/cold_boot64')],check=True)
     names=[row.split(None,1)[1].strip() for row in (out/'kernel.sha256').read_text().splitlines()]
+    names+=['root-startup.sh']
     (out/'kernel.sha256').write_text(''.join(sha(out/n)+'  '+n+'\n' for n in names),encoding='utf-8',newline='\n')
     stage_licenses(out,'mali-global',source_ref=a.source_ref)
     version=dict(line.split('=',1) for line in (out/'module.prop').read_text().splitlines() if '=' in line)['version']
@@ -59,10 +60,14 @@ def main():
     validation={'component':'mali-global','version':version,
                 'status':'FIRMWARE_PINNED_RELEASE' if formal else 'UNRELEASED_BOOT_COMPATIBILITY_CANDIDATE',
                 'base_release_sha256':BASE_SHA,'gpu_kmd_csf_unchanged':True,
-                'new_first_binding_acceptance':evidence['new_first_binding_acceptance'],
-                'hardware_scope':'Matched target startup, full-module-disable rollback and re-enable; not other devices or new game/HDR performance',
-                'evidence':'docs/validation/mali-boot-compat-043.json',
+                'new_first_binding_acceptance':evidence['new_first_binding_acceptance'] if formal else False,
+                'native_keeper_prior_hardware_acceptance':sha(out/'bin/cold_boot64')==evidence['tested_qms_keeper_sha256'],
+                'hardware_scope':'See version-specific evidence; existing keeper hardware acceptance does not certify new root implementations',
+                'evidence':'docs/validation/mali-boot-compat-043.json' if formal else 'docs/validation/root-interface-compat-044.json',
                 'qms_barrier_included':a.qms_barrier,'keeper_sha256':sha(out/'bin/cold_boot64'),'source_ref':a.source_ref}
+    validation.update(root_admission='interface_and_local_layout',root_version_whitelist=False,
+                      root_binary_hash_whitelist=False,new_root_variant_hardware_acceptance=False,
+                      kernelsu_apatch_boot_backend_supported=False)
     (out/'VALIDATION.json').write_text(json.dumps(validation,indent=2)+'\n',encoding='utf-8')
     files=sorted(f for f in out.rglob('*') if f.is_file() and f.name!='checksums.sha256')
     (out/'checksums.sha256').write_text(''.join(sha(f)+'  '+f.relative_to(out).as_posix()+'\n' for f in files),encoding='utf-8',newline='\n')

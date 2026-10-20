@@ -27,7 +27,7 @@
   $('dvfs-detail').textContent=!state.dvfsSupported?t('dvfsUnsupported'):state.dvfsRequested==='on'&&state.dvfsEffective!=='on'?t('dvfsRetained'):t('dvfsInterval')+(state.pollingIntervalMs??'?')+' ms';
   $('cold').setAttribute('aria-checked',String(state.coldRequested==='on'));
   $('cold-current').textContent=t('current')+label(state.coldActive);$('cold-next').textContent=t('after')+label(state.coldEffective);
-  $('cold-detail').textContent=t(state.coldPrepared?'coldPrepared':'coldMissing');
+  $('cold-detail').textContent=t(state.coldPrepared?'coldPrepared':state.rootStartup&&state.rootStartup!=='supported'?'coldRootUnavailable':'coldMissing');
   $('fence').setAttribute('aria-checked',String(state.fenceRequested==='on'));
   $('fence-current').textContent=t('current')+label(state.fenceActive);$('fence-next').textContent=t('after')+label(state.fenceEffective);
   $('fence-card').classList.toggle('inactive',state.fenceEffective!=='on');

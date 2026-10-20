@@ -27,4 +27,5 @@ if __name__=='__main__':
     if a.check:
         if not TARGET.is_file() or TARGET.read_text(encoding='utf-8')!=text:
             raise SystemExit('Native firmware constants differ; regenerate them')
-    else:TARGET.write_text(text,encoding='utf-8',newline='\n')
+    else:
+        TARGET.write_text(text,encoding='utf-8',newline='\n')

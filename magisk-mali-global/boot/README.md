@@ -1,3 +1,11 @@
+# Working-tree 0.4.4-compat2: root interface compatibility
+
+No root version or official payload hash whitelist is used. The host preserves this device's original root records and checks firmware identity, original init, root payload ELF/overlay/command prerequisites and conflicting early hooks. Runtime probes only command usage and the live root temporary directory, never dispatching a boot stage as a test. Config additions and supported compressed/raw, unified/split root layouts are retained.
+
+These are prerequisites, not proof that arbitrary future boot callbacks behave identically. First-boot qualification and original per-user rollback guards remain. Ordinary features do not depend on this root gate. Other root frameworks still need a qualified early backend for first binding; the existing Magisk adapter is not falsely reported as KernelSU/APatch support. See `docs/root-compatibility.zh-CN.md`.
+
+The 0.4.3 single-version restriction below describes the historical published package, not the current candidate.
+
 # Firmware-qualified cold binding
 
 ## 0.4.3: per-user boot compatibility release

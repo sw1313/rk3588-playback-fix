@@ -100,8 +100,8 @@ def main():
     current=records['.backup/.magisk'][1];updated=current.replace(b'KEEPVERITY=false',b'KEEPVERITY=true')
     if updated==current:updated=current.replace(b'KEEPVERITY=true',b'KEEPVERITY=false')
     run('supported Magisk configuration variation',repack(raw,replace_record('.backup/.magisk',updated)),True)
-    for name,entry in cold.CONTRACT['root_records'].items():
-        if not entry['xz']:continue
+    for name in records:
+        if not name.endswith('.xz'):continue
         unpacked=lzma.decompress(records[name][1]);compressed=lzma.compress(unpacked,preset=0)
         run('root XZ recompression '+name,repack(raw,replace_record(name,compressed)),True)
     run('allowed logging argument',repack(raw,cmd=cmd+' loglevel=4'),True)
@@ -116,14 +116,14 @@ def main():
     run('reject changed critical argument',repack(raw,cmd=cmd.replace('init=/init','init=/other-init')),False,False)
     run('reject unknown boot argument',repack(raw,cmd=cmd+' unknown.option=1'),False,False)
     run('reject missing boot argument',repack(raw,cmd=cmd.replace('rootwait ','')),False,False)
-    run('reject different root executable',repack(raw,replace_record('init',records['init'][1]+b'X')),False)
+    run('reject invalid root executable',repack(raw,replace_record('init',b'BAD!'+records['init'][1][4:])),False)
     run('safe root executable permission difference',repack(raw,replace_record('init',records['init'][1],0o100755)),True)
     run('reject non-executable root init',repack(raw,replace_record('init',records['init'][1],0o100600)),False)
     run('reject changed fstab',repack(raw,replace_record('fstab.rk30board',records['fstab.rk30board'][1]+b'\n')),False)
     run('reject writable root executable',repack(raw,replace_record('init',records['init'][1],0o100777)),False)
     for label,name,content in [('early init','overlay.d/custom.rc',b'on post-fs-data\n    start surfaceflinger\n'),
                                ('reserved overlay','overlay.d/rk-mali-cold.rc',b'# conflict\n'),
-                               ('shadowed root executable','overlay.d/sbin/magisk',b'unknown implementation'),
+                               ('ambiguous root executable','overlay.d/sbin/magisk',b'unknown implementation'),
                                ('custom root init','init.rc',b'on boot\n'),
                                ('custom service','overlay.d/custom.rc',b'service custom /custom\n')]:
         added=cold.record(name,content,0o100600,500)

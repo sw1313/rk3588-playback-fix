@@ -35,34 +35,6 @@
     "loglevel=6",
     "loglevel=7"
   ],
-  "root_api": 30700,
-  "root_records": {
-    "init": {
-      "sha256": "383670a7ba3a6a4b79e5f3467e1da4b66a5df66a9b356ab9f70916854dd6b468",
-      "xz": false,
-      "mode": 33256
-    },
-    ".backup/init.xz": {
-      "sha256": "e4e602b2cf61215cf458ddae1183703d6b286425e803310392233184c11e376b",
-      "xz": true,
-      "mode": 33256
-    },
-    "overlay.d/sbin/magisk.xz": {
-      "sha256": "2d8419018dda41f7d9aca94c0ca8f926f3b8447ca5cf7fb71faeb8d05e29694e",
-      "xz": true,
-      "mode": 33188
-    },
-    "overlay.d/sbin/init-ld.xz": {
-      "sha256": "c71e69780bb7ce6d6c26b2d794a3c631689bed130519762716fee285a10417f0",
-      "xz": true,
-      "mode": 33188
-    },
-    "overlay.d/sbin/stub.xz": {
-      "sha256": "f0230e0864be255d963befa929ae1c0bb85c4df3e3578bb6cecc3049b6881eb0",
-      "xz": true,
-      "mode": 33188
-    }
-  },
   "services_sha256": {
     "sf": "4b32de7e3a3faaae7cc3d22ea16b67a8a530f1c4758b8b88b762112efab0e4c8",
     "hwc": "4f3fa4c6c1aeddc43d441711020ec0254698b07fab938a5440a331c662a36199",
@@ -78,5 +50,9 @@
       "sha256": "b15fa39352c2c214dc0703ba969ff44de0bd7872d6d33e31214000a5532ccd34",
       "mode": 33188
     }
+  },
+  "original_init": {
+    "sha256": "e4e602b2cf61215cf458ddae1183703d6b286425e803310392233184c11e376b",
+    "mode": 33256
   }
 }

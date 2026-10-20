@@ -1,6 +1,6 @@
 id=rk3588_mali_global
 name=RK3588 Native Mali Global Upgrade
-version=0.4.3
-versionCode=427
+version=0.4.4-compat2
+versionCode=429
 author=sw1313
-description=Firmware-specific RK3588 API32 g18p0 GPU/KMD/CSF upgrade. Component-qualified boot preparation preserves supported local root ramdisks; matched-target first binding, original-boot rollback and re-enable verified. Private boot adaptation required.
+description=Firmware-specific RK3588 g18 upgrade. Root compatibility candidate: ordinary features have no root-brand/version whitelist; first-binding checks local layout and required startup interfaces without root version or binary-hash whitelists. Other root boot backends remain separate.

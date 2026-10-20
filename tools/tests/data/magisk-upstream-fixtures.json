@@ -1,0 +1,297 @@
+{
+  "schema": 1,
+  "policy": "Regression fixture identities only; never used by module or host admission",
+  "profiles": [
+    {
+      "id": "magisk-26.4",
+      "family": "magisk",
+      "version_code": 26400,
+      "version": "26.4",
+      "source": "https://github.com/topjohnwu/Magisk/tree/6c807d35b241c6a22b35534af8b6fe447a66f073",
+      "apk_url": "https://github.com/topjohnwu/Magisk/releases/download/v26.4/Magisk-v26.4.apk",
+      "apk_sha256": "543a96fe26c012d99baf3a3aa5a97b80508d67cc641af7c12ce9f7b226b2b889",
+      "root_records": {
+        "init": {
+          "sha256": "c560c99a8644167df5087a1e2e412222e1a89bc2b9972ec19d2ce4acecdc711b",
+          "xz": false,
+          "mode": 33256,
+          "apk_entry": "lib/arm64-v8a/libmagiskinit.so"
+        },
+        "overlay.d/sbin/stub.xz": {
+          "sha256": "a6b57ec7b2671fe2156e3538ab527cc674d063e20a053c5b6175801a1f098324",
+          "xz": true,
+          "mode": 33188,
+          "apk_entry": "assets/stub.apk"
+        },
+        "overlay.d/sbin/magisk64.xz": {
+          "sha256": "e3d68fa83bebd208ac25783bcb3f99b7d4855e661519127a4db6ebe4e9543384",
+          "xz": true,
+          "mode": 33188,
+          "apk_entry": "lib/arm64-v8a/libmagisk64.so"
+        },
+        "overlay.d/sbin/magisk32.xz": {
+          "sha256": "5bbd89305ee512dc8e8573ea0b33c9e22d9df75f6630dba688b7ac6f03906ad3",
+          "xz": true,
+          "mode": 33188,
+          "apk_entry": "lib/armeabi-v7a/libmagisk32.so",
+          "optional": true
+        }
+      },
+      "config_vendorboot_optional": true,
+      "source_commit": "6c807d35b241c6a22b35534af8b6fe447a66f073",
+      "startup_contract_sources": [
+        "https://github.com/topjohnwu/Magisk/blob/6c807d35b241c6a22b35534af8b6fe447a66f073/native/src/core/bootstages.cpp",
+        "https://github.com/topjohnwu/Magisk/blob/6c807d35b241c6a22b35534af8b6fe447a66f073/native/src/init/rootdir.cpp",
+        "https://github.com/topjohnwu/Magisk/blob/6c807d35b241c6a22b35534af8b6fe447a66f073/scripts/boot_patch.sh"
+      ]
+    },
+    {
+      "id": "magisk-27.0",
+      "family": "magisk",
+      "version_code": 27000,
+      "version": "27.0",
+      "source": "https://github.com/topjohnwu/Magisk/tree/2c6adbc69ba0e5dce09cd13c6d9aca5de30efe76",
+      "apk_url": "https://github.com/topjohnwu/Magisk/releases/download/v27.0/Magisk-v27.0.apk",
+      "apk_sha256": "f511bd33d3242911d05b0939f910a3133ef2ba0e0ff1e098128f9f3cd0c16610",
+      "root_records": {
+        "init": {
+          "sha256": "dfa787563091f226f83b907d513550995b0b895a2c697c46b3e7a8013cb09c28",
+          "xz": false,
+          "mode": 33256,
+          "apk_entry": "lib/arm64-v8a/libmagiskinit.so"
+        },
+        "overlay.d/sbin/stub.xz": {
+          "sha256": "7b6388c2574a3b320a7d086ff3464ed816f0ab1b14ce07ecc9e96760ed08e22b",
+          "xz": true,
+          "mode": 33188,
+          "apk_entry": "assets/stub.apk"
+        },
+        "overlay.d/sbin/magisk64.xz": {
+          "sha256": "44e69cd81aa4452f69ff55a9340543d8eba00b17776d6268b8f71fe86def70dd",
+          "xz": true,
+          "mode": 33188,
+          "apk_entry": "lib/arm64-v8a/libmagisk64.so"
+        },
+        "overlay.d/sbin/magisk32.xz": {
+          "sha256": "3548e4f2b5e2e0ae9869c1409ba079840c89f0da2b68fce82838c8460fcafd93",
+          "xz": true,
+          "mode": 33188,
+          "apk_entry": "lib/armeabi-v7a/libmagisk32.so",
+          "optional": true
+        }
+      },
+      "config_vendorboot_optional": true,
+      "source_commit": "2c6adbc69ba0e5dce09cd13c6d9aca5de30efe76",
+      "startup_contract_sources": [
+        "https://github.com/topjohnwu/Magisk/blob/2c6adbc69ba0e5dce09cd13c6d9aca5de30efe76/native/src/core/daemon.rs",
+        "https://github.com/topjohnwu/Magisk/blob/2c6adbc69ba0e5dce09cd13c6d9aca5de30efe76/native/src/init/rootdir.cpp",
+        "https://github.com/topjohnwu/Magisk/blob/2c6adbc69ba0e5dce09cd13c6d9aca5de30efe76/scripts/boot_patch.sh"
+      ]
+    },
+    {
+      "id": "magisk-28.1",
+      "family": "magisk",
+      "version_code": 28100,
+      "version": "28.1",
+      "source": "https://github.com/topjohnwu/Magisk/tree/218327f92b572c183718e0fe722c2babf293535f",
+      "apk_url": "https://github.com/topjohnwu/Magisk/releases/download/v28.1/Magisk-v28.1.apk",
+      "apk_sha256": "8bfd3346b3da5814f82eff6f1b1b5fedd0ad585f39a25709b23eb54aac45691d",
+      "root_records": {
+        "init": {
+          "sha256": "990f124e8ab9435f52f9860e4c2e57cd1f8b93f8e7928c4e7536ee655a8dedbc",
+          "xz": false,
+          "mode": 33256,
+          "apk_entry": "lib/arm64-v8a/libmagiskinit.so"
+        },
+        "overlay.d/sbin/stub.xz": {
+          "sha256": "dbd4e7b16ea57e296e317fde762f58ff51000b020d819c16d2338cd667ff6e08",
+          "xz": true,
+          "mode": 33188,
+          "apk_entry": "assets/stub.apk"
+        },
+        "overlay.d/sbin/magisk.xz": {
+          "sha256": "a3d44626f8d8cc4200a2725964d5a464581af3475e72cb75eeb0257216ece436",
+          "xz": true,
+          "mode": 33188,
+          "apk_entry": "lib/arm64-v8a/libmagisk.so"
+        },
+        "overlay.d/sbin/init-ld.xz": {
+          "sha256": "c37644f3653fae64c95849c8ea8b9ac68ea267f4e973ecfde1e8662c8616bf93",
+          "xz": true,
+          "mode": 33188,
+          "apk_entry": "lib/arm64-v8a/libinit-ld.so"
+        }
+      },
+      "config_vendorboot_optional": true,
+      "source_commit": "218327f92b572c183718e0fe722c2babf293535f",
+      "startup_contract_sources": [
+        "https://github.com/topjohnwu/Magisk/blob/218327f92b572c183718e0fe722c2babf293535f/native/src/core/daemon.rs",
+        "https://github.com/topjohnwu/Magisk/blob/218327f92b572c183718e0fe722c2babf293535f/native/src/init/rootdir.cpp",
+        "https://github.com/topjohnwu/Magisk/blob/218327f92b572c183718e0fe722c2babf293535f/scripts/boot_patch.sh"
+      ]
+    },
+    {
+      "id": "magisk-29.0",
+      "family": "magisk",
+      "version_code": 29000,
+      "version": "29.0",
+      "source": "https://github.com/topjohnwu/Magisk/tree/62b1310d97530597de874145182967144f0caed3",
+      "apk_url": "https://github.com/topjohnwu/Magisk/releases/download/v29.0/Magisk-v29.0.apk",
+      "apk_sha256": "99d40df1a68a05a5e78452a9cd4f2d753434d7622baeeb44ea14ae8238c1a9ca",
+      "root_records": {
+        "init": {
+          "sha256": "afc5d5a317e74f0a0130329fc684fe9d1e8e37d228695eb0a9075d69b42cf923",
+          "xz": false,
+          "mode": 33256,
+          "apk_entry": "lib/arm64-v8a/libmagiskinit.so"
+        },
+        "overlay.d/sbin/stub.xz": {
+          "sha256": "6d06d1eb6519fe2db2501d080a0cdd616a8cb67ed2b535567ab745599ba17f4c",
+          "xz": true,
+          "mode": 33188,
+          "apk_entry": "assets/stub.apk"
+        },
+        "overlay.d/sbin/magisk.xz": {
+          "sha256": "b7b9fe3362c28f365b96eed86b96ee9265a6fe8226fdda7184042153379ce685",
+          "xz": true,
+          "mode": 33188,
+          "apk_entry": "lib/arm64-v8a/libmagisk.so"
+        },
+        "overlay.d/sbin/init-ld.xz": {
+          "sha256": "a3ffb6478bda20cc2071e44dfb914be84ab04af490711b54b271db99f64ad598",
+          "xz": true,
+          "mode": 33188,
+          "apk_entry": "lib/arm64-v8a/libinit-ld.so"
+        }
+      },
+      "config_vendorboot_optional": true,
+      "source_commit": "62b1310d97530597de874145182967144f0caed3",
+      "startup_contract_sources": [
+        "https://github.com/topjohnwu/Magisk/blob/62b1310d97530597de874145182967144f0caed3/native/src/core/daemon.rs",
+        "https://github.com/topjohnwu/Magisk/blob/62b1310d97530597de874145182967144f0caed3/native/src/init/rootdir.cpp",
+        "https://github.com/topjohnwu/Magisk/blob/62b1310d97530597de874145182967144f0caed3/scripts/boot_patch.sh"
+      ]
+    },
+    {
+      "id": "magisk-30.6",
+      "family": "magisk",
+      "version_code": 30600,
+      "version": "30.6",
+      "source": "https://github.com/topjohnwu/Magisk/tree/ccb264f33aa245aba26a9b2508a54c40041eb46e",
+      "apk_url": "https://github.com/topjohnwu/Magisk/releases/download/v30.6/Magisk-v30.6.apk",
+      "apk_sha256": "f1ffc3c9a5614c251ba6bada308163acc3c3d844cf01d33f55a8bc151adc34ce",
+      "root_records": {
+        "init": {
+          "sha256": "a3ce9397456cbe260e9d918eb0d62a7d3b4553dd14082538e7bfe19da0326652",
+          "xz": false,
+          "mode": 33256,
+          "apk_entry": "lib/arm64-v8a/libmagiskinit.so"
+        },
+        "overlay.d/sbin/stub.xz": {
+          "sha256": "5a6fc51f1f74647e0b31b50a7e8694f2c73e82edf45355c1d60836667752f2e3",
+          "xz": true,
+          "mode": 33188,
+          "apk_entry": "assets/stub.apk"
+        },
+        "overlay.d/sbin/magisk.xz": {
+          "sha256": "70558e6d6199fa5a961b7bafeb8f96d8157cc63810db8df2a3cded1881763697",
+          "xz": true,
+          "mode": 33188,
+          "apk_entry": "lib/arm64-v8a/libmagisk.so"
+        },
+        "overlay.d/sbin/init-ld.xz": {
+          "sha256": "54ec98f3f93473e51252267a8997cd12878dd463263f3dc2a32c14ab7951f9f0",
+          "xz": true,
+          "mode": 33188,
+          "apk_entry": "lib/arm64-v8a/libinit-ld.so"
+        }
+      },
+      "config_vendorboot_optional": false,
+      "source_commit": "ccb264f33aa245aba26a9b2508a54c40041eb46e",
+      "startup_contract_sources": [
+        "https://github.com/topjohnwu/Magisk/blob/ccb264f33aa245aba26a9b2508a54c40041eb46e/native/src/core/bootstages.rs",
+        "https://github.com/topjohnwu/Magisk/blob/ccb264f33aa245aba26a9b2508a54c40041eb46e/native/src/init/rootdir.cpp",
+        "https://github.com/topjohnwu/Magisk/blob/ccb264f33aa245aba26a9b2508a54c40041eb46e/scripts/boot_patch.sh"
+      ]
+    },
+    {
+      "id": "magisk-30.7",
+      "family": "magisk",
+      "version_code": 30700,
+      "version": "30.7",
+      "source": "https://github.com/topjohnwu/Magisk/tree/e8a58776f1d7bdf852072ad0baa6eceb9a1e4aac",
+      "apk_url": "https://github.com/topjohnwu/Magisk/releases/download/v30.7/Magisk-v30.7.apk",
+      "apk_sha256": "e0d32d2123532860f97123d927b1bb86c4e08e6fd8a48bfc6b5bee0afae9ebd5",
+      "root_records": {
+        "init": {
+          "sha256": "383670a7ba3a6a4b79e5f3467e1da4b66a5df66a9b356ab9f70916854dd6b468",
+          "xz": false,
+          "mode": 33256,
+          "apk_entry": "lib/arm64-v8a/libmagiskinit.so"
+        },
+        "overlay.d/sbin/stub.xz": {
+          "sha256": "f0230e0864be255d963befa929ae1c0bb85c4df3e3578bb6cecc3049b6881eb0",
+          "xz": true,
+          "mode": 33188,
+          "apk_entry": "assets/stub.apk"
+        },
+        "overlay.d/sbin/magisk.xz": {
+          "sha256": "2d8419018dda41f7d9aca94c0ca8f926f3b8447ca5cf7fb71faeb8d05e29694e",
+          "xz": true,
+          "mode": 33188,
+          "apk_entry": "lib/arm64-v8a/libmagisk.so"
+        },
+        "overlay.d/sbin/init-ld.xz": {
+          "sha256": "c71e69780bb7ce6d6c26b2d794a3c631689bed130519762716fee285a10417f0",
+          "xz": true,
+          "mode": 33188,
+          "apk_entry": "lib/arm64-v8a/libinit-ld.so"
+        }
+      },
+      "config_vendorboot_optional": false,
+      "source_commit": "e8a58776f1d7bdf852072ad0baa6eceb9a1e4aac",
+      "startup_contract_sources": [
+        "https://github.com/topjohnwu/Magisk/blob/e8a58776f1d7bdf852072ad0baa6eceb9a1e4aac/native/src/core/bootstages.rs",
+        "https://github.com/topjohnwu/Magisk/blob/e8a58776f1d7bdf852072ad0baa6eceb9a1e4aac/native/src/init/rootdir.cpp",
+        "https://github.com/topjohnwu/Magisk/blob/e8a58776f1d7bdf852072ad0baa6eceb9a1e4aac/scripts/boot_patch.sh"
+      ]
+    },
+    {
+      "id": "magisk-31.0-prerelease",
+      "family": "magisk",
+      "version_code": 31000,
+      "version": "31.0",
+      "apk_url": "https://github.com/topjohnwu/Magisk/releases/download/v31.0/Magisk-v31.0.apk",
+      "apk_sha256": "2c8a488b9a5293e578e95ae4f07e3c57aba4feec4a52ca4dd852a2692d6dd4e8",
+      "root_records": {
+        "init": {
+          "sha256": "dc2ea943541e530e786c69d6d2721f1a3625960d9784ade646baec86a074180e",
+          "xz": false,
+          "mode": 33256,
+          "apk_entry": "lib/arm64-v8a/libmagiskinit.so"
+        },
+        "overlay.d/sbin/magisk.xz": {
+          "sha256": "44eece7e1faefe3156c289c74b9f747e0d5b029aed84cbeb85be0139fb03d813",
+          "xz": true,
+          "mode": 33188,
+          "apk_entry": "lib/arm64-v8a/libmagisk.so"
+        },
+        "overlay.d/sbin/init-ld.xz": {
+          "sha256": "1f069071b33f76504d2396d63f6e0476f6741771a832d1fcc3ff412d91c7f562",
+          "xz": true,
+          "mode": 33188,
+          "apk_entry": "lib/arm64-v8a/libinit-ld.so"
+        },
+        "overlay.d/sbin/stub.xz": {
+          "sha256": "2ceadd8f34da9bb168a77fb523ad266c363887a1c22e49dc714c954136c18a66",
+          "xz": true,
+          "mode": 33188,
+          "apk_entry": "assets/stub.apk"
+        }
+      },
+      "config_vendorboot_optional": false,
+      "upstream_prerelease": true,
+      "source": "https://github.com/topjohnwu/Magisk/tree/v31.0"
+    }
+  ]
+}

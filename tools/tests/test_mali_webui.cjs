@@ -17,7 +17,7 @@ const path = require('node:path');
    if(m[5]){cold=m[5];if(cold==='on'){mode='on';kernel='next';}else kernel='stock';}
    if(m[6]){fence=m[6];if(fence==='on'){mode='on';kernel='next';cold='on';}}
    const next=mode==='on'&&!window.mockUnsupported?kernel:'stock';
-   const s={fenceRequested:fence,fenceSupported:window.mockColdPrepared&&!window.mockUnsupported,fenceActive:window.mockFenceActive,fenceEffective:mode==='on'&&next==='next'&&cold==='on'?fence:'off',coldRequested:cold,coldPrepared:window.mockColdPrepared,coldActive:window.mockColdActive,coldEffective:mode==='on'&&next==='next'?cold:'off',schema:1,version:'0.3.1-test1',activeVersion:'0.3.1-test1',requested:mode,effective:mode,active:'on',activeKnown:true,moduleEnabled:true,staged:window.mockStaged,removing:false,supported:!window.mockUnsupported,kernelRequested:kernel,kernelEffective:next,kernelActive:'stock',kernelHealth:'stock',recovery:window.mockRecovery?'interrupted_previous_boot':'none',dvfsRequested:dvfs,dvfsEffective:next==='next'&&mode==='on'?dvfs:'off',dvfsActive:'off',dvfsSupported:!window.mockUnsupported,dvfsHealth:'off',pollingIntervalMs:100,pendingReboot:mode!=='on'||next!=='stock'};
+   const s={rootStartup:window.mockRootStartup||'supported',fenceRequested:fence,fenceSupported:window.mockColdPrepared&&!window.mockUnsupported,fenceActive:window.mockFenceActive,fenceEffective:mode==='on'&&next==='next'&&cold==='on'?fence:'off',coldRequested:cold,coldPrepared:window.mockColdPrepared,coldActive:window.mockColdActive,coldEffective:mode==='on'&&next==='next'?cold:'off',schema:1,version:'0.3.1-test1',activeVersion:'0.3.1-test1',requested:mode,effective:mode,active:'on',activeKnown:true,moduleEnabled:true,staged:window.mockStaged,removing:false,supported:!window.mockUnsupported,kernelRequested:kernel,kernelEffective:next,kernelActive:'stock',kernelHealth:'stock',recovery:window.mockRecovery?'interrupted_previous_boot':'none',dvfsRequested:dvfs,dvfsEffective:next==='next'&&mode==='on'?dvfs:'off',dvfsActive:'off',dvfsSupported:!window.mockUnsupported,dvfsHealth:'off',pollingIntervalMs:100,pendingReboot:mode!=='on'||next!=='stock'};
    setTimeout(()=>window[callback](0,JSON.stringify(s),''),10);
   }};
  });
@@ -25,6 +25,14 @@ const path = require('node:path');
   await page.goto(pathToFileURL(path.resolve(__dirname,'../../magisk-mali-global/webroot/index.html')).href);
   await page.waitForFunction(()=>document.querySelector('#whole').getAttribute('aria-checked')==='true');
   check(await page.getByRole('switch').count()===4);check(await page.getByRole('combobox').count()===1);
+  await page.evaluate(()=>window.mockRootStartup='other_root_backend');
+  await page.locator('#refresh').click();
+  await page.waitForFunction(()=>document.querySelector('#cold-detail').textContent.includes('当前 root 缺少'));
+  check(!(await page.locator('#whole').isDisabled()));check(await page.locator('#cold').isDisabled());
+  await page.evaluate(()=>window.mockRootStartup='supported');
+  await page.locator('#refresh').click();
+  await page.waitForFunction(()=>document.querySelector('#cold-detail').textContent.includes('尚未准备'));
+
   // Regression: the cold button had aria state but no track/thumb CSS at all.
   check(await page.getByRole('switch').evaluateAll(buttons=>buttons.every(b=>{
    const track=b.getBoundingClientRect(),thumb=b.querySelector('span').getBoundingClientRect();

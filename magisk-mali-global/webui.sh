@@ -45,6 +45,7 @@ status(){
  [ "$fenceActive" = "$fenceEffective" ] || pending=true
  printf '{"fenceRequested":"%s","fenceSupported":%s,"fenceActive":"%s","fenceEffective":"%s",' "$fence" "$fenceSupported" "$fenceActive" "$fenceEffective"
  printf '"coldRequested":"%s","coldPrepared":%s,"coldActive":"%s","coldEffective":"%s",' "$cold" "$coldPrepared" "$coldActive" "$coldEffective"
+ printf '"rootStartup":"%s",' "$(root_startup_reason)"
  recovery=$(cat "$STATE/kernel-recovery" 2>/dev/null);case "$recovery" in '' ) recovery=none;; interrupted_previous_boot|boot_plan_failed|kernel_trial_failed|unsupported_kernel|missing_boot_latch|userspace_unverified|kernel_payload_mismatch|csf_cache_mismatch|invalid_runtime_directory|invalid_firmware_directory) ;;*) recovery=failed;;esac
  printf '"schema":1,"version":"%s","activeVersion":"%s","requested":"%s","effective":"%s","active":"%s","activeKnown":%s,"moduleEnabled":%s,"staged":%s,"removing":%s,"supported":%s,"kernelRequested":"%s","kernelEffective":"%s","kernelActive":"%s","kernelHealth":"%s","recovery":"%s","dvfsRequested":"%s","dvfsEffective":"%s","dvfsActive":"%s","dvfsSupported":%s,"dvfsHealth":"%s","pollingIntervalMs":%s,"pendingReboot":%s}\n' "$(version "$MODDIR")" "$activeVersion" "$mode" "$next" "$active" "$activeKnown" "$moduleEnabled" "$staged" "$removing" "$supported" "$kernel" "$nextKernel" "$activeKernel" "$health" "$recovery" "$dvfs" "$nextDvfs" "$activeDvfs" "$dvfsSupported" "$dvfsHealth" "$interval" "$pending"
 }

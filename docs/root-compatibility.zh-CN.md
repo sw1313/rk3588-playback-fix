@@ -1,38 +1,33 @@
-# Root 环境与固件兼容边界
+# Root 兼容策略：按接口能力，不按版本名单
 
-本记录核对 v0.8.7 实际安装包：Decode Stack 0.8.6、Mali Global 0.4.3。没有改写设备 root，也没有把其他 root 的源码检查当成实机验收。
+当前工作区候选为 **Mali Global 0.4.4-compat2**。普通 Decode／Mali 用户态继续无 root 品牌／版本白名单；首次绑定也已移除逐版本及官方 root 二进制哈希准入。稳定版、测试版、Canary 和本机重编译版本使用同一套接口／布局检查，不需要登记版本号。
 
-## 普通功能不按 root 品牌或版本号拦截
+## 检查什么
 
-两个普通安装入口均未要求 `magisk -V = 30700`，也没有要求只能使用 Magisk。安装器仍需要兼容的模块安装接口、root 脚本环境、属性工具和系统文件挂载；KernelSU／APatch 环境是否提供这些能力需按其具体配置核对。部分版本还依赖额外的模块挂载组件，不能仅看到管理器显示“已启用”就算已挂载。
-
-| 功能 | 当前 root 限制 | 当前验收范围 |
+| 部分 | 当前检查 | 不作为准入条件 |
 | --- | --- | --- |
-| Decode 常规解码、缓冲、HDR、系统显示策略 | 不固定 root 品牌或版本；需兼容模块接口、工具、挂载及原固件依赖 | 已有 Magisk 实机记录；KernelSU／APatch 未实机验收 |
-| Mali g18 全局用户态 | 不固定 root 品牌或版本；需实际挂载，原 GPU／图形依赖匹配 | 已有 Magisk 实机记录；其他 root 不因名字被普通安装入口拒绝 |
-| Mali 配套内核、CSF、DVFS | 还必须匹配真实运行内核及驱动 ABI；不能只看 `5.10.66` 字符串 | 限现有已验收的原厂内核契约 |
-| 图形服务前首次绑定 | 当前后端明确依赖已验证的 Magisk 30700 早期启动流程和 root 载荷 | 尚不能宣称其他 Magisk 版本、KernelSU 或 APatch 已支持 |
-| QMS 启动配套 | 当前已验收路径依赖配套首次绑定载体和显示初始化顺序 | 不能因普通模块安装成功就视为其他 root 下也已启用 |
+| 普通模块功能 | 兼容安装脚本、工具、实际文件挂载、原厂系统依赖 | root 品牌、具体版本、作者的 root 文件哈希 |
+| 当前首次绑定后端 | 运行中的 Magisk 命令能报告所需启动回调、提供有效临时目录及可执行命令；只读探测不触发启动阶段 | 稳定版列表、MAGISK_VER_CODE、Magisk APK／init／core 的官方哈希 |
+| 本机 boot 准备 | 原厂内核／DTB／启动契约；本机 init 和 root 命令 ELF 结构及所需 overlay／回调标记；标准统一／分离、压缩／未压缩载荷布局 | 与作者完整 boot 或官方 root 文件逐字节相同 |
+| 配置和保留 | root 原记录逐字节保留；兼容旧版缺省字段、额外配置字段和可选 ARM32 root 载荷 | 只接受某个版本的配置键集合 |
+| 回退 | 本机原 boot、候选及备份哈希；已有启动仓不自动替换；外部改写的 boot 不自动覆盖 | 另一台盒子的备份或整镜像哈希 |
 
-## 为什么不能直接删除首次绑定的 root 检查
+本机原 root 文件的摘要只保存在私有准备记录里，用于说明保存了什么，不参与跨设备／跨版本白名单匹配。原厂 init 的备份哈希仍用于确认固件原件，不能与 root 替换后的 init 哈希混为一谈。
 
-这项功能会在 ramdisk 中调用 `${MAGISKTMP}/magisk --post-fs-data`，使用 Magisk SELinux 执行域，并依赖该阶段重复调用的行为。它还检查原 init、root 载荷和图形服务启动契约。只删掉数字 30700，或让非 Magisk 环境返回“检查通过”，都不会自动产生正确的早期启动、挂载和恢复流程。
+CLI 输出和 ELF 标记只验证启动所需前提，不能静态证明所有未来版本的启动内部行为。首次试启动仍需匹配私有载体、实际挂载、GPU 首次绑定、图形服务与双 ABI Zygisk／LSPosed 完成确认；未确认仍按原框架回退。没有把“接口存在”标为“全部版本实机通过”。
 
-后续其他 Magisk 版本需要核对其启动实现并建立对应适配；KernelSU／APatch 需要各自的早期挂载／服务屏障适配与回退验收。没有这些证据前，只限制依赖该后端的功能，不应新增整个模块的 root 品牌白名单，也不应默认转到旧的运行时驱动交接来冒充首次绑定。
+## KernelSU／APatch
 
-## 同设备、同固件还需区分什么
+普通功能不因这两个名字被拒绝，但必须提供实际模块挂载和脚本接口。KernelSU 使用 metamodule 时需具备系统文件挂载组件，不能仅以管理器显示启用判定覆盖成功。各工具可能改变内核，仍独立验证真实内核 ABI。
 
-同一固件镜像刷到不同盒子后，原厂 `/system`、`/vendor` 和 APEX 文件通常相同，因此继续验证这些文件的哈希不会绑定某一台盒子。校验中没有设备序列号、MAC 或 Android ID 白名单。私有编译产物、原 boot 备份与候选哈希按各自设备生成，不要求与作者设备一致。
+当前早期载体调用 Magisk 的 overlay／启动回调，故其他 root 缺少对应后端时，只限制首次绑定及依赖它的功能；不关闭整个模块，不默认切到旧运行时 GPU 交接，也不伪报支持。KernelSU 当前提供 initrc／preinit 机制，但需依实际模式和本设备内核单独适配与验收。
 
-但 root 工具可能改变内核、ramdisk、启动服务或挂载方式。KernelSU 可能使用不同内核，也可能通过 LKM 等方式提供；APatch 也有自己的内核修改及启动机制。不能按品牌直接断定一定不兼容，也不能仅凭外层固件相同就断定内核 ABI 相同。真实变化触及现有内核契约时仍应拒绝该内核功能；固定地址／指令布局相关检查不能取消。
+## 上游参考
 
-更换 root 前先关闭首次绑定并重启，确认已回原 boot，再按相应工具的流程更换。启用后被外部工具改写的 boot，当前整镜像回退不会覆盖；不能使用另一人的 boot 或备份来绕过。
+- [ReZygisk 安装器](https://github.com/PerformanC/ReZygisk/blob/main/module/src/customize.sh)：root 提供方分支和必要最低版本，区别于逐稳定版枚举。
+- [KernelSU 模块文档](https://kernelsu.org/guide/module.html)／[metamodule](https://kernelsu.org/guide/metamodule.html)：兼容模块生命周期和挂载组件；模拟的 Magisk 版本不能作 root 类型判据。
+- [APatch 模块文档](https://apatch.dev/apm-guide.html)：相近模块结构、工具路径及挂载阶段差异。
+- [AnyKernel3](https://github.com/osm0sis/AnyKernel3)：基于本机 boot／ramdisk 最小修改并保留本机内容。
+- [Magisk 启动／overlay 文档](https://topjohnwu.github.io/Magisk/guides.html#boot-scripts)：启动阶段与动态 MAGISKTMP 路径。当前内部回调依赖仍需首次启动实际验收。
 
-## 本次核对位置
-
-- 普通安装入口：`magisk-decode/customize.sh`、`magisk-mali-global/customize.sh`。
-- 固件及已知模块配套：`magisk-mali-global/platform-check.sh`、两包的 `contracts/`。
-- 首次绑定 root 约束：`magisk-mali-global/boot-stage.sh`、`cold-state.sh`、`tools/cold-boot/prepare.py`。
-- 设备本地 ART 产物：Decode 包中的 `components/display_policy/compile-artifacts.sh`；产物及其哈希现场生成，没有把作者设备的 OAT 哈希作为跨设备准入值。
-
-这是一份兼容边界核对，不是 KernelSU／APatch 支持发布。现有正式安装包保持原样。
+本地仅参考接口与设计，没有复制这些项目代码。官方载荷的固定摘要现仅放在 `tools/tests/data/magisk-upstream-fixtures.json`，用于可复现回归输入，模块和准备工具均不读取这份测试数据。验证结果与边界见 `docs/validation/root-interface-compat-044.json`；正式 v0.8.7 附件不被候选覆盖。

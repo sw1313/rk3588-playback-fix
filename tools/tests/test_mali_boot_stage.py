@@ -48,8 +48,11 @@ def main():
         expected=sha(candidate);profilehash=sha(profile.encode())
         f=folder/'state/cache'/ (csfhash+'.bin');f.parent.mkdir(parents=True);f.write_bytes(csf)
         (module/'platform-check.sh').write_text('#!/system/bin/sh\n[ "$(cat '+BASE+'/platform-ok)" = yes ]\n',newline='\n')
+        (module/'root-startup.sh').write_bytes((ROOT/'magisk-mali-global/root-startup.sh').read_bytes())
+        (folder/'root-tmp').mkdir()
+        (folder/'root-tmp/magisk').write_text('#!/system/bin/sh\nexit 0\n')
         stage=(ROOT/'magisk-mali-global/boot-stage.sh').read_text().replace('/data/adb/rk3588-mali-global',BASE+'/state').replace('/data/local/tmp/rk3588-mali-cold-prepared',BASE+'/input').replace('/dev/block/mmcblk0p7',BASE+'/boot-device')
-        stage=stage.replace('set -eu','set -eu\nmagisk(){ cat '+BASE+'/root-api; }',1)
+        stage=stage.replace('set -eu','set -eu\ntimeout(){ shift; \"$@\"; }\nmagisk(){ case \"$1\" in --help) cat '+BASE+'/root-help;; --path) echo '+BASE+'/root-tmp;; *) return 1;; esac; }',1)
         (module/'boot-stage.sh').write_text(stage,encoding='utf-8',newline='\n')
         archive=a.out/'stage-fixture-private.tar.gz'
         with tarfile.open(archive,'w:gz') as tar:
@@ -61,10 +64,10 @@ def main():
     shell('mkdir -p '+BASE+' && tar -xzf /data/local/tmp/rk-stage-fixture-private.tar.gz -C '+BASE)
     results=[]
     try:
-        def run(name,setup='',success=False,profile_arg=None,existing=False):
-            shell('rm -rf '+BASE+'/state/boot '+BASE+'/input; mkdir '+BASE+'/input; cp '+BASE+'/assets/original.img '+BASE+'/input/original.img; cp '+BASE+'/assets/candidate.img '+BASE+'/input/candidate.img; cp '+BASE+'/assets/profile '+BASE+'/input/profile; cp '+BASE+'/assets/original.img '+BASE+'/boot-device; echo 30700 > '+BASE+'/root-api; echo yes > '+BASE+'/platform-ok')
+        def run(name,setup='',success=False,profile_arg=None,existing=False,environment=''):
+            shell('rm -rf '+BASE+'/state/boot '+BASE+'/input; mkdir '+BASE+'/input; cp '+BASE+'/assets/original.img '+BASE+'/input/original.img; cp '+BASE+'/assets/candidate.img '+BASE+'/input/candidate.img; cp '+BASE+'/assets/profile '+BASE+'/input/profile; cp '+BASE+'/assets/original.img '+BASE+'/boot-device; echo 30700 > '+BASE+'/root-api; echo --post-fs-data --path > '+BASE+'/root-help; chmod 0700 '+BASE+'/root-tmp/magisk; echo yes > '+BASE+'/platform-ok')
             if setup:shell(setup)
-            r=shell('sh '+BASE+'/module/boot-stage.sh '+expected+' '+(profile_arg or profilehash),False)
+            r=shell(environment+' sh '+BASE+'/module/boot-stage.sh '+expected+' '+(profile_arg or profilehash),False)
             assert (r.returncode==0)==success,(name,r.returncode,r.stdout,r.stderr)
             store=shell('test -e '+BASE+'/state/boot',False).returncode==0
             assert store==(success or existing),(name,'partial or missing store')
@@ -74,7 +77,12 @@ def main():
             results.append({'name':name,'passed':True,'accepted':success})
         run('per-user image stages',success=True)
         run('foreign current boot','printf foreign > '+BASE+'/boot-device')
-        run('unsupported root API','echo 30600 > '+BASE+'/root-api')
+        run('other recognized root API','echo 30600 > '+BASE+'/root-api',success=True)
+        run('unlisted nightly version is not gated','echo 99999 > '+BASE+'/root-api',success=True)
+        run('missing startup command interface','echo --path > '+BASE+'/root-help')
+        run('missing runtime command','chmod 0600 '+BASE+'/root-tmp/magisk')
+        run('KernelSU cannot use the Magisk-only boot backend',environment='KSU=true')
+        run('APatch cannot use the Magisk-only boot backend',environment='APATCH=true')
         run('wrong profile fingerprint',profile_arg='0'*64)
         run('different live graphics contract','echo no > '+BASE+'/platform-ok')
         run('corrupt original backup','printf bad > '+BASE+'/input/original.img')
