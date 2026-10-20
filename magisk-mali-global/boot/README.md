@@ -1,6 +1,6 @@
 # Firmware-qualified cold binding
 
-## 0.4.3-test1: per-user boot compatibility candidate
+## 0.4.3: per-user boot compatibility release
 
 The new source no longer requires one user's complete rooted boot SHA256.
 It pins the firmware kernel, second stage, DTB, fixed boot-header fields and
@@ -25,30 +25,29 @@ unrecognized boot arguments, signed/footer layouts and conflicting early init
 hooks still require separate adaptation. No generic KernelSU/APatch support is
 implied. Repacking a boot *after* activation still changes its ownership hash:
 automatic rollback will not overwrite it with an older full backup. This
-candidate does not implement semantic removal of modifications from a foreign
+release does not implement semantic removal of modifications from a foreign
 boot, nor automatic migration/replacement of an existing private boot store.
 
 The loader changed, so a newly prepared private boot is required before using
-this candidate for first binding. Do not mix it with an old embedded keeper or
-reuse the old QMS startup pairing without requalification. Offline/isolated
-checks are separate from real startup acceptance; published 0.4.2 assets remain
-unchanged. See `tools/tests/test_mali_boot_compat.py` and
-`tools/build_mali_boot_policy.py` for the targeted checks/build.
+this release for first binding. Do not mix it with an old embedded keeper or
+reuse the old QMS startup pairing without requalification. Published 0.4.2 assets remain unchanged.
 
 Targeted checks completed: 37 real-image host cases, 13 independent native
 SHA-256 vectors, 39 inert native restoration cases, 9 actual staging-script
-cases with the native firmware reader, and 21 inert QMS rendezvous cases. The
-generated private image also passed independent device Magisk unpack/CPIO
-checks in a disposable directory; it was never flashed or booted.
-The real boot hash still matches the existing formal-release boot, g18/KMD/DVFS
-remain active and Frame Guard remains disabled/paused. These checks did not
-write real boot, load a new driver, change playback or qualify a new cold boot.
+cases with the native firmware reader, and 21 inert QMS rendezvous cases.
+The matched device additionally passed real full installation, independent
+embedded keeper/profile verification, pre-graphics first binding, whole-module
+disable restoration of the exact original rooted boot, and re-enable. Both-ABI
+Zygisk Next/LSPosed were retained. Frame Guard stays disabled/paused.
+Different-root packaging cases remain offline/isolated validation, not physical
+certification of other devices. Existing GPU/KMD/CSF bytes are unchanged; no new
+game, HDR calibration or HDMI blackout result is claimed by this boot-policy update.
 Machine-readable scope: `docs/validation/mali-boot-compat-043.json`.
 
-`tools/build_mali_boot_policy.py --base <public-0.4.2.zip> --ndk <ndk> --work <fresh-dir>`
+`tools/build_mali_boot_policy.py --base <public-0.4.2.zip> --ndk <ndk> --work <fresh-dir> --qms-barrier --source-ref v0.8.7`
 reuses only the exact published base ZIP's unchanged GPU/kernel/interface bytes,
-rebuilds the keeper and stages the new policy/source with candidate provenance.
-Add `--qms-barrier` for the existing Decode pre-graphics QMS coordination. The
+rebuilds the keeper and stages the new policy/source with explicit release provenance.
+The formal package includes `--qms-barrier` for the existing Decode pre-graphics QMS coordination. Omit both this flag and `--source-ref` only for an unreleased non-QMS build requiring separate acceptance. The
 full `build_mali_global.py` builder supports the same flag. Preparation requires
 the keeper to match the chosen package; generic and QMS keepers are not mixed.
 
@@ -59,8 +58,7 @@ The vendor firmware/ABI/private-layout restrictions remain independent of the
 ramdisk packaging changes; no GKI-wide compatibility is claimed.
 
 中文边界：严格验证固件组件，允许已支持 root 环境内的本机打包差异；按每人的原 boot
-生成适配和回退备份。不是取消校验，也不支持未知内核或任意启动钩子。新版候选没有
-写入设备 boot，没有将离线通过算作新的首次绑定验收。
+生成适配和回退备份。不是取消校验，也不支持未知内核或任意启动钩子。本版已在匹配目标上完成写入、首次绑定、整包回退和重新启用；其他 root 打包变体仅通过离线／隔离检查，不代表其他固件兼容。
 
 ## Historical startup integration (0.4.1-test2 / 0.4.2)
 

@@ -14,7 +14,7 @@ COMPONENTS = {
     'frameguard': ('magisk', None),
     'yamby-mpv-plugin': ('lsposed', '0.3.7'),
 }
-RELEASE_TAG = 'v0.8.6'
+RELEASE_TAG = 'v0.8.7'
 URL = 'https://github.com/sw1313/rk3588-playback-fix'
 
 

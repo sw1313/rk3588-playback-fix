@@ -1,15 +1,19 @@
-# 下一版源码候选：Mali Global 0.4.3-test1
+# Release v0.8.7 · Mali Global 0.4.3 boot validation
 
-启动适配改为依据 `magisk-mali-global/contracts/boot-firmware.json` 严格检查固件组件，
-不再固定个人整份 boot 哈希。`python tools/cold-boot/generate_contract.py --check`
-核对原生常量；准备工具、设备暂存和原生备份验证同步处理。各用户自己的原件／候选
-哈希继续保护回退。[允许差异、验证结果与限制](magisk-mali-global/boot/README.md)。
+本版以固件组件检查代替个人整份 boot 哈希：`magisk-mali-global/contracts/boot-firmware.json` 固定内核、DTB 和关键启动契约，保留本机 root 与个人原件／候选完整性校验。允许差异及拒绝边界见 [启动文档](magisk-mali-global/boot/README.md)，真实安装、首次绑定、整包回退及重新启用见 [验收记录](docs/validation/mali-boot-compat-043.json)。未知内核、DTB、root 方案和冲突启动钩子仍拒绝。
 
-`tools/build_mali_boot_policy.py --base <public-0.4.2.zip> --ndk <ndk> --work <fresh-dir>`
-从精确校验的已发布 ZIP 复用未改 GPU／内核配套，仅重建 keeper 和验证策略。
-需要既有 Decode 启动协调时添加 `--qms-barrier`，完整 Mali 构建器同样支持。
-这是未发布候选，需新建私有启动适配并单独完成首次绑定验收；不覆盖 v0.8.6 附件，
-不分发私人镜像，也不表示未知内核或其他 root 方案已兼容。
+Build the formal Mali package from the hash-pinned public 0.4.2 ZIP:
+
+```text
+python tools/cold-boot/generate_contract.py --check
+python tools/build_mali_boot_policy.py --base <public-0.4.2.zip> --ndk <ndk> --work <fresh-dir> --qms-barrier --source-ref v0.8.7
+```
+
+The builder reuses unchanged GPU/KMD/CSF/interface bytes and rebuilds only the boot keeper/policy. It verifies the formal keeper equals the actual tested binary. The full `tools/build_mali_global.py` also supports `--qms-barrier`. Per-device private preparation uses `tools/cold-boot/prepare.py`; its boot/profile must match the chosen keeper. Existing private backup stores are not replaced automatically. Foreign boot changes after activation still block full-image rollback.
+
+Mali 0.4.3 is new; Decode 0.8.6 and client 0.3.7 are carried byte-for-byte from v0.8.6, optional PanVK Test8.1 from v0.6.9. Their original provenance stays intact. Frame Guard is omitted from this release and stays historical. No private firmware, boot images, logs, keys or closed Mali/CSF blobs are included. This release does not add new game/HDR/physical-blackout acceptance.
+
+以下为历史版本的构建和验证记录，当前状态以上方说明及对应验收记录为准。
 
 # Release v0.8.6 / 正式版源码与构建
 

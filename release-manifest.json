@@ -1,10 +1,10 @@
 {
   "kind": "complete_project_release",
-  "project_version": "0.8.6",
-  "release_tag": "v0.8.6",
+  "project_version": "0.8.7",
+  "release_tag": "v0.8.7",
   "release_date": "2026-10-20",
   "system_modules_firmware_pinned": true,
-  "validation_scope": "Recorded hardware, boot/rollback and bounded Exo physical-display feedback; not universal receiver, app, complete HDR or game performance certification",
+  "validation_scope": "Matched-target Mali component-qualified boot preparation, first binding, original-boot rollback and re-enable; unchanged Decode/client runtime retains prior acceptance, not other firmware or new performance certification",
   "components": [
     {
       "id": "decode-stack",
@@ -12,17 +12,20 @@
       "filename": "rk3588-decode-stack-0.8.6.zip",
       "status": "firmware_pinned_release",
       "sha256": "3984e75aaa367e380eb50addd78821b568366f882886f70e8ad25d1f0114e517",
-      "url": "https://github.com/sw1313/rk3588-playback-fix/releases/download/v0.8.6/rk3588-decode-stack-0.8.6.zip",
-      "source_release": "v0.8.6"
+      "url": "https://github.com/sw1313/rk3588-playback-fix/releases/download/v0.8.7/rk3588-decode-stack-0.8.6.zip",
+      "source_release": "v0.8.6",
+      "carried_from": "v0.8.6",
+      "runtime_identical_to_prior_release": true
     },
     {
       "id": "mali-global",
-      "version": "0.4.2",
-      "filename": "rk3588-mali-global-0.4.2.zip",
+      "version": "0.4.3",
+      "filename": "rk3588-mali-global-0.4.3.zip",
       "status": "firmware_pinned_release",
-      "sha256": "7ab0ef96f8560dd1c732df353879c26b567ce0e20c28116f95c1061033aa4a0c",
-      "url": "https://github.com/sw1313/rk3588-playback-fix/releases/download/v0.8.6/rk3588-mali-global-0.4.2.zip",
-      "source_release": "v0.8.6"
+      "sha256": "517bacfcf81b94f02504070cb586c313a86a6ab7d2cbd6ad342e771969e95137",
+      "url": "https://github.com/sw1313/rk3588-playback-fix/releases/download/v0.8.7/rk3588-mali-global-0.4.3.zip",
+      "source_release": "v0.8.7",
+      "runtime_identical_to_prior_release": false
     },
     {
       "id": "yamby-mpv-plugin",
@@ -30,18 +33,10 @@
       "filename": "RK3588-Mpv-Fix-0.3.7.apk",
       "status": "released",
       "sha256": "275d9df9ef0ebd676517036ce8b17c93156e6c96eef7f840c0a8c70af8d5eed8",
-      "url": "https://github.com/sw1313/rk3588-playback-fix/releases/download/v0.8.6/RK3588-Mpv-Fix-0.3.7.apk",
-      "source_release": "v0.8.6"
-    },
-    {
-      "id": "frameguard",
-      "version": "0.1.1",
-      "filename": "rk3588-frameguard-0.1.1.zip",
-      "status": "released",
-      "sha256": "a248d93828123800c0100aab7959f1da50e765706fa661ad12db6afc398a9c59",
-      "url": "https://github.com/sw1313/rk3588-playback-fix/releases/download/v0.8.6/rk3588-frameguard-0.1.1.zip",
-      "source_release": "v0.6.7",
-      "carried_from": "v0.6.7"
+      "url": "https://github.com/sw1313/rk3588-playback-fix/releases/download/v0.8.7/RK3588-Mpv-Fix-0.3.7.apk",
+      "source_release": "v0.8.6",
+      "carried_from": "v0.8.6",
+      "runtime_identical_to_prior_release": true
     },
     {
       "id": "panvk-app",
@@ -49,7 +44,7 @@
       "filename": "rk3588-panvk-rc3-test8.1.zip",
       "status": "experimental_optional",
       "sha256": "cd5a9c6d13c05f2d31535fa5c5ca15e95c6a3caba9b67919860e3d0e4ccc50bb",
-      "url": "https://github.com/sw1313/rk3588-playback-fix/releases/download/v0.8.6/rk3588-panvk-rc3-test8.1.zip",
+      "url": "https://github.com/sw1313/rk3588-playback-fix/releases/download/v0.8.7/rk3588-panvk-rc3-test8.1.zip",
       "source_release": "v0.6.9",
       "carried_from": "v0.6.9",
       "installation": "Application driver manager import; not a Magisk module",
@@ -58,8 +53,8 @@
   ],
   "original_project_license": "MIT",
   "source_archive": {
-    "filename": "rk3588-playback-fix-0.8.6-source.zip",
-    "url": "https://github.com/sw1313/rk3588-playback-fix/releases/download/v0.8.6/rk3588-playback-fix-0.8.6-source.zip",
+    "filename": "rk3588-playback-fix-0.8.7-source.zip",
+    "url": "https://github.com/sw1313/rk3588-playback-fix/releases/download/v0.8.7/rk3588-playback-fix-0.8.7-source.zip",
     "scope": "Project source, GPL kernel changes, patches and build guides; private firmware/link inputs, logs, addresses and signing keys excluded"
   }
 }

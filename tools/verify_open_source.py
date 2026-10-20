@@ -8,7 +8,7 @@ from package_licenses import ROOT, DOCUMENTS, metadata
 
 def verify():
     manifest = json.loads((ROOT / 'release-manifest.json').read_text(encoding='utf-8'))
-    assert {i['id'] for i in manifest['components']} == {'decode-stack','mali-global','yamby-mpv-plugin','frameguard','panvk-app'}
+    assert {i['id'] for i in manifest['components']} == {'decode-stack','mali-global','yamby-mpv-plugin','panvk-app'}
     results = []
     for item in manifest['components']:
         path = ROOT / 'dist' / item['filename']

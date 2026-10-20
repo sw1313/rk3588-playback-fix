@@ -1,0 +1,89 @@
+{
+  "project_release": "v0.8.7",
+  "date": "2026-10-20",
+  "status": "FORMAL_FIRMWARE_PINNED_BOOT_POLICY_RELEASE",
+  "all_installer_checks_passed": true,
+  "installers": [
+    {
+      "component": "decode-stack",
+      "version": "0.8.6",
+      "documents": 7,
+      "license_texts_checked": 23,
+      "checksum_entries_checked": 622,
+      "passed": true
+    },
+    {
+      "component": "mali-global",
+      "version": "0.4.3",
+      "documents": 7,
+      "license_texts_checked": 1,
+      "checksum_entries_checked": 132,
+      "passed": true
+    },
+    {
+      "component": "yamby-mpv-plugin",
+      "version": "0.3.7",
+      "documents": 7,
+      "license_texts_checked": 1,
+      "checksum_entries_checked": 0,
+      "passed": true
+    },
+    {
+      "component": "panvk-app",
+      "version": "0.1.0-rc3-rk3588-a12-test8.1",
+      "documents": 7,
+      "license_texts_checked": 1,
+      "checksum_entries_checked": 50,
+      "passed": true
+    }
+  ],
+  "new_component": "Mali Global 0.4.3",
+  "actual_full_installer_passed": true,
+  "actual_arm32_arm64_gles_shader_and_vulkan_gpu_readback_passed": true,
+  "actual_boot_acceptance": {
+    "pregraphics_first_binding": true,
+    "independent_embedded_keeper_profile_match": true,
+    "whole_module_disable_original_root_boot_restoration": true,
+    "original_driver_and_both_abi_original_libraries_after_rollback": true,
+    "reenable": true,
+    "formal_package_reboot_health": true,
+    "unchanged_gpu_kmd_csf": true,
+    "g18_csf_fence_dvfs_active": true,
+    "qms_and_refresh_session_active": true,
+    "external_zygisk_both_abis_lsposed": true,
+    "all_original_module_flags_restored": true,
+    "all_original_mali_and_decode_choices_restored": true,
+    "auto_hdr_preserved": true,
+    "frame_guard": "disabled and paused",
+    "webui_state_valid": true,
+    "webui_pending_reboot": false
+  },
+  "test_sequence_observation": "A reboot during the stock-boot rollback leg left Decode refresh-session unconfirmed. Its existing guard withdrew that selection at re-enable. The original selection was restored and a complete startup verification passed before formal installation. No Decode runtime or safety guard was changed.",
+  "firmware_policy": "Firmware components strictly pinned; supported per-user root packaging differences allowed; personal original/candidate identity and foreign-boot write guards retained",
+  "per_user_whole_boot_hash_as_cross_device_compatibility_gate": false,
+  "tested_qms_keeper_sha256": "ba28daffe3cd1fc6511d0d132c07b16e39546eb52ccde12b9d0fd35a2b9f2eac",
+  "offline_checks": {
+    "real_image_host_cases": 37,
+    "native_sha256_vectors": 13,
+    "inert_native_restore_cases": 39,
+    "actual_staging_script_fixture_cases": 9,
+    "inert_qms_rendezvous_cases": 21
+  },
+  "carried_unchanged": {
+    "decode-stack": "v0.8.6 / 0.8.6",
+    "yamby-mpv-plugin": "v0.8.6 / 0.3.7",
+    "panvk-app": "v0.6.9 / Test8.1"
+  },
+  "frameguard": "Omitted from new release; historical assets retained in old release",
+  "new_physical_playback_game_hdr_acceptance": false,
+  "private_material_scan": "Passed tracked-source and all four package scans; no per-user images, endpoints, logs or signing keys",
+  "source_archive": "Git-tracked release commit only; excludes local AGENTS.md, dist/private work, firmware, keys and proprietary blobs",
+  "limitations": [
+    "Only matched target boot lifecycle physically tested",
+    "Other supported root-packaging variants checked offline/in fixtures",
+    "New private boot/profile required for the new keeper; no silent existing-store migration",
+    "Foreign boot changes after activation block full-image rollback",
+    "Unknown firmware/root/init variants remain unsupported",
+    "No new sustained game performance, HDR calibration or physical HDMI-blackout claim"
+  ]
+}

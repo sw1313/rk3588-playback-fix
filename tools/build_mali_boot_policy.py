@@ -1,4 +1,4 @@
-"""Build a boot-validation-only Mali candidate from the pinned public release.
+"""Build a boot-validation-only Mali package from the pinned public release.
 
 Reuses unchanged GPU/KMD/interface bytes from the public ZIP, never an installed
 module directory. Rebuilds the native keeper and includes all changed source.
@@ -19,6 +19,7 @@ def main():
     p=argparse.ArgumentParser(description=__doc__)
     for key in ('base','ndk','work'):p.add_argument('--'+key,type=Path,required=True)
     p.add_argument('--qms-barrier',action='store_true',help='Retain the existing pre-graphics Decode QMS coordination')
+    p.add_argument('--source-ref',default='working-tree',help='Published source tag, or working-tree for an unreleased build')
     a=p.parse_args()
     require(sha(a.base)==BASE_SHA,'Expected unchanged public Mali Global 0.4.2 ZIP')
     work=a.work.resolve();require(not work.exists(),'Use a fresh work directory');work.mkdir(parents=True)
@@ -33,7 +34,8 @@ def main():
         expected,name=row.split(None,1);require(sha(out/name.strip())==expected,'Base package checksum differs')
     subprocess.run([sys.executable,ROOT/'tools/cold-boot/generate_contract.py','--check'],check=True)
     changed=['module.prop','boot-stage.sh','boot/README.md','README.md','src/cold_boot.c',
-             'src/cold_sha256.h','src/cold_firmware.h','src/cold_firmware_contract.h','contracts/boot-firmware.json']
+             'src/cold_sha256.h','src/cold_firmware.h','src/cold_firmware_contract.h','contracts/boot-firmware.json',
+             'webroot/index.html','webroot/i18n.js']
     for name in changed:
         target=out/name;target.parent.mkdir(parents=True,exist_ok=True)
         target.write_bytes((ROOT/'magisk-mali-global'/name).read_bytes().replace(b'\r\n',b'\n'))
@@ -45,10 +47,22 @@ def main():
                     '-Wl,-z,relro,-z,now','-o',str(out/'bin/cold_boot64')],check=True)
     names=[row.split(None,1)[1].strip() for row in (out/'kernel.sha256').read_text().splitlines()]
     (out/'kernel.sha256').write_text(''.join(sha(out/n)+'  '+n+'\n' for n in names),encoding='utf-8',newline='\n')
-    stage_licenses(out,'mali-global',source_ref='working-tree')
-    validation={'component':'mali-global','version':'0.4.3-test1','status':'UNRELEASED_BOOT_COMPATIBILITY_CANDIDATE',
-                'base_release_sha256':BASE_SHA,'gpu_kmd_csf_unchanged':True,'boot_written':False,
-                'new_first_binding_acceptance':False,'qms_barrier_included':a.qms_barrier,'source_ref':'working-tree'}
+    stage_licenses(out,'mali-global',source_ref=a.source_ref)
+    version=dict(line.split('=',1) for line in (out/'module.prop').read_text().splitlines() if '=' in line)['version']
+    evidence=json.loads((ROOT/'docs/validation/mali-boot-compat-043.json').read_text(encoding='utf-8'))
+    formal=a.source_ref!='working-tree'
+    if formal:
+        require(a.source_ref=='v0.8.7' and version=='0.4.3','Formal source tag/version differs')
+        require(evidence['new_first_binding_acceptance'] is True,'Actual first-binding acceptance missing')
+        require(sha(out/'bin/cold_boot64')==evidence['tested_qms_keeper_sha256'],'Formal keeper differs from actual tested keeper')
+        require(a.qms_barrier,'The accepted formal package includes Decode startup coordination')
+    validation={'component':'mali-global','version':version,
+                'status':'FIRMWARE_PINNED_RELEASE' if formal else 'UNRELEASED_BOOT_COMPATIBILITY_CANDIDATE',
+                'base_release_sha256':BASE_SHA,'gpu_kmd_csf_unchanged':True,
+                'new_first_binding_acceptance':evidence['new_first_binding_acceptance'],
+                'hardware_scope':'Matched target startup, full-module-disable rollback and re-enable; not other devices or new game/HDR performance',
+                'evidence':'docs/validation/mali-boot-compat-043.json',
+                'qms_barrier_included':a.qms_barrier,'keeper_sha256':sha(out/'bin/cold_boot64'),'source_ref':a.source_ref}
     (out/'VALIDATION.json').write_text(json.dumps(validation,indent=2)+'\n',encoding='utf-8')
     files=sorted(f for f in out.rglob('*') if f.is_file() and f.name!='checksums.sha256')
     (out/'checksums.sha256').write_text(''.join(sha(f)+'  '+f.relative_to(out).as_posix()+'\n' for f in files),encoding='utf-8',newline='\n')

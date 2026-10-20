@@ -1,8 +1,8 @@
 {
   "component": "mali-global",
-  "version": "0.4.3-test1",
+  "version": "0.4.3",
   "date": "2026-10-20",
-  "status": "UNRELEASED_FIRMWARE_COMPONENT_VALIDATION_CANDIDATE",
+  "status": "MATCHED_TARGET_BOOT_AND_ROLLBACK_ACCEPTED",
   "personal_whole_boot_hash_as_compatibility_gate": false,
   "per_user_backup_and_candidate_integrity_hashes_retained": true,
   "firmware_checks": [
@@ -29,29 +29,40 @@
     "native_restore_fixture_cases": 39,
     "actual_staging_script_fixture_cases": 9,
     "qms_rendezvous_fixture_cases": 21,
-    "independent_magiskboot_unpack": true
+    "independent_magiskboot_unpack": true,
+    "different_root_packaging_physical_devices_tested": false
   },
   "actual_device_safety": {
-    "real_boot_unchanged": true,
-    "gpu_kmd_dvfs_remain_active": true,
+    "actual_full_installer_passed": true,
+    "independent_embedded_keeper_and_profile_match": true,
+    "real_pregraphics_first_binding_passed": true,
+    "real_whole_module_disable_original_boot_restoration_passed": true,
+    "real_reenable_passed": true,
+    "gpu_kmd_csf_unchanged": true,
+    "external_zygisk_both_abis_lsposed_passed": true,
     "frame_guard_disabled_and_paused": true,
-    "fixture_directory_removed": true,
-    "real_kernel_or_display_mutation": false,
-    "player_input_or_capture": false
+    "player_input_or_capture": false,
+    "all_original_module_flags_restored": true,
+    "original_mali_and_decode_choices_restored": true,
+    "auto_hdr_preserved": true,
+    "qms_and_refresh_session_active": true,
+    "formal_package_installed_and_reboot_health_passed": true
   },
-  "new_first_binding_acceptance": false,
-  "public_release": false,
+  "new_first_binding_acceptance": true,
+  "public_release": true,
   "remaining_limits": [
     "requires regenerated private boot/profile for the new keeper",
     "no automatic replacement of existing private backup stores",
     "foreign boot modified after activation is not overwritten by full-image rollback",
     "unknown kernels, device trees, root implementations and conflicting init hooks remain unsupported",
-    "fixture success is not new cold-boot, QMS or game acceptance"
+    "Other-device root packaging remains offline/fixture validation; no new game/HDR/physical-blackout certification"
   ],
   "upstream_design_references": [
     "https://github.com/osm0sis/AnyKernel3/tree/020dfeccf9d7e962a48400fc94d3e451df92eead",
     "https://github.com/tiann/KernelSU/blob/4663610011d03771a64e7c36a2aa65bd1794022d/userspace/ksud/src/boot_patch.rs",
     "https://source.android.com/docs/core/architecture/kernel/loadable-kernel-modules"
   ],
-  "local_scope": "Component-qualified preparation and native validation; no upstream code copied and no generic GKI ABI claim"
+  "local_scope": "Component-qualified preparation and native validation; no upstream code copied and no generic GKI ABI claim",
+  "tested_qms_keeper_sha256": "ba28daffe3cd1fc6511d0d132c07b16e39546eb52ccde12b9d0fd35a2b9f2eac",
+  "test_sequence_observation": "A reboot during the stock-boot rollback leg left Decode refresh-session unconfirmed. Its existing guard withdrew that selection at re-enable. The original selection was restored and a complete startup verification passed before formal installation. No Decode runtime or safety guard was changed."
 }
