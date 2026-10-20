@@ -21,6 +21,8 @@ System modules target the pinned **H96 Max V58 / RK3588, Android 12 / API32, Lin
 - QMS requires a QMS-capable receiver, Auto and matched kernel/startup components. VRR support alone does not establish QMS support. Matrices, receivers and adapters can change link capabilities.
 - First binding before graphics and low-level display features need private preparation matched to the device, firmware and existing root. **Public ZIPs contain no boot image and do not provide universal boot adaptation.** Boot changes are separate from ordinary userspace selections.
 
+Ordinary installers do not whitelist a root brand/version. The current pre-graphics boot backend still requires qualified Magisk startup behavior; KernelSU/APatch have no hardware acceptance yet. See [root compatibility boundaries (Chinese)](docs/root-compatibility.zh-CN.md).
+
 ## Components
 
 | Component | Included version | Purpose and installation |
