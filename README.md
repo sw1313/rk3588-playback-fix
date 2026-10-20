@@ -4,7 +4,7 @@
 
 Reversible upgrades for **RK3588 playback and game graphics**: a system decode/display stack, global Mali driver module, LSPosed player client, and optional in-app Vulkan driver. Install the components you need; enabling everything is not required.
 
-The project has grown from a Yamby HW+ helper and fixed-60Hz workaround into coordinated system modules: Decode Stack handles decoding, buffer transfer and HDMI/HDR; Mali Global handles GPU userspace, matched kernel/CSF and response/stability policies. The LSPosed client remains responsible for supported app-specific format and seek repairs. System modules target exact firmware, with independent selections and reboot rollback. The repository name is retained for existing links and updates.
+The project has grown from a Yamby HW+ helper and fixed-60Hz workaround into coordinated system modules: Decode Stack handles decoding, buffer transfer and HDMI/HDR; Mali Global handles GPU userspace, matched kernel/CSF and response/stability policies. The LSPosed client remains responsible for supported app-specific format and seek repairs. System modules check their required system dependencies, with independent selections and reboot rollback. The repository name is retained for existing links and updates.
 
 **0.8.8 updates Mali Global to 0.4.4: root compatibility checks actual interfaces and local boot layout, without root-version or official binary-hash whitelists.** Firmware/ABI and per-user boot backup/rollback guards remain. Existing Magisk 30.7 passed physical installation and reboot; other variants have offline coverage only. KernelSU/APatch first-binding adapters are not implemented. [Compatibility scope](docs/root-compatibility.zh-CN.md). Decode and the client retain their prior packages.
 
@@ -14,7 +14,9 @@ The project has grown from a Yamby HW+ helper and fixed-60Hz workaround into coo
 
 ## Supported hardware and prerequisites
 
-System modules target the pinned **H96 Max V58 / RK3588, Android 12 / API32, Linux 5.10.66 firmware**. A matching SoC or kernel version alone is insufficient: installers check firmware hashes, ABI and component combinations. Unknown builds are refused; do not bypass these guards.
+The supported target is **H96 Max V58 / RK3588, Android 12 / API32, with the supported Linux 5.10.66 firmware**. Users on that device and firmware can have different root versions and locally patched boot images: root compatibility uses actual interfaces and local layout, without root-version or official root-binary hash whitelists, or a requirement to match the author's whole boot image.
+
+Checks of the system libraries and kernel interfaces used by each component remain, including known system-file fingerprints where required by binary adapters. These checks identify compatible system dependencies; each user's own boot hashes separately protect their backup and rollback. Different root packaging alone does not mean different firmware. [What is checked and why](docs/root-compatibility.zh-CN.md).
 
 - Decode Stack and Mali Global require a working root/module environment. Their offline panels require KsuWebUI or a manager with the compatible root bridge.
 - The client requires working Zygisk/LSPosed. The Yamby settings adapter targets **2.1.0.11 (20010012)**; newer app builds may need adaptation.

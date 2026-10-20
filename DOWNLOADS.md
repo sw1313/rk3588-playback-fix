@@ -13,9 +13,9 @@
 
 PanVK 原字节携带，仍为可选的应用内实验驱动，不是全局替换。
 
-System modules require the exact firmware contracts. Existing choices survive updates; turn a feature off and reboot for rollback. QMS / first binding require independently prepared private boot compatibility; no firmware or boot image is distributed.
+System modules check the system dependencies and ABI used by each component. Different root versions or locally patched boot images are not rejected by a root-version, official root-file hash or author's whole-boot whitelist. Existing choices survive updates; turn a feature off and reboot for rollback. QMS / first binding require independently prepared private boot compatibility; no firmware or boot image is distributed.
 
-系统模块严格匹配固件；安装前会检查依赖，保留现有分项。关闭分项并重启回退。全套源代码不含私有固件、设备地址、原始日志和签名密钥。
+同设备同固件允许各自的 root 版本与 boot 打包差异，按实际接口和布局检查；系统依赖／ABI 与个人备份完整性仍核对，更新保留现有分项。关闭分项并重启回退。全套源代码不含私有固件、设备地址、原始日志和签名密钥。
 
 [SHA256](https://github.com/sw1313/rk3588-playback-fix/releases/download/v0.8.8/SHA256SUMS.txt) · [Manifest](release-manifest.json) · [Source ZIP](https://github.com/sw1313/rk3588-playback-fix/releases/download/v0.8.8/rk3588-playback-fix-0.8.8-source.zip) · [本版启动验收](docs/validation/release-0.8.8.json) · [播放验收](docs/validation/decode-refresh-session-086.json)
 

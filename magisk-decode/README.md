@@ -2,7 +2,7 @@
 
 项目的系统播放与显示升级模块，负责 Codec2／MPP／RGA 配套、AFBC 与缓冲传递、十位 HDR 合成输出、HDMI 兼容和内容帧率管理。按固件精确适配、分项选择、重启应用及回退；GPU 驱动升级归 Mali Global，应用特定的格式／索引修复归 LSPosed 客户端。[完整安装与功能说明](../README.zh-CN.md)。
 
-System playback/display upgrades: codec and buffer paths, AFBC, ten-bit HDR, HDMI compatibility and content-rate management. Exact firmware required, with per-feature reboot rollback. GPU drivers and app-specific repairs are managed by the separate Mali Global and LSPosed components. [Full English guide](../README.md).
+System playback/display upgrades: codec and buffer paths, AFBC, ten-bit HDR, HDMI compatibility and content-rate management. The installer checks the required system dependencies and ABI, with per-feature reboot rollback; root versions are not whitelisted. GPU drivers and app-specific repairs are managed by the separate Mali Global and LSPosed components. [Full English guide](../README.md).
 
 按用途提供“播放基础、原生播放稳定性、AV1、十位画质与 HDR、显示兼容与合成”组合，也可展开逐项选择。保留既有配置，启用时补齐依赖，修改后重启。关闭分项恢复对应旧路径，关闭整包并重启恢复原固件。
 
@@ -14,7 +14,7 @@ Frame Guard 已退出当前推荐组合，当前已验收的帧率保留配置�
 
 原生队列背压、暂停恢复、十位格式支持及指定精度／回退已有各自记录。完整 HDR 色彩校准、所有应用／片源兼容和每项性能净收益仍分别验收；客户端 HW/Main10 格式与 MKV 索引修复在独立 LSPosed 客户端。
 
-仅适用于契约中精确匹配的 RK3588 Android 12/API32 固件。安装器检查固件和 ABI，不分发原固件镜像、闭源 Mali 或私有 boot。首次绑定适配必须预先准备匹配设备和 root 的私有启动文件；普通 ZIP 安装不会替用户生成通用 boot。未配置的低层显示功能默认关闭，升级保留用户已有选择。
+面向已适配的 RK3588 Android 12/API32 系统，安装器核对组件实际依赖的系统文件及 ABI；同固件下 root 版本或 boot 打包差异不作为整包拒绝理由。公开包不分发原固件镜像、闭源 Mali 或私有 boot。首次绑定适配必须预先准备匹配设备和 root 的私有启动文件；普通 ZIP 安装不会替用户生成通用 boot。未配置的低层显示功能默认关闭，升级保留用户已有选择。
 
 当前完整发布是项目 **v0.8.8**，本组件仍为 **0.8.6 原包**，本次无需重复安装。普通模块入口不按 root 品牌／版本拒绝，但需实际挂载与固件 ABI；Mali 图形服务前首次绑定的专用后端由 Mali 模块独立检查。[root 兼容与限制](../docs/root-compatibility.zh-CN.md)。
 
