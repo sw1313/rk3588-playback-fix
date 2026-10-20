@@ -2,7 +2,7 @@
 
 **RK3588 playback, display and game graphics upgrades — per-feature controls and rollback.**
 
-Reversible upgrades for **RK3588 playback and game graphics**: a system decode/display stack, global Mali driver module, LSPosed player client, and optional refresh-rate workaround and in-app Vulkan driver. Install the components you need; enabling everything is not required.
+Reversible upgrades for **RK3588 playback and game graphics**: a system decode/display stack, global Mali driver module, LSPosed player client, and optional in-app Vulkan driver. Install the components you need; enabling everything is not required.
 
 The project has grown from a Yamby HW+ helper and fixed-60Hz workaround into coordinated system modules: Decode Stack handles decoding, buffer transfer and HDMI/HDR; Mali Global handles GPU userspace, matched kernel/CSF and response/stability policies. The LSPosed client remains responsible for supported app-specific format and seek repairs. System modules target exact firmware, with independent selections and reboot rollback. The repository name is retained for existing links and updates.
 
@@ -26,10 +26,9 @@ System modules target the pinned **H96 Max V58 / RK3588, Android 12 / API32, Lin
 | [Decode Stack](magisk-decode/README.md) | **0.8.6** | Magisk system module: decoding, buffer transfer, ten-bit/HDR, display compatibility, matched-rate retention and optional QMS |
 | [Mali Global](magisk-mali-global/README.md) | **0.4.2** | Magisk GPU module: global ARM32/ARM64 g18p0 userspace, optional paired kernel/CSF, DVFS and synchronization stability |
 | Yamby/mpv LSPosed client | **0.3.7** | APK: HW+ settings, optional edge compensation, guarded Main10 HW copy-back and MKV seek-index repair |
-| Frame Guard | **0.1.1, unchanged** | Magisk fixed-60Hz workaround; restore its saved restrictions and keep it off for Auto content matching |
 | [PanVK in-app driver](panvk/README.md) | **RC3 Test8.1, optional experimental** | Import in the supported application's driver manager; not a Magisk module or global Mali replacement |
 
-The project version identifies a complete release snapshot; components keep their own version numbers. The release includes five components, source ZIP, manifest and SHA256 sums. Older releases remain available for history and rollback. Standalone MPP/RGA/Codec2/libyuv directories are historical sources and must not overlap the unified Decode Stack.
+The project version identifies a complete release snapshot; components keep their own version numbers. The current installation set is Decode Stack, Mali Global and the client as needed, with PanVK independently optional. A source ZIP, manifest and SHA256 sums accompany the release. Frame Guard has been retired from the recommended set: its existing assets and sources remain for historical rollback reference, but the accepted current configuration no longer needs it installed or enabled. Standalone MPP/RGA/Codec2/libyuv directories are also historical sources and must not overlap the unified Decode Stack.
 
 ## Install or update
 
@@ -64,7 +63,7 @@ Groups show selected/current/next-boot counts. Mixed means a retained custom sel
 | Keep matched rate during playback | Retains the same video layer's valid source vote when pause/resume/same-video seek clears it, preventing unnecessary desktop-rate reselection |
 | QMS | Maintains the HDMI link for genuine same-resolution rate changes; does not replace retention of a playback request |
 | Fixed resolution/rate | Intended to keep the selected mode; only Auto adapts. Localized identification is repaired; sustained locking of every fixed combination remains separately scoped |
-| Frame Guard | Saves system limits and requests fixed 60Hz, preventing Auto content matching |
+| Frame Guard (retired workaround) | Fixed 60Hz prevents Auto content matching; the accepted current configuration no longer depends on it |
 
 The 0.8.6 policy runs at the common SurfaceFlinger layer setter, covering legacy Binder and BLAST requests. It retains only eligible zero/default requests in Auto. **New positive frame-rate requests pass through and update normally.** Native policy excludes hidden/removed layers; there is no global cross-video vote cache. Disable `display_session` and reboot to restore original handling.
 
@@ -127,7 +126,7 @@ Mali Global provides global ARM32/ARM64 **g18p0 userspace**, optional paired KMD
 | Disable a client repair and restart the app | Restores corresponding original app handling; LSPosed scope can also be disabled |
 | Select System GPU Driver in the app | Restores its system-driver choice after closing/reopening the game; no global module change |
 
-**Frame Guard is an exception: disabling its module alone does not undo saved system refresh restrictions.** First restore/pause through its Action, or uninstall to restore values still owned by the module. Its original backup is `/data/adb/rk3588-frameguard/original.conf`; later manual changes are protected. The accepted release configuration keeps it disabled and paused.
+**When removing an old Frame Guard installation, disabling the module alone does not undo saved system refresh restrictions.** First restore/pause through its Action, or uninstall to restore values still owned by the module. Its original backup is `/data/adb/rk3588-frameguard/original.conf`; later manual changes are protected. The accepted release configuration keeps it disabled and paused. New installations do not need it.
 
 On failed boot checks, inspect state/dependencies/rollback records instead of repeatedly forcing unknown tuples. A hard kernel hang or interrupted boot write can still require power cycling or physical Loader recovery; network ADB recovery cannot be guaranteed. See the startup guide for the exact limits.
 
