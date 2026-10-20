@@ -12,13 +12,14 @@ def sha(b):return hashlib.sha256(b).hexdigest()
 def main():
  p=argparse.ArgumentParser(description=__doc__)
  p.add_argument('--adb',required=True);p.add_argument('--serial',required=True)
+ p.add_argument('--adb-port',default='5037');p.add_argument('--su',default='su')
  p.add_argument('--ndk',type=Path,required=True);p.add_argument('--out',type=Path,required=True)
  a=p.parse_args();a.out.mkdir(parents=True,exist_ok=True)
  compiler=a.ndk/'toolchains/llvm/prebuilt/windows-x86_64/bin/clang.exe'
  exe=a.out/'cold_fixture64'
  subprocess.run([str(compiler),'--target=aarch64-linux-android32','-DRK_COLD_TEST','-O2','-static','-Wall','-Wextra','-Werror',str(ROOT/'magisk-mali-global/src/cold_boot.c'),'-o',str(exe)],check=True)
- adb=[a.adb,'-s',a.serial]
- def shell(cmd,check=True):return subprocess.run(adb+['shell','su -c '+shlex.quote(cmd)],capture_output=True,text=True,check=check)
+ adb=[a.adb,'-P',a.adb_port,'-s',a.serial]
+ def shell(cmd,check=True):return subprocess.run(adb+['shell',shlex.quote(a.su)+' -c '+shlex.quote(cmd)],capture_output=True,text=True,check=check)
  def push(src,dest):subprocess.run(adb+['push',str(src),dest],capture_output=True,check=True)
  require=shell('test ! -e '+BASE,False);assert require.returncode==0,'Fixture exists; inspect and remove explicitly first'
  push(exe,'/data/local/tmp/rk-cold-fixture64')
@@ -52,7 +53,7 @@ def main():
   r=shell('/data/local/tmp/rk-cold-fixture64 '+command,False)
   assert r.returncode==expected,(name,r.returncode,r.stderr)
   disk=shell('sha256sum '+BASE+'/boot-device').stdout.split()[0]
-  if restored:assert disk==sha(original),(name,'did not restore original')
+  if restored:assert disk==sha(files['state/boot/original.img']),(name,'did not restore original')
   elif command=='apply' and expected==0:assert disk==sha(candidate),(name,'did not apply candidate')
   if event:assert event in shell('cat '+BASE+'/state/cold-journal').stdout,(name,'missing event')
   if command=='stage' and expected==0:
@@ -63,6 +64,10 @@ def main():
  case('apply verifies write',{'boot-device':original},'apply',0)
  case('failed partial candidate write restores original',{'boot-device':original,'state/fail-write':'yes'},'apply',70,True,event='BOOT_WRITE_FAILED_ORIGINAL_RECOVERED')
  case('restore verifies original',{},'restore',0,True)
+ alternate=b'U'*4096
+ alternate_profile=profile.replace('original_sha256 '+sha(original),'original_sha256 '+sha(alternate))
+ case('per-user original hash restores that user backup',{'state/boot/original.img':alternate,'state/boot/profile':alternate_profile},'restore',0,True)
+ case('one user backup cannot restore another profile',{'state/boot/original.img':alternate},'restore',70)
  case('missing candidate still restores',{'state/boot/candidate.img':None},'restore',0,True)
  case('corrupt candidate still restores',{'state/boot/candidate.img':b'bad'},'restore',0,True)
  case('foreign boot never overwritten',{'boot-device':b'X'*4096},'restore',70,event='REFUSED_FOREIGN_BOOT')

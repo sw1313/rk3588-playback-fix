@@ -1,0 +1,82 @@
+{
+  "schema": 1,
+  "firmware": "H96 Max V58 AGtv API32 Linux 5.10.66",
+  "partition_bytes": 50331648,
+  "page_size": 2048,
+  "header_version": 2,
+  "fixed_header_sha256": "f60d855bd49632dd45279d2c041631cd0a51af4db86774f5197a73b1244821c8",
+  "parts": {
+    "0": {
+      "bytes": 36323336,
+      "sha256": "d9b764ad8342ce71ddde45bc0978e548ae636ce6d01fb4bf3f426eba5fff0740"
+    },
+    "2": {
+      "bytes": 6518784,
+      "sha256": "8289ad340c3beebf3fdfce6d00519937b9515a97cf2ba6946298a347af7d91d3"
+    },
+    "3": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "4": {
+      "bytes": 513137,
+      "sha256": "a28555b6657de71b5b5251d4e724c28512ba2eee13199be5278f4831d04bf349"
+    }
+  },
+  "cmdline": "console=ttyFIQ0 firmware_class.path=/vendor/etc/firmware init=/init rootwait ro loop.max_part=7 androidboot.console=ttyFIQ0 androidboot.wificountrycode=XS androidboot.hardware=rk30board androidboot.boot_devices=fe2e0000.mmc androidboot.selinux=permissive buildvariant=userdebug",
+  "allowed_extra_cmdline": [
+    "quiet",
+    "loglevel=0",
+    "loglevel=1",
+    "loglevel=2",
+    "loglevel=3",
+    "loglevel=4",
+    "loglevel=5",
+    "loglevel=6",
+    "loglevel=7"
+  ],
+  "root_api": 30700,
+  "root_records": {
+    "init": {
+      "sha256": "383670a7ba3a6a4b79e5f3467e1da4b66a5df66a9b356ab9f70916854dd6b468",
+      "xz": false,
+      "mode": 33256
+    },
+    ".backup/init.xz": {
+      "sha256": "e4e602b2cf61215cf458ddae1183703d6b286425e803310392233184c11e376b",
+      "xz": true,
+      "mode": 33256
+    },
+    "overlay.d/sbin/magisk.xz": {
+      "sha256": "2d8419018dda41f7d9aca94c0ca8f926f3b8447ca5cf7fb71faeb8d05e29694e",
+      "xz": true,
+      "mode": 33188
+    },
+    "overlay.d/sbin/init-ld.xz": {
+      "sha256": "c71e69780bb7ce6d6c26b2d794a3c631689bed130519762716fee285a10417f0",
+      "xz": true,
+      "mode": 33188
+    },
+    "overlay.d/sbin/stub.xz": {
+      "sha256": "f0230e0864be255d963befa929ae1c0bb85c4df3e3578bb6cecc3049b6881eb0",
+      "xz": true,
+      "mode": 33188
+    }
+  },
+  "services_sha256": {
+    "sf": "4b32de7e3a3faaae7cc3d22ea16b67a8a530f1c4758b8b88b762112efab0e4c8",
+    "hwc": "4f3fa4c6c1aeddc43d441711020ec0254698b07fab938a5440a331c662a36199",
+    "allocator": "2e09eb4cf14063ac4a19d5f7103366f507532c9498456549cc187a21719128f4",
+    "zygote": "e36386004bd0988687bc38d1b7b28632af23dfff01c07e011c3c08a85f095f94"
+  },
+  "ramdisk_firmware_records": {
+    "fstab.rk30board": {
+      "sha256": "cb08846ccc8bfce3c0340a521d030a07ff46d128abc6786385a68f40a7735d10",
+      "mode": 33184
+    },
+    "system/etc/ramdisk/build.prop": {
+      "sha256": "b15fa39352c2c214dc0703ba969ff44de0bd7872d6d33e31214000a5532ccd34",
+      "mode": 33188
+    }
+  }
+}

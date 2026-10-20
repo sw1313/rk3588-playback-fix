@@ -1,6 +1,6 @@
 id=rk3588_mali_global
 name=RK3588 Native Mali Global Upgrade
-version=0.4.2
-versionCode=425
+version=0.4.3-test1
+versionCode=426
 author=sw1313
-description=Firmware-specific RK3588 API32 g18p0 userspace/KMD/CSF. Matched cold boot, CSF stability and bounded DVFS/rollback checks recorded; per-game gains still require comparison. Independent boot adaptation preserves external Zygisk and original-driver rollback.
+description=Firmware-specific RK3588 API32 g18p0 userspace/KMD/CSF candidate. Checks firmware components while preserving supported per-user root ramdisks; private first-binding preparation and reboot rollback retained. New boot adaptation needs device acceptance.

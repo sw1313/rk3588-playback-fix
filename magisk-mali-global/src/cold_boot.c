@@ -22,6 +22,7 @@
 #include <stdint.h>
 #include <string.h>
 #include <limits.h>
+#include "cold_firmware.h"
 
 #ifdef RK_COLD_TEST
 #define BASE "/data/local/tmp/rk-cold-fixture"
@@ -89,7 +90,8 @@ static int profile_read(const char *path){
   if(seen&bit){ok=0;break;}seen|=bit;if(dest){if(!hex64(value)){ok=0;break;}memcpy(dest,value,65);}
  }fclose(f);
 #ifndef RK_COLD_TEST
- if(strcmp(cfg.original,"eabcbc53b3e56846036c8cb23fd77d246ad919aae427757e17364cb777186264")||cfg.bytes!=50331648)ok=0;
+ // Whole-image digests identify this user's backup, not firmware compatibility.
+ if(cfg.bytes!=RK_BOOT_BYTES)ok=0;
 #endif
  return ok&&seen==127;
 }
@@ -112,12 +114,20 @@ static int digest(const char *path,char hash[65]){char b[1024];const char *a[]={
 static int matches(const char *path,const char *expected){char h[65];return digest(path,h)&&!strcmp(h,expected);}
 static int image_hash(char h[65]){return owned(STORE "/image.sha256")&&text_read(STORE "/image.sha256",h,65)&&hex64(h);}
 static int verify_original(void){
- struct stat s;return owned(STORE "/original.img")&&!stat(STORE "/original.img",&s)&&(uint64_t)s.st_size==cfg.bytes&&matches(STORE "/original.img",cfg.original);
+ struct stat s;int ok=owned(STORE "/original.img")&&!stat(STORE "/original.img",&s)&&(uint64_t)s.st_size==cfg.bytes&&matches(STORE "/original.img",cfg.original);
+#if !defined(RK_COLD_TEST) || defined(RK_COLD_REAL_FIRMWARE)
+ if(ok)ok=rk_boot_firmware(STORE "/original.img",0);
+#endif
+ return ok;
 }
 static int verify_files(void){
  char h[65];struct stat s;
- return verify_original()&&
+ int ok=verify_original()&&
   image_hash(h)&&owned(STORE "/candidate.img")&&!stat(STORE "/candidate.img",&s)&&(uint64_t)s.st_size==cfg.bytes&&matches(STORE "/candidate.img",h);
+#if !defined(RK_COLD_TEST) || defined(RK_COLD_REAL_FIRMWARE)
+ if(ok)ok=rk_boot_firmware(STORE "/candidate.img",1);
+#endif
+ return ok;
 }
 static int verify_payload(void){
  char cache[PATH_MAX];snprintf(cache,sizeof(cache),STATE "/cache/%s.bin",cfg.csf);

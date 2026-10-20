@@ -1,5 +1,10 @@
 # Mali Global 0.4.2 · GPU 驱动与游戏图形升级
 
+源码中的下一版候选为 **0.4.3-test1**：首次绑定改为严格校验固件组件、保留各用户自己的
+boot／root ramdisk，不再要求整镜像等于单台设备的哈希。新的准备／暂存／恢复检查已
+纳入模块；需要重新生成私有启动适配并分别验收，尚不替代已发布的 0.4.2。现有安装包、
+设备 boot 和运行配置不因源码修改而改变。[具体允许／拒绝边界](boot/README.md)。
+
 项目的全局 GPU 升级模块，负责 32／64 位 Mali g18p0 用户态、匹配内核／CSF、图形服务前首次绑定、DVFS 响应和 CSF 同步稳定性。严格匹配固件并保留分项控制与重启回退。系统解码、HDR 和 HDMI 修复归 Decode Stack；游戏收益按具体场景验收。[完整安装与功能说明](../README.zh-CN.md)。
 
 Global GPU upgrades: ARM32/ARM64 Mali g18p0 userspace, paired kernel/CSF, pre-graphics first binding, DVFS response and synchronization stability. Exact firmware required, with independent controls and reboot rollback. Per-game performance remains separately measured; Decode Stack manages playback/display repairs. [Full English guide](../README.md).

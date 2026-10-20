@@ -4,7 +4,7 @@ The installer fetches both native drivers from pinned HTTPS upstream URLs. All
 included interface libraries are built from the bundled frozen AOSP source.
 Original firmware libraries are link inputs only and are never copied to output.
 """
-import argparse,hashlib,json,os,shutil,subprocess,zipfile
+import argparse,hashlib,json,os,shutil,subprocess,sys,zipfile
 from pathlib import Path
 from package_licenses import stage as stage_licenses
 from stage_mali_kernel import stage as stage_kernel
@@ -20,8 +20,10 @@ def main():
  parser.add_argument('--kernel-artifacts',type=Path,required=True)
  parser.add_argument('--kernel-runtime',type=Path,required=True)
  parser.add_argument('--source-ref',help='Source tag/ref; working-tree marks an unpublished local candidate')
+ parser.add_argument('--qms-barrier',action='store_true',help='Include the existing Decode pre-graphics QMS coordinator in the private keeper')
  parser.add_argument('--build-tools',default='35.0.0');parser.add_argument('--aidl-build-tools',default='34.0.0')
  a=parser.parse_args();w=a.work.resolve();out=w/'package'
+ run([sys.executable,ROOT/'tools/cold-boot/generate_contract.py','--check'])
  if out.exists():raise SystemExit('Use a fresh output directory')
  w.mkdir(parents=True,exist_ok=True);h=a.headers.resolve();src=MODULE/'src';sdk=a.sdk.resolve();ndk=a.ndk.resolve()
  host='windows-x86_64' if os.name=='nt' else 'linux-x86_64';ext='.exe' if os.name=='nt' else '';llvm=ndk/'toolchains/llvm/prebuilt'/host/'bin';bt=sdk/'build-tools'/a.build_tools;aidl=sdk/'build-tools'/a.aidl_build_tools/('aidl'+ext)
@@ -31,7 +33,7 @@ def main():
   args+=['-I'+str(src/'aidl'/name) for name in PACKAGES];args+=list((src/'aidl'/key).rglob('*.aidl'));run(args)
  shutil.copytree(MODULE,out,ignore=shutil.ignore_patterns('payload','system','bin','active*','status.txt','compositor-status.txt','disable','checksums.sha256','payload.sha256','skip_mount'))
  (out/'bin').mkdir()
- run([llvm/('clang'+ext),'--target=aarch64-linux-android32','-std=c11','-O2','-static','-Wall','-Wextra','-Werror','-ffile-prefix-map='+ROOT.as_posix()+'=/src',src/'cold_boot.c','-Wl,-z,relro,-z,now','-o',out/'bin/cold_boot64'])
+ run([llvm/('clang'+ext),'--target=aarch64-linux-android32','-std=c11','-O2','-static','-Wall','-Wextra','-Werror',*(['-DRKQMS_DISPLAY_STAGE=1'] if a.qms_barrier else []),'-ffile-prefix-map='+ROOT.as_posix()+'=/src',src/'cold_boot.c','-Wl,-z,relro,-z,now','-o',out/'bin/cold_boot64'])
  common_args=['-std=c++17','-O2','-fPIC','-shared','-fno-exceptions','-fno-rtti','-nostdinc++','-nostdlib++','-DANDROID','-DBINDER_STABILITY_SUPPORT','-isystem'+str(h/'external/libcxx/include'),'-isystem'+str(h/'generated-headers/bionic/libc/libc/android_vendor.32_arm_armv8-a_shared/gen/include'),'-I'+str(src/'binder-cpp')]
  for original,replacement in [(MODULE.resolve(),'/src'),(h,'/platform'),(ndk,'/ndk'),(w,'/obj')]:
   for spelling in {str(original).replace('\\','/'),str(original).replace('/','\\')}:common_args+=['-ffile-prefix-map='+spelling+'='+replacement]

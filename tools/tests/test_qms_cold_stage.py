@@ -31,6 +31,7 @@ def main():
     for key in ('adb', 'serial'):
         p.add_argument('--' + key, required=True)
     p.add_argument('--su', default='su', help='Verified on-device su executable; supports original-root recovery PATH')
+    p.add_argument('--adb-port', default='5037')
     for key in ('ndk', 'out'):
         p.add_argument('--' + key, type=Path, required=True)
     a = p.parse_args()
@@ -40,7 +41,7 @@ def main():
     subprocess.run([str(compiler), '--target=aarch64-linux-android32', '-DRK_COLD_TEST',
                     '-DRKQMS_DISPLAY_STAGE=1', '-O2', '-static', '-Wall', '-Wextra', '-Werror',
                     str(ROOT / 'magisk-mali-global/src/cold_boot.c'), '-o', str(binary)], check=True)
-    adb = [a.adb, '-s', a.serial]
+    adb = [a.adb, '-P', a.adb_port, '-s', a.serial]
 
     def shell(cmd, check=True):
         return subprocess.run(adb + ['shell', shlex.quote(a.su)+' -c ' + shlex.quote(cmd)], capture_output=True,

@@ -1,0 +1,57 @@
+{
+  "component": "mali-global",
+  "version": "0.4.3-test1",
+  "date": "2026-10-20",
+  "status": "UNRELEASED_FIRMWARE_COMPONENT_VALIDATION_CANDIDATE",
+  "personal_whole_boot_hash_as_compatibility_gate": false,
+  "per_user_backup_and_candidate_integrity_hashes_retained": true,
+  "firmware_checks": [
+    "exact kernel, second stage and DTB",
+    "fixed boot header and critical command line",
+    "ramdisk firmware fstab and properties",
+    "supported Magisk 30700 implementation and original init",
+    "normalized graphics and Zygote service definitions",
+    "existing graphics ABI and GPU/KMD/CSF platform contracts"
+  ],
+  "allowed_differences": [
+    "gzip timestamps and compression levels",
+    "raw newc ramdisk",
+    "zero tail omitted by image tools, normalized before full partition comparison",
+    "supported per-user Magisk configuration and backup SHA1",
+    "unchanged root executables recompressed as XZ",
+    "unrelated additional CPIO files",
+    "service whitespace and full-line comments",
+    "explicitly allowed logging arguments and command-line token order"
+  ],
+  "checks": {
+    "real_image_host_cases": 37,
+    "native_sha256_vectors": 13,
+    "native_restore_fixture_cases": 39,
+    "actual_staging_script_fixture_cases": 9,
+    "qms_rendezvous_fixture_cases": 21,
+    "independent_magiskboot_unpack": true
+  },
+  "actual_device_safety": {
+    "real_boot_unchanged": true,
+    "gpu_kmd_dvfs_remain_active": true,
+    "frame_guard_disabled_and_paused": true,
+    "fixture_directory_removed": true,
+    "real_kernel_or_display_mutation": false,
+    "player_input_or_capture": false
+  },
+  "new_first_binding_acceptance": false,
+  "public_release": false,
+  "remaining_limits": [
+    "requires regenerated private boot/profile for the new keeper",
+    "no automatic replacement of existing private backup stores",
+    "foreign boot modified after activation is not overwritten by full-image rollback",
+    "unknown kernels, device trees, root implementations and conflicting init hooks remain unsupported",
+    "fixture success is not new cold-boot, QMS or game acceptance"
+  ],
+  "upstream_design_references": [
+    "https://github.com/osm0sis/AnyKernel3/tree/020dfeccf9d7e962a48400fc94d3e451df92eead",
+    "https://github.com/tiann/KernelSU/blob/4663610011d03771a64e7c36a2aa65bd1794022d/userspace/ksud/src/boot_patch.rs",
+    "https://source.android.com/docs/core/architecture/kernel/loadable-kernel-modules"
+  ],
+  "local_scope": "Component-qualified preparation and native validation; no upstream code copied and no generic GKI ABI claim"
+}

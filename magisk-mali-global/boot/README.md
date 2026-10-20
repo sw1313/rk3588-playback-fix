@@ -1,4 +1,68 @@
-# Exact-root cold binding (0.4.1-test2)
+# Firmware-qualified cold binding
+
+## 0.4.3-test1: per-user boot compatibility candidate
+
+The new source no longer requires one user's complete rooted boot SHA256.
+It pins the firmware kernel, second stage, DTB, fixed boot-header fields and
+critical command-line values. The host additionally checks the ramdisk fstab,
+firmware properties, supported Magisk 30700 executables and original init,
+plus normalized allocator/HWC/SF/Zygote definitions. Original CPIO records are
+preserved byte for byte. Gzip timestamps/levels, raw newc ramdisks, supported
+Magisk configuration values and unrelated extra files may differ. Tool-generated
+images may omit the unused zero tail: preparation pads to the known partition
+size, verifies all components, and staging must match the full live partition.
+
+Each user's complete original SHA256 is recorded in their private profile;
+candidate identity, verified backup and foreign-boot write protection remain.
+The native keeper rechecks firmware components independently when verifying
+the backup/candidate. Staging checks the live graphics contract, root API,
+caller-supplied profile digest and that the original/candidate belongs to the
+current boot. It does not write boot. Failed new staging removes only its own
+files; an existing backup store is never silently replaced.
+
+Custom kernels/DTBs, unknown root implementations, recovery/vendor_boot root,
+unrecognized boot arguments, signed/footer layouts and conflicting early init
+hooks still require separate adaptation. No generic KernelSU/APatch support is
+implied. Repacking a boot *after* activation still changes its ownership hash:
+automatic rollback will not overwrite it with an older full backup. This
+candidate does not implement semantic removal of modifications from a foreign
+boot, nor automatic migration/replacement of an existing private boot store.
+
+The loader changed, so a newly prepared private boot is required before using
+this candidate for first binding. Do not mix it with an old embedded keeper or
+reuse the old QMS startup pairing without requalification. Offline/isolated
+checks are separate from real startup acceptance; published 0.4.2 assets remain
+unchanged. See `tools/tests/test_mali_boot_compat.py` and
+`tools/build_mali_boot_policy.py` for the targeted checks/build.
+
+Targeted checks completed: 37 real-image host cases, 13 independent native
+SHA-256 vectors, 39 inert native restoration cases, 9 actual staging-script
+cases with the native firmware reader, and 21 inert QMS rendezvous cases. The
+generated private image also passed independent device Magisk unpack/CPIO
+checks in a disposable directory; it was never flashed or booted.
+The real boot hash still matches the existing formal-release boot, g18/KMD/DVFS
+remain active and Frame Guard remains disabled/paused. These checks did not
+write real boot, load a new driver, change playback or qualify a new cold boot.
+Machine-readable scope: `docs/validation/mali-boot-compat-043.json`.
+
+`tools/build_mali_boot_policy.py --base <public-0.4.2.zip> --ndk <ndk> --work <fresh-dir>`
+reuses only the exact published base ZIP's unchanged GPU/kernel/interface bytes,
+rebuilds the keeper and stages the new policy/source with candidate provenance.
+Add `--qms-barrier` for the existing Decode pre-graphics QMS coordination. The
+full `build_mali_global.py` builder supports the same flag. Preparation requires
+the keeper to match the chosen package; generic and QMS keepers are not mixed.
+
+Design references, not directly copied code: [AnyKernel3 local ramdisk handling](https://github.com/osm0sis/AnyKernel3/tree/020dfeccf9d7e962a48400fc94d3e451df92eead),
+[KernelSU local backup/profile handling](https://github.com/tiann/KernelSU/blob/4663610011d03771a64e7c36a2aa65bd1794022d/userspace/ksud/src/boot_patch.rs),
+and [Android module ABI limits](https://source.android.com/docs/core/architecture/kernel/loadable-kernel-modules).
+The vendor firmware/ABI/private-layout restrictions remain independent of the
+ramdisk packaging changes; no GKI-wide compatibility is claimed.
+
+中文边界：严格验证固件组件，允许已支持 root 环境内的本机打包差异；按每人的原 boot
+生成适配和回退备份。不是取消校验，也不支持未知内核或任意启动钩子。新版候选没有
+写入设备 boot，没有将离线通过算作新的首次绑定验收。
+
+## Historical startup integration (0.4.1-test2 / 0.4.2)
 
 This is an **experimental candidate**, disabled by default. On the target,
 0.4.1-test2 passed cold startup, both-ABI external injection, app-hook and

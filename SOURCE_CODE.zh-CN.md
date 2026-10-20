@@ -1,3 +1,16 @@
+# 下一版源码候选：Mali Global 0.4.3-test1
+
+启动适配改为依据 `magisk-mali-global/contracts/boot-firmware.json` 严格检查固件组件，
+不再固定个人整份 boot 哈希。`python tools/cold-boot/generate_contract.py --check`
+核对原生常量；准备工具、设备暂存和原生备份验证同步处理。各用户自己的原件／候选
+哈希继续保护回退。[允许差异、验证结果与限制](magisk-mali-global/boot/README.md)。
+
+`tools/build_mali_boot_policy.py --base <public-0.4.2.zip> --ndk <ndk> --work <fresh-dir>`
+从精确校验的已发布 ZIP 复用未改 GPU／内核配套，仅重建 keeper 和验证策略。
+需要既有 Decode 启动协调时添加 `--qms-barrier`，完整 Mali 构建器同样支持。
+这是未发布候选，需新建私有启动适配并单独完成首次绑定验收；不覆盖 v0.8.6 附件，
+不分发私人镜像，也不表示未知内核或其他 root 方案已兼容。
+
 # Release v0.8.6 / 正式版源码与构建
 
 Release components: Decode Stack 0.8.6, Mali Global 0.4.2, LSPosed 0.3.7. The accepted system refresh policy lives in `magisk-hdr/src/refresh_session.cpp`; `tools/build_refresh_session.py` builds its exact-firmware loader chain and `tools/build_decode_stack.py --refresh-session <component>` integrates it. `docs/validation/decode-refresh-session-086.json` records the tested binary SHA and bounded physical feedback.
