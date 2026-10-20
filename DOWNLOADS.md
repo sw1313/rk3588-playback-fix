@@ -19,6 +19,14 @@ System modules require the exact firmware contracts. Existing choices survive up
 
 [SHA256](https://github.com/sw1313/rk3588-playback-fix/releases/download/v0.8.7/SHA256SUMS.txt) · [Manifest](release-manifest.json) · [Source ZIP](https://github.com/sw1313/rk3588-playback-fix/releases/download/v0.8.7/rk3588-playback-fix-0.8.7-source.zip) · [本版启动验收](docs/validation/mali-boot-compat-043.json) · [播放验收](docs/validation/decode-refresh-session-086.json)
 
+## 兼容候选更新 / Compatibility candidate
+
+[Mali Global 0.4.4-compat2 发布说明](https://github.com/sw1313/rk3588-playback-fix/releases/tag/mali-v0.4.4-compat2) · [安装包](https://github.com/sw1313/rk3588-playback-fix/releases/download/mali-v0.4.4-compat2/rk3588-mali-global-0.4.4-compat2.zip) · [源码](https://github.com/sw1313/rk3588-playback-fix/releases/download/mali-v0.4.4-compat2/rk3588-mali-global-0.4.4-compat2-source.zip) · [SHA256](https://github.com/sw1313/rk3588-playback-fix/releases/download/mali-v0.4.4-compat2/rk3588-mali-global-0.4.4-compat2-SHA256SUMS.txt)
+
+本候选按实际接口和本机启动布局判断 root 兼容性，取消版本号及官方 root 二进制哈希白名单，保留固件／ABI 和备份保护。当前 Magisk 30.7 已实机安装重启验收；其他版本及变体仅完成离线回归。KernelSU／APatch 的专用首次绑定后端尚未实现。仅需更新 Mali，其他组件不变；正式推荐版仍为上方 v0.8.7。详见[验证范围](docs/validation/root-interface-compat-044.json)。
+
+This candidate qualifies root compatibility by interfaces and local boot layout, while retaining firmware/ABI and backup guards. The existing Magisk 30.7 target passed physical installation and reboot; other variants have offline coverage only. KernelSU/APatch first-binding adapters are not implemented. Stable v0.8.7 remains the recommended release.
+
 ## 历史回退工具 / Legacy rollback reference
 
 Frame Guard 0.1.1 仅保留供旧版本回退核对，[历史文件](https://github.com/sw1313/rk3588-playback-fix/releases/download/v0.8.6/rk3588-frameguard-0.1.1.zip) 不属于当前推荐安装组合。它固定 60Hz，会阻止 Auto／QMS 内容匹配。移除旧安装时先恢复其保存的系统刷新率值；只禁用模块不会自动清除限制。详见 [回退说明](README.zh-CN.md#关闭回退与故障处理)。
