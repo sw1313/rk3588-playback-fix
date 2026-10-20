@@ -1,10 +1,71 @@
-# Mali Global 0.4.4 正式版：按接口兼容 root
+# Mali Global 0.4.4 · GPU 驱动与游戏图形升级
 
-首次绑定不再枚举 root 版本或固定官方 root 文件哈希，改为检查实际启动接口、运行目录与本机载荷布局；普通功能继续无 root 品牌／版本白名单。保留原厂固件／内核 ABI、本机原 boot 和回退保护。新测试版不会仅因未登记版本号被拒绝，仍须实际启动确认。其他 root 缺少早期后端时只限制相关功能。[说明与来源](../docs/root-compatibility.zh-CN.md)。
+**对应项目正式版 [v0.8.8](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.8.8)。** 提供全局 ARM32／ARM64 Mali g18p0 用户态、匹配内核／CSF、图形服务前首次绑定、DVFS 响应和 CSF 同步稳定性，分项选择、重启生效及回退。系统解码、HDMI／HDR 和帧率保留归 Decode Stack。
 
-0.4.4 对应项目正式版 v0.8.8。当前 Magisk 30.7 已通过完整安装、重启、首次绑定及双 ABI 图形验证；其他版本与本地变体仅完成离线回归，不代表全部 root 实机通过。GPU／KMD／CSF 与 keeper 原生执行代码保持不变，更新保留现有选择。KernelSU／APatch 的专用首次绑定后端尚未实现。[本次发布与验证范围](../docs/release-0.8.8.zh-CN.md)。
+Global GPU upgrades for the matched RK3588 firmware: ARM32/ARM64 g18p0 userspace, paired kernel/CSF, pre-graphics first binding, DVFS response and fence stability. Version 0.4.4 belongs to formal project release v0.8.8. [English project guide](../README.md).
 
-以下为历史版本说明；v0.8.7 安装包保持原样。
+## 0.4.4 改了什么
+
+root 兼容按真实接口和本机启动布局判断，**不再按 Magisk 版本号或官方 root 二进制哈希名单放行**。稳定版、测试版、Canary 和本地构建使用同一检查，不必登记版本。固件／ABI、原厂 init、个人原 boot 备份及回退归属保护继续保留。
+
+当前 Magisk 30.7 已完成完整安装、重启、首次绑定及两个 ABI 的 GLES／Vulkan 验证，Zygisk Next／LSPosed 和原有选项保留。其他 root 版本及变体仅有离线回归；接口通过不等于全部版本均已实机启动。GPU／KMD／CSF、keeper 及运行脚本与已验收接口策略一致，本次不增加游戏性能声明。[验证范围](../docs/validation/release-0.8.8.json)。
+
+## 谁可以使用
+
+目标为 **H96 Max V58／RK3588、Android 12／API32、契约中指定的 5.10.66 固件**。同型号和内核版本只是起点，安装时仍检查真实系统文件与 ABI。
+
+| 环境／差异 | 当前处理 |
+| --- | --- |
+| 同设备、同固件，root 工具版本不同 | 不按版本名单拒绝；按实际接口、布局和依赖检查 |
+| Magisk 稳定版／测试版／本地构建 | 普通模块不设版本门槛；首次绑定使用现有 Magisk 适配并检查实际能力 |
+| KernelSU／APatch | 普通入口不因品牌拒绝，仍需实际挂载与固件 ABI；专用首次绑定后端尚未实现 |
+| 更换内核、DTB 或关键系统组件 | 需重新核对契约，未知 ABI 不能当成相同固件放行 |
+| 每人自己修补的 boot | 不要求等于作者整份 boot 的哈希；私有适配和备份属于当前设备 |
+
+固件哈希确认系统文件是否属于支持版本；个人镜像哈希保护备份和回退，两者均不同于已移除的 root 文件白名单。[详细兼容说明](../docs/root-compatibility.zh-CN.md)。
+
+## 开关分别做什么
+
+| 功能 | 作用与依赖 | 关闭并重启 |
+| --- | --- | --- |
+| 全局用户态 | 使用双 ABI g18p0 图形库；上级选择保留下级配置 | 恢复原厂用户态；依赖它的升级停止生效 |
+| 内核／CSF 组合 | 选择原版或精确配套的新版组合 | 选原版恢复原 KMD／CSF |
+| 图形服务前首次绑定 | 让配套驱动在图形服务首次启动前接管，需本机私有 boot 适配 | 恢复个人原 boot 并选回原内核组合，不转为运行中交接 |
+| GPU 响应／DVFS | 负载采样周期 100ms→20ms，保留 OPP、电压、频率边界及温控，依赖新版组合 | 恢复原响应策略 |
+| CSF 同步稳定性 | 修正 fence metadata 引用顺序，依赖配套内核和首次绑定 | 恢复原顺序 |
+
+DVFS 采样周期与曾被否决的 CSF 调度 tick 方案不同。本项目没有交付后者，也未将 g25 列为当前主线。《传奇四叶草》及 Eden 的持续帧时间、温度、功耗和原厂 g13 对照仍需分场景验收；启动成功不能证明所有游戏更快。
+
+## 安装、更新与状态
+
+1. 从[下载页](../DOWNLOADS.md)取得 `rk3588-mali-global-0.4.4.zip` 并核对 SHA256，在兼容模块管理器中覆盖安装。
+2. 安装器从固定上游地址下载并校验闭源 Mali／CSF；公共 ZIP 不包含这些闭源载荷。已有校验通过的缓存可复用。
+3. 在 WebUI 查看保存配置与实际状态。更新保留分项选择，不自动全开；依赖联动及灰显不会删除原选择。
+4. 重启后确认实际版本、启动结果和“待重启”状态。普通选择不热替换运行中的图形库。
+
+从 0.4.3 更新无需重复安装 Decode／客户端，也不因版本更名要求重刷已匹配的私有 boot。未准备首次绑定的设备不能只装公开 ZIP 就获得通用启动适配。
+
+WebUI 的“当前”表示本次启动结果，“重启后”表示保存选择；两者不一致时先看依赖及回退原因。只读状态命令：
+
+```sh
+sh /data/adb/modules/rk3588_mali_global/mode-control.sh status
+sh /data/adb/modules/rk3588_mali_global/webui.sh status
+```
+
+## 首次绑定与回退
+
+首次绑定的启用／恢复会写入并验证 boot，随后重启生效，不进行实时 GPU 解绑。具体准备、校验及启停步骤见[启动适配说明](boot/README.md)。
+
+原 boot 与备份仓位于模块目录之外；整包停用／卸载后，独立恢复机制按归属检查恢复原路径。若其他工具在启用后再次修改 boot，拒绝用旧整镜像覆盖，需先核对新的 boot。不能用删除备份仓或绕过哈希检查来强行回退。
+
+本模块不修改 root 数据库或外部 Zygisk／LSPosed 选择。相关注入是首次绑定启动验收的一部分；Frame Guard 保持用户关闭状态，不由回退流程自动开启。
+
+[启动适配](boot/README.md) · [完整中文说明](../README.zh-CN.md) · [源码构建](../SOURCE_CODE.zh-CN.md) · [DVFS 验证](../docs/mali-dvfs-031.zh-CN.md) · [CSF 修复来源](../docs/mali-csf-fence-042.zh-CN.md)
+
+<details>
+<summary>历史版本与研发记录（不代表当前 0.4.4 的准入规则）</summary>
+
+以下保留当时版本的原始说明。旧“实验／候选”、固定 root 版本及旧 keeper 要求仅适用于各自阶段；当前安装与兼容规则以上方正式版说明为准。
 
 # Mali Global 0.4.3 · GPU 驱动与游戏图形升级
 
@@ -172,3 +233,5 @@ sh /data/adb/modules/rk3588_mali_global/mode-control.sh dvfs off
 ## Mali Global 0.4.2-test9 pair policy — post-install evidence
 
 The unchanged tested installers now have bounded device evidence in [the current validation record](../docs/validation/decode-physical-hdr-081.json) and [scope/limits](../docs/decode-physical-hdr-081.zh-CN.md). Primary PQ/HLG explicit P01054 reaches real 4K AB30 AFBC scanout; actual queued ten-bit target, mixed SDR UI/virtual output and item/whole reboot rollback passed. RGB gray-reference differences remain up to 3/3/4 code values, so this is not bit-exact RGB or full colorimetric acceptance. Mali test9 changes only the exact pairing policy, with GPU/KMD/CSF binaries unchanged. Frame Guard remains the default workaround; the newly reproduced original Exo queue timeout/black screen is still under investigation. Historical sections above and embedded installer validation are build-time snapshots, not broader release acceptance.
+
+</details>

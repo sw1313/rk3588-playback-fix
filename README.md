@@ -8,8 +8,6 @@ The project has grown from a Yamby HW+ helper and fixed-60Hz workaround into coo
 
 **0.8.8 updates Mali Global to 0.4.4: root compatibility checks actual interfaces and local boot layout, without root-version or official binary-hash whitelists.** Firmware/ABI and per-user boot backup/rollback guards remain. Existing Magisk 30.7 passed physical installation and reboot; other variants have offline coverage only. KernelSU/APatch first-binding adapters are not implemented. [Compatibility scope](docs/root-compatibility.zh-CN.md). Decode and the client retain their prior packages.
 
-**0.8.7 updates Mali Global to 0.4.3: strict firmware-component boot checks accept supported local root packaging differences while preserving per-device backups and rollback guards. Target first binding, full-module rollback and re-enable passed.** [Compatibility boundaries](magisk-mali-global/boot/README.md). Decode and the client retain their prior packages.
-
 **The main 0.8.6 change keeps the matched video frame-rate request across pause, resume and same-video seeking in Auto**, avoiding unnecessary returns to the desktop refresh rate. The specified Exo scenario passed user feedback on the physical HDMI display. Native queue errors and MKV seeking back to the beginning have separate repairs and acceptance records.
 
 [Downloads and SHA256](DOWNLOADS.md) · [Release](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.8.8) · [详细中文说明](README.zh-CN.md) · [Release notes](docs/release-0.8.8.zh-CN.md)
@@ -23,20 +21,24 @@ System modules target the pinned **H96 Max V58 / RK3588, Android 12 / API32, Lin
 - QMS requires a QMS-capable receiver, Auto and matched kernel/startup components. VRR support alone does not establish QMS support. Matrices, receivers and adapters can change link capabilities.
 - First binding before graphics and low-level display features need private preparation matched to the device, firmware and existing root. **Public ZIPs contain no boot image and do not provide universal boot adaptation.** Boot changes are separate from ordinary userspace selections.
 
-Ordinary installers do not whitelist a root brand/version. The current pre-graphics boot backend still requires qualified Magisk startup behavior; KernelSU/APatch have no hardware acceptance yet. See [root compatibility boundaries (Chinese)](docs/root-compatibility.zh-CN.md).
+Ordinary installers do not whitelist a root brand/version, but still require working module mounts and a matching firmware ABI. The current pre-graphics boot adapter uses Magisk startup interfaces; dedicated KernelSU/APatch first-binding adapters are not implemented. This limits that feature separately rather than rejecting the entire module by root brand. See [root compatibility boundaries (Chinese)](docs/root-compatibility.zh-CN.md).
 
 ## Components
 
+The current complete formal release is **v0.8.8**, with the component versions below. Installers, source and checksums are available on the same release page.
+
 | Component | Included version | Purpose and installation |
 | --- | --- | --- |
-| [Decode Stack](magisk-decode/README.md) | **0.8.6** | Magisk system module: decoding, buffer transfer, ten-bit/HDR, display compatibility, matched-rate retention and optional QMS |
-| [Mali Global](magisk-mali-global/README.md) | **0.4.4** | Magisk GPU module: global ARM32/ARM64 g18p0 userspace, optional paired kernel/CSF, DVFS and synchronization stability |
+| [Decode Stack](magisk-decode/README.md) | **0.8.6** | Root system module: decoding, buffer transfer, ten-bit/HDR, display compatibility, matched-rate retention and optional QMS |
+| [Mali Global](magisk-mali-global/README.md) | **0.4.4** | Root GPU module: global ARM32/ARM64 g18p0 userspace, optional paired kernel/CSF, DVFS and synchronization stability |
 | Yamby/mpv LSPosed client | **0.3.7** | APK: HW+ settings, optional edge compensation, guarded Main10 HW copy-back and MKV seek-index repair |
 | [PanVK in-app driver](panvk/README.md) | **RC3 Test8.1, optional experimental** | Import in the supported application's driver manager; not a Magisk module or global Mali replacement |
 
 The project version identifies a complete release snapshot; components keep their own version numbers. The current installation set is Decode Stack, Mali Global and the client as needed, with PanVK independently optional. A source ZIP, manifest and SHA256 sums accompany the release. Frame Guard has been retired from the recommended set: its existing assets and sources remain for historical rollback reference, but the accepted current configuration no longer needs it installed or enabled. Standalone MPP/RGA/Codec2/libyuv directories are also historical sources and must not overlap the unified Decode Stack.
 
 ## Install or update
+
+Updating from v0.8.7 only requires installing **Mali Global 0.4.4** and rebooting. Decode Stack 0.8.6 and client 0.3.7 keep their existing packages. Feature choices are retained, and this version change does not require reflashing an already matched private boot. New devices still need their own first-binding preparation.
 
 1. Choose the required assets in [DOWNLOADS.md](DOWNLOADS.md) and check filenames/SHA256.
 2. Install Decode Stack and/or Mali Global ZIPs in the module manager. Decode validates dependencies before handling overlapping old modules. Do not re-enable those standalone decoder modules or combine global Mali with the retired app-scoped Mali experiment.

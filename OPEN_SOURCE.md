@@ -9,16 +9,21 @@ licenses and copyright notices take precedence for their respective files.
 | Installer / 安装包 | Open-source material / 开源内容 | External material / 外部组件 |
 | --- | --- | --- |
 | Decode Stack | Scripts, offline WebUI, compatibility adapters, source-built MPP/RGA/Codec2/libyuv/software backends and probes | Original firmware ABI/link inputs and system services are not bundled |
-| Native Mali Global | Installer/downloader, probes and AOSP interface libraries | Proprietary Mali driver is fetched separately from a pinned upstream URL |
+| Mali Global | Installer/downloader, WebUI, startup adapter, GPL kernel source/modules, probes and AOSP interface libraries | Proprietary Mali driver and CSF firmware are fetched separately from pinned upstream URLs |
 | Yamby/mpv LSPosed plugin | Plugin Java/resources and settings | Xposed API is compile-only; LSPosed, Yamby and mpv are not bundled |
-| Frame Guard | Installer, refresh policy, switches and rollback scripts | Uses existing Android commands; no Android or Magisk binaries bundled |
+| PanVK (optional) | In-app driver adapter, Mesa/kbase core, patches and build/provenance records; upstream terms retained | Application-specific driver import, not a global system module |
 
-All three Magisk ZIPs carry LICENSE, NOTICE, this file,
+The Decode Stack and Mali Global ZIPs carry LICENSE, NOTICE, this file,
 THIRD_PARTY_NOTICES.md, SOURCE_CODE.md, SOURCE_CODE.zh-CN.md and OPEN_SOURCE.json
-at ZIP root. The APK carries them under `assets/open-source/`. Applicable
+at ZIP root. The optional PanVK ZIP also carries its source, provenance and license notices.
+The APK carries the project notices under `assets/open-source/`. Applicable
 license texts accompany the material, with Decode Stack also retaining the
 original per-component `components/*/licenses/` directories.
-三份 ZIP 根目录、APK 的 `assets/open-source/` 均携带许可与源码构建说明。
+当前完整正式版为 v0.8.8：Decode 0.8.6、Mali 0.4.4、客户端 0.3.7，以及独立可选的 PanVK Test8.1。系统 ZIP 与 APK 均携带对应许可、构建说明和来源元数据；原字节沿用的组件保留各自原始标签，不将重新携带标成重新构建。
+
+Frame Guard is historical and is not bundled with current releases. Its published
+source and notices remain available for rollback reference; it is not part of the
+current recommended installation. / Frame Guard 仅保留历史源码及已发布附件供回退核对。
 
 Use the tag in OPEN_SOURCE.json for the exact project snapshot. The release
 also supplies a project source archive and SHA256SUMS.txt; the source archive

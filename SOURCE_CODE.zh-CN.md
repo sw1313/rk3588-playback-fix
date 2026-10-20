@@ -1,19 +1,25 @@
-# Release v0.8.8 · Mali Global 0.4.4 root compatibility
+# v0.8.8 正式版源码与构建 · Mali Global 0.4.4
 
 本次正式版按真实启动接口和本机布局判断 root 兼容性，不按 root 版本或官方二进制哈希白名单放行。固件／ABI、原 init 与个人原 boot／候选完整性和回退保护继续保留。普通模块入口不按 root 品牌拒绝；KernelSU／APatch 专用首次绑定后端尚未实现。当前 Magisk 30.7 完成实机安装重启，其他变体仅有离线回归。正式版与已验收接口策略的运行文件逐字节一致，仅版本、文档及发布来源元数据更新。
 
-Build from the hash-pinned public Mali 0.4.2 base ZIP using the same NDK 29.0.14206865 toolchain as the accepted keeper:
+精确复现公开安装包时，先检出发布标签，使用哈希固定的公开 Mali 0.4.2 基包及与已验收 keeper 相同的 NDK 29.0.14206865：
 
 ```text
+git checkout --detach v0.8.8
 python tools/cold-boot/generate_contract.py --check
 python tools/build_mali_boot_policy.py --base <public-0.4.2.zip> --ndk <ndk-29.0.14206865> --work <fresh-dir> --qms-barrier --source-ref v0.8.8
 ```
 
-The builder verifies the rebuilt keeper matches the hardware-tested binary. Root admission uses interfaces and preserved local boot layout; upstream APK hashes in regression fixtures are not read by runtime/preparation admission. GPU/KMD/CSF and runtime policy files match the accepted 0.4.4-compat2 test input. Test-stage version names remain in historical evidence only. Package comparison and bounded acceptance: [v0.8.8 validation](docs/validation/release-0.8.8.json), [root compatibility](docs/root-compatibility.zh-CN.md).
+构建器核对重新编译的 keeper 是否等于实机验收过的二进制。正式化时 36 个运行文件与已验收接口策略逐字节一致，只修改版本、文档、静态界面缓存标记、来源与校验清单。旧测试版本名仅保留在历史证据中。回归输入中的官方 APK 哈希不被运行时或准备工具作为准入条件读取。[正式包对照与验收](docs/validation/release-0.8.8.json) · [root 兼容边界](docs/root-compatibility.zh-CN.md)。
 
-Decode 0.8.6, client 0.3.7 and optional PanVK Test8.1 retain their original bytes and source tags. Frame Guard is omitted. Root APKs, firmware/link inputs, boot/profile images and private logs remain outside public archives. Per-device first-binding preparation and rollback guards still apply; this release does not certify other root implementations or add new gameplay/HDR/HDMI claims.
+Decode 0.8.6、客户端 0.3.7 和可选 PanVK Test8.1 保留原字节与原源码标签。Frame Guard 不随本版提供。root APK、固件／链接输入、私有 boot／profile、日志与密钥均不进入公开附件。每台设备仍须独立准备首次绑定并保留回退检查；本次不新增游戏、HDR 或 HDMI 短黑收益声明。
 
 以下为历史版本构建说明；重建旧版请检出相应标签。
+
+仓库 main 的说明会继续更新；精确复现已发布附件请使用其 `OPEN_SOURCE.json` 指向的标签。历史安装包与校验值不随文档更新改写。
+
+<details>
+<summary>历史构建与研发记录（请检出对应标签再使用）</summary>
 
 # Release v0.8.7 · Mali Global 0.4.3 boot validation
 
@@ -229,3 +235,5 @@ Decode Stack 0.8.4 私有候选新增 `magisk-codec2-sdk-next/patches/native-bac
 正在开发的Decode Stack QMS内核核心位于 `decode-kernel/qms/`，按GPL-2.0-only提供，选择性引入Rockchip d0e8f558时序数据和5a89a1cb的VTEM／多帧流程，范围及两项本地数据修正见该目录UPSTREAM.json。新增请求会话／UAPI、MIT HWC前端和启动屏障协调候选；普通构建关闭候选编译门禁。真实硬件绑定、内核端点、显示loader及可安装QMS升级尚未交付；私有Image／ELF／契约及日志不公开。该GPL源码不适用原创适配器的默认MIT授权。
 
 UAPI头文件使用GPL-2.0-only WITH Linux-syscall-note，MIT前端只引用该系统调用头，不引入GPL实现。增量检查入口为`tools/qms/test_session.py`、`tools/build_hdr.py --qms-candidate --qms-frontend-test`及`tools/tests/test_qms_cold_stage.py`；私有输入见各工具help。这些检查不操作真实显示或验收boot；Decode打包器拒绝只有前端而没有真实后端的候选组件。
+
+</details>

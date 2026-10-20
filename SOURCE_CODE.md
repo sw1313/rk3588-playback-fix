@@ -1,19 +1,23 @@
 # Release v0.8.8 · Mali Global 0.4.4 root compatibility
 
-本次正式版按真实启动接口和本机布局判断 root 兼容性，不按 root 版本或官方二进制哈希白名单放行。固件／ABI、原 init 与个人原 boot／候选完整性和回退保护继续保留。普通模块入口不按 root 品牌拒绝；KernelSU／APatch 专用首次绑定后端尚未实现。当前 Magisk 30.7 完成实机安装重启，其他变体仅有离线回归。正式版与已验收接口策略的运行文件逐字节一致，仅版本、文档及发布来源元数据更新。
+Root admission checks actual startup interfaces and local boot layout, without root-version or official binary-hash whitelists. Firmware/ABI, original-init and per-device backup/rollback guards remain. Ordinary installers do not reject a root brand; dedicated KernelSU/APatch first-binding adapters are not implemented. The existing Magisk 30.7 target passed physical installation and reboot; other variants have offline coverage only.
 
-Build from the hash-pinned public Mali 0.4.2 base ZIP using the same NDK 29.0.14206865 toolchain as the accepted keeper:
+To reproduce the published package, select its source tag and use the hash-pinned public Mali 0.4.2 base ZIP with NDK 29.0.14206865:
 
 ```text
+git checkout --detach v0.8.8
 python tools/cold-boot/generate_contract.py --check
 python tools/build_mali_boot_policy.py --base <public-0.4.2.zip> --ndk <ndk-29.0.14206865> --work <fresh-dir> --qms-barrier --source-ref v0.8.8
 ```
 
-The builder verifies the rebuilt keeper matches the hardware-tested binary. Root admission uses interfaces and preserved local boot layout; upstream APK hashes in regression fixtures are not read by runtime/preparation admission. GPU/KMD/CSF and runtime policy files match the accepted 0.4.4-compat2 test input. Test-stage version names remain in historical evidence only. Package comparison and bounded acceptance: [v0.8.8 validation](docs/validation/release-0.8.8.json), [root compatibility](docs/root-compatibility.zh-CN.md).
+The builder verifies that the rebuilt keeper matches the hardware-tested binary. All 36 runtime files match the accepted interface policy; only version, documentation, static UI cache marker, provenance and checksums changed during formalization. Test-stage names remain in historical evidence only. See [release validation](docs/validation/release-0.8.8.json) and [root compatibility](docs/root-compatibility.zh-CN.md). Official APK hashes are reproducible regression inputs, not runtime/preparation admission criteria.
 
-Decode 0.8.6, client 0.3.7 and optional PanVK Test8.1 retain their original bytes and source tags. Frame Guard is omitted. Root APKs, firmware/link inputs, boot/profile images and private logs remain outside public archives. Per-device first-binding preparation and rollback guards still apply; this release does not certify other root implementations or add new gameplay/HDR/HDMI claims.
+Decode 0.8.6, client 0.3.7 and optional PanVK Test8.1 retain their original bytes and source tags. Frame Guard is omitted. Private firmware/link inputs, root APKs, boot/profile images, logs and keys are excluded. Per-device first-binding preparation and rollback guards still apply. This update does not add gameplay/HDR/physical-blackout acceptance.
 
-以下为历史版本构建说明；重建旧版请检出相应标签。
+Documentation on main can receive follow-up corrections. Reproduce published assets from the tag in their `OPEN_SOURCE.json`; documentation updates do not rewrite existing installers or checksums. Historical commands below require their corresponding tags.
+
+<details>
+<summary>Historical builds and development notes — use their corresponding tags</summary>
 
 # Release v0.8.7 · Mali Global 0.4.3 boot validation
 
@@ -347,3 +351,5 @@ Reproduce the new isolated checks with `tools/qms/test_session.py`,
 `tools/tests/test_qms_cold_stage.py`; read each tool's help for private build
 inputs. These checks do not perform real QMS or qualify a boot image. The Decode
 builder refuses the frontend-only component until a functional backend exists.
+
+</details>

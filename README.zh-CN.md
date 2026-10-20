@@ -8,8 +8,6 @@
 
 **0.8.8 正式版更新 Mali Global 0.4.4：root 兼容改按实际接口与本机启动布局判断，不再依赖版本号或官方 root 二进制哈希白名单。** 保留固件／ABI、个人 boot 备份与回退保护。当前 Magisk 30.7 已实机安装重启；其他版本仅离线回归，KernelSU／APatch 专用首次绑定后端尚未实现。[兼容范围](docs/root-compatibility.zh-CN.md)。Decode 与客户端保持原包。
 
-**0.8.7 正式版更新 Mali Global 0.4.3：启动适配按固件组件严格验证，允许受支持的本机 root 打包差异，保留个人原 boot 和回退保护。实机首次绑定、整包回退与重新启用已通过。** [验证边界](magisk-mali-global/boot/README.md)。Decode 与客户端保持原包。
-
 **0.8.6 正式版的主要变化：Auto 下保留已匹配的视频帧率，减少 Exo 播放器暂停、恢复、同片快进时不必要的显示模式切换。** 指定 Exo 场景已由用户在 HDMI 实际显示器上确认通过。原生队列报错与 MKV 快进回片头另有独立修复，三项不混算。
 
 [下载与 SHA256](DOWNLOADS.md) · [正式发布页](https://github.com/sw1313/rk3588-playback-fix/releases/tag/v0.8.8) · [English](README.md) · [版本说明](docs/release-0.8.8.zh-CN.md)
@@ -27,16 +25,20 @@
 
 ## 该安装哪个组件
 
+当前完整正式版是 **v0.8.8**，组件版本分别如下；安装包、源码和校验文件均在同一发布页。
+
 | 组件 | 正式版内版本 | 用途与安装位置 |
 | --- | --- | --- |
-| [Decode Stack](magisk-decode/README.md) | **0.8.6** | Magisk 系统模块：解码、缓冲传递、十位／HDR、显示兼容、帧率保留及可选 QMS |
-| [Mali Global](magisk-mali-global/README.md) | **0.4.4** | Magisk 全局 GPU 模块：32／64 位 g18p0 用户态，可选配套内核／CSF、DVFS 与同步稳定性 |
+| [Decode Stack](magisk-decode/README.md) | **0.8.6** | root 系统模块：解码、缓冲传递、十位／HDR、显示兼容、帧率保留及可选 QMS |
+| [Mali Global](magisk-mali-global/README.md) | **0.4.4** | root 全局 GPU 模块：32／64 位 g18p0 用户态，可选配套内核／CSF、DVFS 与同步稳定性 |
 | Yamby／mpv LSPosed 客户端 | **0.3.7** | APK：HW+ 设置补全、可选灰边修正、匹配客户端的 Main10 HW 回读及 MKV 快进索引修复 |
 | [PanVK 应用内驱动](panvk/README.md) | **RC3 Test8.1，实验可选** | 在已适配应用的驱动管理器导入 ZIP；不在 Magisk 安装，不替换全局 Mali |
 
 项目版本表示整套发布快照，组件保留各自版本号。当前安装组合为 Decode Stack、Mali Global 和按需使用的 LSPosed 客户端；PanVK 独立可选。Release 另有源码 ZIP、发布清单和 SHA256。Frame Guard 已退出当前推荐组合，仅保留已发布文件和源码供历史回退核对，正常使用当前已验收配置不再需要安装或启用。源码目录中的旧独立 MPP／RGA／Codec2／libyuv 模块同样用于历史参考，不与当前 Decode Stack 叠加使用。
 
 ## 安装与更新
+
+已使用 v0.8.7 的用户，本次只需覆盖更新 Mali Global 到 **0.4.4** 并重启；Decode Stack 0.8.6 和客户端 0.3.7 无需重复安装。保留现有分项选择，不要求因为版本更名重新刷 boot。新设备的首次绑定仍按本机原镜像单独准备。
 
 1. 从 [DOWNLOADS.md](DOWNLOADS.md) 选择需要的组件，核对文件名和 SHA256。
 2. 在模块管理器安装 Decode Stack／Mali Global ZIP。Decode 安装器检查依赖后处理重叠旧模块；不要再手动开启旧独立解码模块。全局 Mali 也不与旧按应用 Mali 实验叠加。

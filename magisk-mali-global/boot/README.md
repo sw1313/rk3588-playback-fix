@@ -1,10 +1,66 @@
-# Mali Global 0.4.4 / v0.8.8: root interface compatibility release
+# 图形服务前首次绑定 · Mali Global 0.4.4 / v0.8.8
 
-No root version or official payload hash whitelist is used. The host preserves this device's original root records and checks firmware identity, original init, root payload ELF/overlay/command prerequisites and conflicting early hooks. Runtime probes only command usage and the live root temporary directory, never dispatching a boot stage as a test. Config additions and supported compressed/raw, unified/split root layouts are retained.
+首次绑定让匹配的 GPU 驱动在 allocator／HWC／SurfaceFlinger 首次启动前完成绑定，避免运行中切换驱动造成交接干扰。它独立于普通用户态升级，需要根据当前设备的原 boot、root 和服务定义准备私有启动适配。公开安装包不包含 boot 或 root 二进制。
 
-These are prerequisites, not proof that arbitrary future boot callbacks behave identically. First-boot qualification and original per-user rollback guards remain. Ordinary features do not depend on this root gate. Other root frameworks still need a qualified early backend for first binding; the existing Magisk adapter is not falsely reported as KernelSU/APatch support. See `docs/root-compatibility.zh-CN.md`.
+Pre-graphics first binding uses a per-device private boot adaptation. Version 0.4.4 checks actual root interfaces and local layout, without a root-version or official binary-hash whitelist. Firmware/ABI and personal rollback identity remain checked. See the [English project guide](../../README.md) and [build guide](../../SOURCE_CODE.md).
 
-The 0.4.3 single-version restriction below describes the historical published package, not the current release. The existing Magisk 30.7 target passed full installation and reboot with the interface policy; other variants have offline coverage only. The formal package retains identical runtime files and keeper bytes from that tested policy; see `docs/validation/release-0.8.8.json`.
+## 当前验证边界
+
+| 检查对象 | 作用 |
+| --- | --- |
+| 原厂内核、DTB、启动头、关键参数、fstab／属性与原 init | 确认支持的固件及启动契约 |
+| 图形服务定义与库／内核 ABI | 确认升级组件和服务配套；Zygote 原定义保留 |
+| 本机 root 命令及 ELF／overlay 布局 | 确认当前适配所需接口；不按 root 版本／官方文件哈希放行 |
+| 个人原镜像、生成镜像及备份哈希 | 确保适配属于当前设备，防止错误备份或覆盖外部修改 |
+
+当前早期适配使用 Magisk overlay 和启动回调。只读能力探测查询帮助与运行目录，不把触发启动回调当作测试。标准统一／分离、压缩／未压缩载荷及允许的额外配置字段按实际布局检查；原 CPIO 记录逐字节保留。KernelSU／APatch 专用早期后端尚未实现，不影响其普通模块入口的独立检查。
+
+当前 Magisk 30.7 已实机安装重启通过；其他稳定版、测试版及本地构建仅完成离线回归。历史 0.4.3 的固定 Magisk 30700 要求不适用于 0.4.4。[完整 root 边界](../../docs/root-compatibility.zh-CN.md) · [正式版验证](../../docs/validation/release-0.8.8.json)。
+
+## 哪些情况下需要重新准备
+
+- 新设备首次使用时，必须使用自己的原 boot 和服务定义，不能复制别人的备份。
+- root 工具重补 boot、内核／DTB／启动服务改变，或升级包的 keeper／KMD 配对改变时，需重新核对配套；已有备份仓不会自动替换。
+- 本次 0.4.4 的 keeper 与已验收版本相同，不因版本更名要求重刷已匹配载体。已有状态仍须通过运行检查。
+
+整份 boot 哈希不再作为跨设备兼容门槛；每个人自己的原镜像与生成镜像哈希仍用于归属和完整性确认。gzip 时间／压缩级别和支持范围内的 root 打包差异不应单独造成另一固件判定。
+
+## 私有准备与暂存
+
+1. 检出要使用的发布标签，解开匹配安装包，保留本机完整原 boot、SF／HWC／allocator／Zygote 服务定义；这些输入不进入公开源码或附件。
+2. 使用准备工具。参数名和范围可只读查看：
+
+   ```text
+   python tools/cold-boot/prepare.py --help
+   ```
+
+   实际准备需提供 `--original`、`--loader`、`--module`、`--sf`、`--hwc`、`--allocator`、`--zygote`、`--out`。`--loader` 使用所选包的 `bin/cold_boot64`。输出仅为本机待验收载体，不代表已验证启动成功。
+3. 独立核对输出后，放到设备固定暂存目录 `/data/local/tmp/rk3588-mali-cold-prepared`；以 root 执行暂存，两个参数分别取私有输出中已核对的生成镜像和 profile 摘要：
+
+   ```sh
+   sh /data/adb/modules/rk3588_mali_global/boot-stage.sh EXPECTED_CANDIDATE_SHA256 EXPECTED_PROFILE_SHA256
+   ```
+
+暂存只检查并保存到 root 拥有的备份仓 `/data/adb/rk3588-mali-global/boot`，不写 boot、不启用功能。原镜像须属于当前 boot 分区；已存在的仓不会被覆盖，失败只清理本次创建的暂存。
+
+## 启用、启动确认与恢复
+
+准备完成后，在 WebUI 开启首次绑定。**这一步会写入并验证 boot**；重启后首次绑定生效，不修改当前运行中的 GPU。关闭首次绑定会恢复已验证的个人原 boot，并选择原内核／CSF，重启后生效。上级关闭、选择原内核、整包停用／卸载也遵循相应恢复流程，独立 keeper 检测停用后恢复可能增加一次重启。
+
+启动确认包含匹配的用户态／KMD／CSF、GPU 首次绑定、双 ABI GL／Vulkan 和所需图形／音频／框架状态。预先记录已开启的外部 Zygisk Next／LSPosed 需求，检查两个 ABI 的实际注入与 lspd；不能因它们意外掉线就视作无需求。原 Zygote 服务保留，不修改 root 数据库或外部模块选择。Frame Guard 不自动恢复开启。
+
+未确认试启动或关键检查失败时按现有框架恢复原 boot；外部工具改写过的 boot 不被旧整镜像自动覆盖。本流程不实现从任意外部修改的镜像中自动剥离本项目改动，也不自动迁移旧备份仓。内核硬挂、写入中断、数据分区或备份损坏仍可能需要物理 Loader 恢复，不能保证网络 ADB 始终可用。
+
+## 构建与来源
+
+当前构建入口与所需 NDK、固定基包、`--qms-barrier --source-ref v0.8.8` 配套见[源码说明](../../SOURCE_CODE.zh-CN.md)。重建历史版本请检出相应标签，不在当前代码上套旧命令。
+
+设计参考：[AnyKernel3](https://github.com/osm0sis/AnyKernel3)、[Magisk overlay／启动脚本](https://topjohnwu.github.io/Magisk/guides.html)、[Android 内核模块 ABI](https://source.android.com/docs/core/architecture/kernel/loadable-kernel-modules)。参考启动选择与本机内容保留机制，不代表直接套用其他项目驱动或新增上游 GPU 修复。
+
+<details>
+<summary>历史启动集成与版本限制（仅对应当时实现）</summary>
+
+下文原样保留历史记录。旧版固定 Magisk 版本、新 keeper 要求和“实验候选”不作为当前 0.4.4 的安装说明。
 
 # Firmware-qualified cold binding
 
@@ -162,3 +218,5 @@ This is a local sequencing fix, not an upstream GPU driver update.
 
 The preflight records enabled external injection requirements in this module's own state, tied to the boot UUID. An injector that subsequently auto-disables
 cannot bypass qualification. No external module flag or Magisk DB setting is written.
+
+</details>
